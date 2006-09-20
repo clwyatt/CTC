@@ -1,0 +1,4 @@
+
+ADD_EXECUTABLE(test_ctcRVFImageIO test_ctcRVFImageIO.cxx ) 
+
+TARGET_LINK_LIBRARIES(test_ctcRVFImageIO CTCIO ITKCommon ITKIO)

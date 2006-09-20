@@ -1,0 +1,11 @@
+/* 
+ * here is where system comupted values get stored these values should only
+ * change when the target compile platform changes 
+ */
+
+#define CTC_VERSION_MAJOR @CTC_VERSION_MAJOR@
+#define CTC_VERSION_MINOR @CTC_VERSION_MINOR@
+#define CTC_VERSION_PATCH @CTC_VERSION_PATCH@
+#define CTC_VERSION_STRING "@CTC_VERSION_STRING@"
+
+#define CTC_REVISION_STRING "@CTC_REVISION_STRING@"

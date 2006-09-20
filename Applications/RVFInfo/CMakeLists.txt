@@ -1,0 +1,3 @@
+ADD_EXECUTABLE(rvfinfo RVFInfo.cxx ) 
+
+TARGET_LINK_LIBRARIES(rvfinfo CTCIO ITKCommon ITKIO)

@@ -1,0 +1,2 @@
+SUBDIRS(Dicom2RVF RVFInfo)
+
