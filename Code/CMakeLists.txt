@@ -1,2 +1,2 @@
-SUBDIRS(IO)
+SUBDIRS(IO Algorithms)
 

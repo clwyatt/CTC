@@ -1,0 +1,5 @@
+
+ADD_EXECUTABLE(test_ctcSegmentColonFilter test_ctcSegmentColonFilter.cxx ) 
+
+#TARGET_LINK_LIBRARIES(test_ctcSegmentColonFilter CTCSegmentation ITKBasicFilters ITKCommon ITKIO)
+TARGET_LINK_LIBRARIES(test_ctcSegmentColonFilter ITKBasicFilters ITKCommon ITKIO)
