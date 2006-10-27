@@ -11,20 +11,33 @@ Language:  C++
 #include "itkImageToImageFilter.h"
 
 #include "itkChangeLabelImageFilter.h"
+#include "itkBinaryThresholdImageFilter.h"
+#include "itkConnectedThresholdImageFilter.h"
+#include "itkDanielssonDistanceMapImageFilter.h"
+#include "itkResampleImageFilter.h"
+#include "itkIdentityTransform.h"
+#include "itkNearestNeighborInterpolateImageFunction.h"
+
 
 namespace ctc
 {
 
-template <class TImageType>
+  template <class TInputImageType, class TOutputImageType>
 class ITK_EXPORT SegmentColonFilter :
-    public itk::ImageToImageFilter<TImageType, TImageType>
+    public itk::ImageToImageFilter<TInputImageType, TOutputImageType>
 {
 public:
 
   typedef SegmentColonFilter                   Self;
-  typedef itk::ImageToImageFilter<TImageType,TImageType> Superclass;
+  typedef itk::ImageToImageFilter<TInputImageType,TOutputImageType> Superclass;
   typedef itk::SmartPointer<Self>                        Pointer;
   typedef itk::SmartPointer<const Self>                  ConstPointer;
+
+  typedef unsigned char BinaryPixelType;
+  typedef itk::Image<BinaryPixelType, 3> BinaryImageType; 
+  
+  typedef unsigned short DistancePixelType;
+  typedef itk::Image<DistancePixelType, 3> DistanceImageType;
 
   // standard ITK macros
   itkNewMacro(Self);
@@ -32,11 +45,16 @@ public:
 
   void PrintSelf( std::ostream& os, itk::Indent indent ) const;
 
-  typedef typename TImageType::PixelType PixelType;
+  typedef typename TInputImageType::PixelType InputPixelType;
 
   // ITK shortcuts to get/set m_Threshold
-  itkGetMacro( Threshold, PixelType);
-  itkSetMacro( Threshold, PixelType);
+  itkGetMacro(Threshold, InputPixelType);
+  itkSetMacro(Threshold, InputPixelType);
+
+  itkGetMacro(MaxIterations, unsigned int);
+  itkSetMacro(MaxIterations, unsigned int);
+  itkGetMacro(MinDistanceThreshold, DistancePixelType);
+  itkSetMacro(MinDistanceThreshold, DistancePixelType);
 
 protected:
 
@@ -44,19 +62,44 @@ protected:
 
 protected:
 
-  typedef itk::ChangeLabelImageFilter< TImageType, TImageType > ChangeLabelFilterType;
+  typedef itk::ChangeLabelImageFilter< TInputImageType, TInputImageType > 
+    ChangeLabelFilterType;
+  
+  typedef itk::BinaryThresholdImageFilter<TInputImageType, BinaryImageType> 
+    ThresholdFilterType;
+  
+  typedef itk::ConnectedThresholdImageFilter<BinaryImageType, BinaryImageType> 
+    RegionGrowFilterType;
+
+  typedef itk::DanielssonDistanceMapImageFilter<BinaryImageType, DistanceImageType>
+    DistanceFilterType;
+
+  typedef itk::ResampleImageFilter<BinaryImageType, BinaryImageType, double>
+    DownsampleFilterType;
 
   void GenerateData();
 
 private:
+
+  signed short m_constShortROSMarker;
+  double downsampleFactor;
 
   SegmentColonFilter(Self&);   // intentionally not implemented
   void operator=(const Self&);          // intentionally not implemented
 
 
   typename ChangeLabelFilterType::Pointer     m_ChangeLabelFilter;
+  typename ThresholdFilterType::Pointer       m_ThresholdFilter;
+  typename RegionGrowFilterType::Pointer      m_BGRegionGrowFilter;
+  typename DistanceFilterType::Pointer        m_DistanceFilter;
+  typename DownsampleFilterType::Pointer      m_DownsampleFilter;
 
-  PixelType m_Threshold;
+  InputPixelType m_Threshold;
+  InputPixelType m_MinPixelValue;
+  InputPixelType m_MaxPixelValue;
+  unsigned int m_MaxIterations;
+  DistancePixelType m_MinDistanceThreshold;
+
 };
 
 } // end namespace ctc

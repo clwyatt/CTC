@@ -36,6 +36,7 @@ SET(CTC_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 INCLUDE_DIRECTORIES(
 ${ITK_INCLUDE_DIRS}
 ${CTC_BINARY_DIR}
+${CTC_SOURCE_DIR}/Utilities/vul
 ${CTC_SOURCE_DIR}/Code/IO
 ${CTC_SOURCE_DIR}/Code/Algorithms/Segmentation
 )
@@ -48,7 +49,7 @@ CONFIGURE_FILE(${CTC_SOURCE_DIR}/ctcConfigure.h.in
                ${CTC_BINARY_DIR}/ctcConfigure.h)
 	       
 # Dispatch the build into the proper subdirectories.
-SUBDIRS(Code Testing Applications)
+SUBDIRS(Utilities Code Testing Applications)
 
 
 
