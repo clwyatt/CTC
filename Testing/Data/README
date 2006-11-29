@@ -1,0 +1,6 @@
+Testing Directories and Files
+
+DICOM_short_prone/ - prone data from Walter Reed Dataset short integer (remapped CT) voxels
+DICOM_short_supine/ - supine data from Walter Reed Dataset short integer (remapped CT) voxels
+DICOM_ushort_prone/ - prone data from WFU Dataset unsigned short integer (raw CT) voxels
+DICOM_ushort_supine/ - supine data from WFU Dataset unsigned short integer (raw CT) voxels
