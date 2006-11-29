@@ -10,9 +10,9 @@ Converts DICOM images to RVF file format
 #include <fstream>
 
 // ITK includes
-#include "itkDICOMImageIO2.h"
+#include "itkGDCMImageIO.h"
 #include "itkImageSeriesReader.h"
-#include "itkDICOMSeriesFileNames.h"
+#include "itkGDCMSeriesFileNames.h"
 #include "itkImageFileWriter.h"
 
 // CTC includes
@@ -38,12 +38,12 @@ int main( int argc, char* argv[] )
   typedef itk::ImageFileWriter< OutputImageType > WriterType; 
   typedef ctc::RVFImageIO ImageIOType;
 
-  itk::DICOMImageIO2::Pointer dicomIO = itk::DICOMImageIO2::New();
+  itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
 
   // Get the DICOM filenames from the directory
-  itk::DICOMSeriesFileNames::Pointer nameGenerator = itk::DICOMSeriesFileNames::New();
+  itk::GDCMSeriesFileNames::Pointer nameGenerator = 
+    itk::GDCMSeriesFileNames::New();
   nameGenerator->SetDirectory( argv[1] );
-  
 
   typedef std::vector<std::string> seriesIdContainer;
   const seriesIdContainer & seriesUID = nameGenerator->GetSeriesUIDs();
@@ -71,7 +71,7 @@ int main( int argc, char* argv[] )
   if( argc < 4 ) // If no optional third argument
     {
     std::cout << seriesUID.begin()->c_str() << std::endl;
-    fileNames = nameGenerator->GetFileNames();
+    fileNames = nameGenerator->GetFileNames(seriesUID.begin()->c_str());
     }
   else
     {
