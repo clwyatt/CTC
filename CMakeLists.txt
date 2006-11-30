@@ -51,6 +51,9 @@ INCLUDE(${CTC_SOURCE_DIR}/CMake/GetSubversionRevision.cmake)
 CONFIGURE_FILE(${CTC_SOURCE_DIR}/ctcConfigure.h.in 
                ${CTC_BINARY_DIR}/ctcConfigure.h)
 	       
+# enable testing
+ENABLE_TESTING()
+
 # Dispatch the build into the proper subdirectories.
 SUBDIRS(Utilities Code Testing Applications)
 
