@@ -6,6 +6,7 @@ Language:  C++
 
 #include <fstream>
 
+#include "ctcConfigure.h"
 #include "ctcByteSwap.h"
 #include "ctcRVFImageIO.h"
 #include "ctcRVFHeader.h"
@@ -61,8 +62,7 @@ namespace ctc
     // determine endianness of the current machine
     // RVF files should always be big endian
     bool swabreq;
-    int etest = 1;
-    if((((char *)(&etest))[0]) == 1) //little endian
+    if(!CTC_BIG_ENDIAN) //little endian
       swabreq = true;
     else // big endian
       swabreq = false;
@@ -128,8 +128,7 @@ namespace ctc
     
     //swap if needed
     bool swabreq;
-    int etest = 1;
-    if((((char *)(&etest))[0]) != 1)
+    if(!CTC_BIG_ENDIAN)
       swabreq = true;
     else
       swabreq = false;
@@ -225,8 +224,7 @@ namespace ctc
     }
   
   //swap if needed
-  int etest = 1;
-  if((((char *)(&etest))[0]) != 1)
+  if(!CTC_BIG_ENDIAN)
     {
       swab(header.magic);
       swab(header.version);
@@ -352,8 +350,7 @@ void RVFImageIO::Write(const void* buffer)
   // determine endianness of the current machine
   // RVF files should always be written in big endian
   bool swabreq;
-  int etest = 1;
-  if((((char *)(&etest))[0]) == 1) //little endian
+  if(!CTC_BIG_ENDIAN) //little endian
     swabreq = true;
   else // big endian
     swabreq = false;
