@@ -52,6 +52,7 @@ CONFIGURE_FILE(${CTC_SOURCE_DIR}/ctcConfigure.h.in
                ${CTC_BINARY_DIR}/ctcConfigure.h)
 	       
 # enable testing
+INCLUDE(Dart)
 ENABLE_TESTING()
 
 # Dispatch the build into the proper subdirectories.
