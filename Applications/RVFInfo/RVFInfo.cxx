@@ -107,6 +107,8 @@ int main(int nargs, char ** args)
   
   ImageType::Pointer image = reader->GetOutput();
 
+  clog << "CTC_BIG_ENDIAN = " << CTC_BIG_ENDIAN << endl;
+
   const ImageType::SizeType size =  image->GetBufferedRegion().GetSize();
   clog << "Size = "; clog << size[0] << ", " << size[1] << ", " << size[2] << endl;
 
