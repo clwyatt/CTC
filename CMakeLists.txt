@@ -43,6 +43,8 @@ ${CTC_SOURCE_DIR}/Code/Filters
 )
 
 # include extra checks
+INCLUDE(TestBigEndian)
+TEST_BIG_ENDIAN(CTC_BIG_ENDIAN)
 INCLUDE(${CTC_SOURCE_DIR}/CMake/GetSubversionRevision.cmake)
 
 # Configure files with settings for use by the build.
