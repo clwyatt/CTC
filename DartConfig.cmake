@@ -5,9 +5,11 @@ SET (NIGHTLY_START_TIME "21:00:00 EDT")
 SET (DROP_METHOD "ftp")
 SET (DROP_SITE "bsl-1.ece.vt.edu")
 SET (DROP_LOCATION "/incoming")
+SET (DROP_SITE_USER "anonymous")
+SET (DROP_SITE_PASSWORD "public")
 
 SET (TRIGGER_SITE 
-  "http://${DROP_SITE}/cgi-bin/Submit-CTC-TestingResults.cgi")
+  "https://${DROP_SITE}/cgi-bin/Submit-CTC-TestingResults.cgi")
 
 # Project Home Page
 SET (PROJECT_URL "http://www.bsl.ece.vt.edu")
