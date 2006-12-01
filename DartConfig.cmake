@@ -9,7 +9,7 @@ SET (DROP_SITE_USER "anonymous")
 SET (DROP_SITE_PASSWORD "public")
 
 SET (TRIGGER_SITE 
-  "https://${DROP_SITE}/cgi-bin/Submit-CTC-TestingResults.cgi")
+  "http://${DROP_SITE}/cgi-bin/Submit-CTC-TestingResults.cgi")
 
 # Project Home Page
 SET (PROJECT_URL "http://www.bsl.ece.vt.edu")
