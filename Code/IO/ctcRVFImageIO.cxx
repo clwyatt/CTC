@@ -119,13 +119,7 @@ namespace ctc
     }
     
     infile.read((char *) &header, sizeof(header));
-  
-    if(header.magic != RVF_MAGIC_NUMBER){  
-      itkExceptionMacro("Error File not of type isq: " 
-			<< this->GetFileName());
-      return;
-    }
-    
+      
     //swap if needed
     bool swabreq;
     if(!CTC_BIG_ENDIAN)
@@ -158,6 +152,13 @@ namespace ctc
 	swab(header.dicomHeaderFollows);
 	swab(header.dicomHeaderSize);
       }
+
+    if(header.magic != RVF_MAGIC_NUMBER){  
+      itkExceptionMacro("Error File not of type rvf: " 
+			<< this->GetFileName());
+      return;
+    }
+
 
     unsigned long size[3];
     size[0]  = header.xDim;
@@ -216,6 +217,10 @@ namespace ctc
     infile.read((char *) &header, sizeof(header));
     
     infile.close();
+
+    //swap if needed
+    if(!CTC_BIG_ENDIAN)
+      swab(header.magic);
     
     if(header.magic != RVF_MAGIC_NUMBER){  
       itkExceptionMacro("Error File not of type rvf: " 

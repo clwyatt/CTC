@@ -14,6 +14,8 @@ Language:  C++
 #include "itkImageFileWriter.h"
 #include "ctcRVFImageIO.h"
 
+#define ASSERT_EPS 0.1
+
 using namespace std;
 
 int main(int argc, char ** argv)
@@ -55,14 +57,33 @@ int main(int argc, char ** argv)
   ImageType::Pointer image = reader->GetOutput();
 
   const ImageType::SizeType size =  image->GetBufferedRegion().GetSize();
-  clog << "Size = "; clog << size[0] << ", " << size[1] << ", " << size[2] << endl;
+  clog << "Size = "; clog << size[0] 
+       << ", " << size[1] 
+       << ", " << size[2] 
+       << endl;
+  assert(size[0] == 512);
+  assert(size[1] == 512);
+  assert(size[2] == 481);
 
   const ImageType::SpacingType& sp = image->GetSpacing(); 
-  clog << "Spacing = "; clog << sp[0] << ", " << sp[1] << ", " << sp[2] << endl;
-  
-  const ImageType::PointType& orgn = image->GetOrigin(); 
-  clog << "Origin = "; clog << orgn[0] << ", " << orgn[1] << ", " << orgn[2] << endl;
+  clog << "Spacing = "; 
+  clog << sp[0] << ", " 
+       << sp[1] << ", " 
+       << sp[2] 
+       << endl;
+  assert(fabs(sp[0]-0.664062) < ASSERT_EPS);
+  assert(fabs(sp[1]-0.664062) < ASSERT_EPS);
+  assert(fabs(sp[2]-1) < ASSERT_EPS);
 
+  const ImageType::PointType& orgn = image->GetOrigin(); 
+  clog << "Origin = "; 
+  clog << orgn[0] << ", " 
+       << orgn[1] << ", " 
+       << orgn[2] 
+       << endl;
+  assert(fabs(orgn[0]-170.6) < ASSERT_EPS);
+  assert(fabs(orgn[1]-170.0) < ASSERT_EPS);
+  assert(fabs(orgn[2]+532.46) < ASSERT_EPS);
 
   WriterType::Pointer writer = WriterType::New(); 
 
