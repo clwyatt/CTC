@@ -12,7 +12,7 @@ SET (TRIGGER_SITE
   "http://${DROP_SITE}/cgi-bin/Submit-CTC-TestingResults.cgi")
 
 # Project Home Page
-SET (PROJECT_URL "http://www.bsl.ece.vt.edu")
+# SET (PROJECT_URL "http://www.bsl.ece.vt.edu")
 
 # Dart server configuration 
 #SET (ROLLUP_URL "http://${DROP_SITE}/cgi-bin/insight-rollup-dashboard.sh")
