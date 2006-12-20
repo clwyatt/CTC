@@ -41,7 +41,7 @@ int main(int argc, char ** argv)
   vul_arg<char const*> outfilename(0, "Output filename");
   vul_arg<int> maxiter("-i", "Maximum number of iterations", 5);
   vul_arg<int> mindist("-d", "Minimum distance considered", 10);
-  vul_arg<float> thresh("-t", "Air/Tissue threshold", -800);
+  vul_arg<int> thresh("-t", "Air/Tissue threshold", -800);
   vul_arg_parse(argc, argv);
 
   ReaderType::Pointer reader = ReaderType::New(); 
