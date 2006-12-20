@@ -27,7 +27,7 @@ namespace ctc
     m_DistanceFilter = DistanceFilterType::New();
     m_DownsampleFilter = DownsampleFilterType::New();
 
-    downsampleFactor = 2.0;
+    downsampleFactor = 2;
 
     // TODO need to switch these based on pixel type
     m_MinPixelValue = -1024;
