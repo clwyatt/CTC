@@ -82,7 +82,7 @@ protected:
 private:
 
   signed short m_constShortROSMarker;
-  double downsampleFactor;
+  long int downsampleFactor;
 
   SegmentColonFilter(Self&);   // intentionally not implemented
   void operator=(const Self&);          // intentionally not implemented
