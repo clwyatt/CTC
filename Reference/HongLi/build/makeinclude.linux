@@ -1,0 +1,85 @@
+#######################################################################################
+# File: makeinclude.unix
+# Abstract: make includes for UNIX systems
+#           edit this file for platform specific values
+# Created: 2002-06-24
+# (C) 2002 by Wake Forest University School of Medicine
+#                             and
+#         Virgina Polytechnic Institute and State University
+#
+# Last Revision ($Revision: 1.1 $) by $Author: hongli $ on $Date: 2003/10/13 19:51:37 $
+#######################################################################################
+
+############### paths and compiler need to be configured #####################
+# source code location
+TOPLEVEL        = /home/relito/students/hongli/work/CAPD/prog/wfubmc/capd
+
+#intallation dir 
+PREFIX 		= /home/relito/students/hongli/work/CAPD/testing
+BINPATH 	= $(PREFIX)/bin
+INCLUDEPATH 	= $(PREFIX)/include
+LIBPPATH 	= $(PREFIX)/lib
+DOCPATH 	= $(PREFIX)/doc
+
+#Third party code
+THIRDPARTY	=/home/relito/students/hongli/work/capd/thirdparty
+
+# compiler
+CXX		=g++
+CXXLINK		=g++ 
+CC		=gcc
+
+############## Do not change code after this line #########################
+
+# tools
+RM = /bin/rm -f
+INSTALL = 
+
+MAKEDEPEND	=$(CXX) -M
+
+# flags for C++ compiler:
+CXXFLAGS	=-gstabs+ -O2 -DNDEBUG \
+                 -fno-exceptions -ansi -Wall -pedantic \
+		 -DHAVE_ZLIB -DNULL=0 -D_REENTRANT \
+		 -I/usr/local/include \
+		 -I$(TOPLEVEL)/common \
+		 -I$(TOPLEVEL)/capd \
+		 -I$(TOPLEVEL)/segment \
+		 -I$(INCLUDEDIR) \
+		 -I$(THIRDPARTY)/ctn/include 		 
+
+# linking
+LDFLAGS = -L$(TOPLEVEL)/common \
+          -L$(TOPLEVEL)/capd \
+	  -L$(TOPLEVEL)/segment \
+	  -L$(THIRDPARTY)/ctn/lib
+	  
+LDLIBS =  -lstdc++ -lm -lz
+
+
+# building library 
+
+IMTK_BASE_STATIC_LIB = libimtk.a
+CAPD__STATIC_LIB = libcapd.a
+
+#IMTK_BASE_SHARED_LIB = libimtk.so.1.0.0
+
+LIBCOMMAND = ar cr
+RANLIB = ranlib
+#DSOCOMMAND = $(CXX) -Wl,-h,$(IMTK_BASE_SHARED_LIB) $(LDLIBS) -G  -o
+
+# be quiet
+.SILENT:
+
+# build commands and filename extensions...
+.SUFFIXES:	.c .cc .hh .o
+
+.c.o:
+	echo Compiling $@
+	$(CC) $(CXXFLAGS) $< -c
+
+.cc.o:
+	echo Compiling $@
+	$(CXX) $(CXXFLAGS) $< -c
+
+

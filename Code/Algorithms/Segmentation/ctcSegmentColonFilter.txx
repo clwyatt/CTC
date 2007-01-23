@@ -1,4 +1,4 @@
-/*******************************************************************************
+//*******************************************************************************
 Program:   Wake Forest University - Virginia Tech CTC Software
 Id:        $Id$
 Language:  C++
@@ -198,12 +198,12 @@ namespace ctc
 	      }
 	    ++dit;
 	  }
-	
-	if(maxd < m_MinDistanceThreshold)
-	  break;
 
 	std::clog << "Pass " << pass << 
 	  ": Seed Value " << maxd << " at " << maxi << std::endl;
+	
+	if(maxd < m_MinDistanceThreshold)
+	  break;
 
 	DistanceFloodIteratorType dfit(m_DistanceFilter->GetOutput(),
 				       dfunction,

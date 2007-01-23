@@ -1,0 +1,64 @@
+# IMTK makefile includes
+# 
+# $Id: makeinclude,v 1.11 2002/07/31 20:27:12 clwyatt Exp $
+#
+# edit this file for platform specific values
+
+# paths
+PREFIX 		= /home/relito/students/clwyatt/work/imtk/test
+BINPREFIX 	= $(PREFIX)/bin
+INCLUDEPREFIX 	= $(PREFIX)/include
+LIBPREFIX 	= $(PREFIX)/lib
+DOCPREFIX 	= $(PREFIX)/doc
+
+THIRDPARTY	=/home/clwyatt/Projects/imtk/thirdparty
+SRCDIR		=/home/clwyatt/Projects/imtk/sandbox/imtk/src
+INCLUDEDIR	=$(SRCDIR)
+LIBDIR		=$(SRCDIR)
+
+# tools
+RM = /bin/rm -f
+INSTALL = 
+
+# compiler
+CXX		=c++ 
+CC		=gcc
+MAKEDEPEND	=$(CXX) -M
+
+# flags for C++ compiler:
+#CXXFLAGS	=-g -fno-exceptions -Wall -I/usr/local/include -I$(INCLUDEDIR) -I$(THIRDPARTY)/DCMTK_new/include -DHAVE_ZLIB -DNULL=0 -D_REENTRANT
+CXXFLAGS	=-gstabs+ -O2 -DNDEBUG -fno-exceptions -ansi -Wall -pedantic -I/usr/local/include -I$(INCLUDEDIR) -I$(THIRDPARTY)/DCMTK_new/include -I$(THIRDPARTY)/zlib/include -DHAVE_ZLIB -DNULL=0 -D_REENTRANT
+#CXXFLAGS	=-g -fno-exceptions -Wall -I/usr/local/include -I$(INCLUDEDIR) -DNULL=0 -D_REENTRANT
+
+# linking
+LDFLAGS = -L$(LIBDIR) -L$(THIRDPARTY)/DCMTK_new/lib -L$(THIRDPARTY)/zlib/lib
+#LDLIBS = -lstdc++ -lm -lz 
+LDLIBS = -lstdc++ -lm -ldcm -lz
+
+# building library 
+IMTK_BASE_STATIC_LIB = libimtk.a
+#IMTK_BASE_SHARED_LIB = libimtk.so.1.0.0
+
+LIBCOMMAND = ar cr
+RANLIB = ranlib
+#DSOCOMMAND = $(CXX) -Wl,-h,$(IMTK_BASE_SHARED_LIB) $(LDLIBS) -G  -o
+
+# be quiet
+#.SILENT:
+
+# build commands and filename extensions...
+.SUFFIXES:	.c .cc .hh .o
+
+.cc:
+	echo Compiling and linking $@
+	$(CXX) $(CXXFLAGS) $< -limtk $(LDFLAGS) $(LDLIBS) -o $@
+
+.c.o:
+	echo Compiling $@
+	$(CC) $(CXXFLAGS) $< -c
+
+.cc.o:
+	echo Compiling $@
+	$(CXX) $(CXXFLAGS) $< -c
+
+

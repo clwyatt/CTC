@@ -1,0 +1,325 @@
+/********************************************************
+File: Dicom.cc
+Abstract: Implementation for Dicom
+
+See header (Dicom.hh) for documentation
+
+Last Revision ($Revision: 1.1.1.1 $) 
+by $Author: hongli $ 
+on $Date: 2002/12/06 21:49:32 $
+*********************************************************/
+
+#include "Dicom.hh"
+
+#include <fstream>
+#include <cstdio>
+
+IMTK::Dicom::Dicom()
+{
+	dcmObj = NULL;
+	contents = NULL;
+}
+
+IMTK::Dicom::Dicom(const Dicom & D)
+{
+
+}
+
+IMTK::Dicom::~Dicom()
+{
+	close();
+}
+
+bool IMTK::Dicom::open(const std::string &theFile)
+{
+	ifstream  infile;
+	int length = 0;
+
+	infile.open( theFile.c_str() );
+
+	if(!infile){
+		cerr << "Error opening file: " << theFile.c_str() << endl;
+		return false;
+	}
+
+	// get length of file:
+	infile.seekg(0, ios::end);
+	length = infile.tellg();
+	infile.seekg(0, ios::beg);
+
+	// allocate space
+	contents = new unsigned char[length];
+
+	//read the entire file into a char buffer
+	infile.read(contents, length);
+	infile.close();
+	if(length == 0) return false;
+
+	// if the CTN DICOM object exists, close it first
+	if(dcmObj != NULL) close();
+
+	// use the CTN code to load the DICOM object
+	CONDITION cond;
+	cond = DCM_ImportStream(contents, length, DCM_ORDERLITTLEENDIAN, &dcmObj);
+	if(cond != DCM_NORMAL){
+		dcmObj = NULL;
+		return false;
+	}
+
+	// everything is OK if we got here
+	return true;
+}
+
+void IMTK::Dicom::close()
+{
+	if(dcmObj != NULL)
+		DCM_CloseObject(&dcmObj);
+
+	if(contents != NULL)
+		delete [] contents;
+
+	dcmObj = NULL; //reset so it can be reused
+	contents = NULL;
+}
+
+bool IMTK::Dicom::getCharElement(DCM_TAG tag, char * & pChar)
+{
+	assert(dcmObj != NULL);
+
+	// get the tag
+	CONDITION cond;
+	DCM_ELEMENT element;
+	cond = DCM_GetElement(&dcmObj, tag, &element);
+	if(cond != DCM_NORMAL) return false;
+
+	// allocate the space
+	pChar = new char[element.length+1];
+
+	// get the char array
+	element.d.string = pChar;
+	void *ctx = NULL;
+	U32 size;
+	cond = DCM_GetElementValue(&dcmObj, &element, &size, &ctx);
+	if(cond != DCM_NORMAL){
+		delete [] pChar;
+		pChar = NULL;
+		return false;
+	}
+
+	// make char array a well formed string
+	pChar[element.length] = '\0';
+
+	// if we got here, everything is OK
+	return true;
+}
+
+bool IMTK::Dicom::getUShortElement(DCM_TAG tag, unsigned short & value)
+{
+	assert(dcmObj != NULL);
+
+	// get the tag
+	CONDITION cond;
+	DCM_ELEMENT element;
+	cond = DCM_GetElement(&dcmObj, tag, &element);
+	if(cond != DCM_NORMAL) return false;
+
+	// check the length matches an unsigned short
+	if( element.length != sizeof(value) ) return false;
+
+	// get the value
+	element.d.us = &value;
+	void *ctx = NULL;
+	U32 size;
+	cond = DCM_GetElementValue(&dcmObj, &element, &size, &ctx);
+	if(cond != DCM_NORMAL){
+		value = 0;
+		return false;
+	}
+
+	// if we got here, everything is OK
+	return true;
+}
+
+
+bool IMTK::Dicom::getOrigin(float & xo, float &yo, float &zo)
+{
+	bool opOK;
+	char * pChar = NULL;
+
+	opOK = getCharElement(DCM_RELIMAGEPOSITIONPATIENT, pChar);
+	if(!opOK){ //try a different tag
+		opOK = getCharElement(DCM_RELSLICELOCATION, pChar);
+		if(!opOK) return false;
+
+		xo = 0.0; // these are not defined if used DCM_RELSLICELOCATION
+		yo = 0.0; // fill in with these default values
+		zo = atof(pChar);
+
+		// free up pChar
+		delete [] pChar;
+		return true;
+	}
+
+	// numbers are seperated by "\\", split up
+	char *temp;
+
+	temp = strtok(pChar, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	xo = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	yo = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	zo = atof(temp);
+
+	delete [] pChar;
+	return true;
+}
+
+
+bool IMTK::Dicom::getDims(unsigned short &xdim, unsigned short &ydim)
+{
+	bool opOK;
+
+	opOK = getUShortElement(DCM_IMGCOLUMNS, xdim);
+	if(!opOK) return false;
+
+	opOK = getUShortElement(DCM_IMGROWS, ydim);
+	if(!opOK) return false;
+
+	return true;
+}
+bool IMTK::Dicom:: getImageOrientP(float &x_x, float &x_y,  float &x_z,  float &y_x,  float &y_y, float &y_z)
+{
+	bool opOK;
+	char * pChar = NULL;
+
+	opOK = getCharElement(DCM_RELIMAGEORIENTATIONPATIENT, pChar);
+	if(!opOK) return false;
+
+	// numbers are seperated by "\\", split up
+	char *temp;
+
+	temp = strtok(pChar, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	x_x = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	x_y = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	x_z = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	y_x = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	y_y = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	y_z = atof(temp);
+
+	delete [] pChar;
+	return true;
+}
+
+
+
+bool IMTK::Dicom::getPxlSize(float &dx, float &dy)
+{
+	bool opOK;
+	char * pChar = NULL;
+
+	opOK = getCharElement(DCM_IMGPIXELSPACING, pChar);
+	if(!opOK) return false;
+
+	// numbers are seperated by "\\", split up
+	char *temp;
+
+	temp = strtok(pChar, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	dx = atof(temp);
+
+	temp = strtok(NULL, "\\");
+	if(temp == 0){
+		delete [] pChar;
+		return false;
+	}
+	dy = atof(temp);
+
+	delete [] pChar;
+	return true;
+}
+
+bool IMTK::Dicom::getSliceNum(int &slice)
+{
+	bool opOK;
+	char * pChar = NULL;
+
+	opOK = getCharElement(DCM_RELIMAGENUMBER, pChar);
+	if(!opOK) return false;
+
+	slice = atoi(pChar);
+
+	delete [] pChar;
+	return true;
+}
+
+bool IMTK::Dicom::getData(unsigned short *data)
+{
+	assert(dcmObj != NULL);
+
+	// get the tag
+	CONDITION cond;
+	DCM_ELEMENT element;
+	cond = DCM_GetElement(&dcmObj, DCM_PXLPIXELDATA, &element);
+	if(cond != DCM_NORMAL) return false;
+
+	// get the data
+	element.d.ot = data;
+	void *ctx = NULL;
+	U32 size;
+	cond = DCM_GetElementValue(&dcmObj, &element, &size, &ctx);
+	if(cond != DCM_NORMAL) return false;
+
+	// if we got here, everything is OK
+	return true;
+}

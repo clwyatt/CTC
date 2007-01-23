@@ -1,0 +1,15 @@
+This directory contains the alpha version (0.0.1 release) of IMTK (the
+IMage analysis ToolKit) a numerical toolkit for algorithm 
+prototyping and development in medical imaging.
+
+IMTK is free software.  See the file COPYING for copying
+permission.
+
+The file INSTALL contains a copy of the installation information. You
+will need a C++ compiler that supports templates, namespaces and RTTI 
+(gcc > 2.8.1 should work). You might also need the GNU version of make.
+
+See the file ChangeLog for the latest modifications.
+
+
+

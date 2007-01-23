@@ -1,0 +1,157 @@
+<!doctype article public "-//Davenport//DTD DocBook V3.0//EN">
+
+<!-- Design Documentation for IMTK -->
+
+<article>
+<artheader>
+  <author><firstname>Chris</firstname>
+          <surname>Wyatt</surname>
+  </author>
+  <authorinitials>clw</authorinitials>
+  <pubdate>March 29, 2000</pubdate>
+  <title>The Image Analysis Toolkit (IMTK) Design Documentation</title>
+  <titleabbrev>IMTK Design Doc</titleabbrev>
+  <revhistory>
+     <revision>
+        <revnumber>0.5</revnumber>
+        <date>29 March 2000</date>
+        <revremark>First Draft.</revremark>
+     </revision>
+  </revhistory>
+</artheader>
+
+<sect1>
+<title>Introduction</title>
+<para>
+IMTK (the IMage analysis ToolKit) is intended to help the development and debugging 
+of image analysis algorithms by providing a set common data types, algorithms, and interfaces. 
+The toolkit may be used to generate command-line applications using the built-in data types or 
+GUI based applications with algorithm debugging. 
+IMTK has a built-in browser for various data structures commonly used in image processing 
+and analysis, (i.e. image, volumes, curves, meshes). 
+An algorithm in development may add an intermediate result to the global pool of data which 
+is organized by the browser. 
+These data can be individually selected, viewed, and operated upon. 
+Not only will the use of IMTK speed up the time to see results from an algorithm, but it 
+encourages proper seperation of algorithmic code from GUI code. 
+When testing is complete the algorithm can be inserted into the developers GUI of choice, 
+(or simply left in the IMTK framework as a command-line or GUI app).
+</para>
+<para>
+The motivation for IMTK is that, while debuggers allow one to set breakpoints, step through
+code, and evaluate expressions, they do not allow the viewing of intermediate results.
+I found myself constantly dumping data to files to view intermediate results of
+a chain of image/volume processing or analysis algorithms. This toolkit is an attempt to
+speed up that process, not by creating files, but by sharing objects.
+IMTK is not a debugger in the traditional sense (e.g. you cannot set breakpoints) but you can easily
+view intermediate results by posting a data set to the data pool.
+</para>
+<para>
+This toolkit differs from Matlab, in that multiple data precision is included and (this is a biggie)
+HAS THREAD CAPABILITY. While matlab is good for algorithm development, it's single execution makes
+interactive sdjustments a huge pain. Thus IMTK is an attempt to provide some of the development
+and visualization features of Matlab, but with the ability to do more interactive (real-time)
+examination of the algorithm internals.
+</para>
+<para>
+This document is here to contain the design approach and desired features and behaviors of IMTK.
+It should be a reference for those working on the IMTK code itself and those using the toolkit.
+It does not contain implementation or code details, those will be placed in a seperate document.
+A very alpha version of IMTK was completed as a proof of concept, but revieled some major design
+flaws, hence the creation of this document.
+</para>
+</sect1>
+
+<sect1>
+<title>Design Overview</title>
+<para>
+The IMTK object hierarchy is shown in figure 1. The 
+</para>
+<figure><title>The IMTK Object Hierarchy</title>
+     <graphic fileref="figures/toplevel.png"></graphic>
+</figure>
+</sect1>
+
+<sect1>
+<title>Object Types</title>
+
+<sect2>
+<title>Data Objects</title>
+<para>
+These objects are templates that may contain structured or unstructured data.
+Examples of structured data include a matrix, volume, or image.
+An example of unstructured data is a 3D triangular mesh.
+</para>
+
+<para>
+TYPE SAFE CAST of data types
+</para>
+</sect2>
+
+<sect2>
+<title>Storage Objects</title>
+<para>
+These objects contain, the data and provide a graph representation of their relationships.
+</para>
+</sect2>
+
+<sect2>
+<title>Thread Objects</title>
+<para>
+These objects are responsible for the thread interface for I/O and algorithms.
+</para>
+</sect2>
+
+<sect2>
+<title>GUI Objects</title>
+<para>
+The GUI specific part of the code. Slicers, surface and volume rendering, plotting, ect.
+</para>
+</sect2>
+</sect1>
+
+<sect1>
+<title>Features and Behaviors</title>
+
+<sect2>
+<title>Dynamic Algorithm Loading</title>
+<para>
+This feature allows algorithms to be developed and compiled seperatley from the main IMTK code base.
+Thus, you do not have to recompile IMTK every time you want to add or change an algorithm. This is
+somewhat similar to MEX files in matlab.
+</para>
+<para>
+Using dynamic class loading, the algorithms should be registered at runtime via a GUI or when the browser
+is run using a configuration file. Something like
+<programlisting>
+# IMTK algorithm configuration file
+# format follows: [algorithm name] [path to the shared library]
+imtk_builtin_threshold /home/relito/students/clwyatt/work/imtk/libs/threshold.so.1.0
+clw_region_grow_1 /home/relito/students/clwyatt/work/imtk/libs/regiongrow1.so.1.0
+</programlisting>
+</para>
+<para>
+The individual algorithm code must include ImtkAlgorithm.hh and subclass ImtkAlgorithm, implementing the
+get_params and run methods. The code is then compiled (with PIC) and archived in a shared library.
+The library self-registers with a factory class in the main IMTK code base, when it is loaded.
+At this point I think parameter passing to the algorthms will be done in a text interface, most likely
+a shell. That way the algorithm can implement get_params, to ask whatever questions it needs using
+streams. That will require a shell for each running algorithm, which is good for informational messages
+and interaction, but will clutter things. There is also the possibility of the algorithm calling it's
+own GUI code, but that will need further research.
+</para>
+</sect2>
+
+<sect2>
+<title>Scripting Capability</title>
+<para>
+Embed the Python interpreter (as an option) for quickly creating scripts to perform operations in images.
+For example, to load, filter, apply segmentation algorithm, write output. Python is a very flexible, easy
+to learn language, with OO concepts. This might be an alternative to creating a CLI for IMTK, just start
+the interpretor and let it use the IMTK objects. This needs alot more investigating.
+</para>
+</sect2>
+
+</sect1>
+
+</article>

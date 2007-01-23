@@ -1,0 +1,121 @@
+/********************************************************
+File: Dicom.hh
+Abstract: The IMTK class for reading individual DICOM images. 
+Created: 11/16/01
+Author: Chris L. Wyatt
+
+Last Revision ($Revision: 1.1 $) 
+by $Author: clwyatt $ 
+on $Date: 2001/11/16 21:45:50 $
+*********************************************************/
+
+//prevent recursive includes
+#ifndef _Dicom_hh
+#define _Dicom_hh 1
+
+#include <string>
+
+extern "C" {
+#define SOLARIS 
+#define BIG_ENDIAN_ARCHITECTURE 
+#define SHORTSIZE  16 
+#define INTSIZE 32 
+#define LONGSIZE 32
+#include <dicom.h>
+#include <lst.h>
+#include <condition.h>
+#include <dicom_objects.h>
+}
+
+/** The IMTK class for reading individual DICOM images.
+
+This class encapsulates the reading of individual
+DICOM files using the CTN software as a base.
+
+@author Chris L. Wyatt <cwyatt@wfubmc.edu>
+@version $Revision: 1.1 $
+*/
+
+namespace IMTK{
+
+class Dicom
+{
+private:
+	DCM_OBJECT *dcmObj;
+	unsigned char *contents;
+
+protected:
+	/**
+	 * Get DICOM element of type char array.
+	 *
+	 * This member allocates heap memory if returned true
+	 * and pChar should be deleted with delete [] after use.
+	 *
+	 */
+	bool getCharElement(DCM_TAG tag, char * & pChar);
+
+	/**
+	 * Get DICOM element of type ushort.
+	 *
+	 */
+	bool getUShortElement(DCM_TAG tag, unsigned short & value);
+
+public:
+	/// Default Constructor
+	Dicom();
+	
+	/// Copy Constructor
+	Dicom(const Dicom & D);
+	
+	/// Destructor
+	~Dicom();
+	
+	/**
+	 * Open the DICOM file.
+	 * 
+	 *@param theFile the filename to open
+	 */
+	bool open(const std::string &theFile);
+
+	/**
+	 * Close the DICOM file.
+	 * 
+	 */
+	void close();
+	
+	/**
+	 * Get the Patient coordinates of (0,0)
+	 * in this slice.
+	 *
+	 */
+	bool getOrigin(float & xo, float &yo, float &zo);
+
+	/**
+	 * Get the image dimensions
+	 * 
+	 */
+	bool getDims(unsigned short &xdim, unsigned short &ydim);
+
+	/**
+	 * Get the image pixel size
+	 * 
+	 */
+	bool getPxlSize(float &dx, float &dy);
+
+	/**
+	 * Get the slice number this image corresponds too
+	 * 
+	 */
+	bool getSliceNum(int &slice);
+
+	/**
+	 * Get the image data
+	 * This must be preallocated space.
+	 * 
+	 */
+	bool getData(unsigned short *data);
+
+};
+}
+
+#endif

@@ -1,0 +1,18 @@
+
+For now, edit toplevel makefile.
+Set PREFIX to the location you
+want the includes, libs, bins, and docs installed. Then do
+'make'
+'make install'
+which should build the base IMTK library, tools, and the test cases.
+
+At some point make may be discarded in favor of jam, but not untill
+I am more familiar with jambase and jamfiles.
+
+
+At a later date, this will use a configure script. Building the
+shared libs on many systems is much easier using GNU Autoconf, Automake,
+and Libtool, however, it does not support C++ too well (as far as I can tell).
+
+-- clw 
+

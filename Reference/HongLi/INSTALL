@@ -1,0 +1,22 @@
+INSTALL information for capd
+
+Copy the appropriate makeinclude from
+the build directory to the toplevel
+directory (rename to makeinclude) 
+and edit for your particular configuration.
+
+capd requires the following libraries
+- dcmtk
+- zlib
+
+Set PREFIX to the location you want the includes, 
+libs, bins, and docs installed. Then do
+'make'
+'make install'
+which should build the src and do an install.
+
+*At some point make may be discarded in favor of jam, but not until
+we am more familiar with jambase and jamfiles.
+
+-- clw 
+

@@ -1,0 +1,147 @@
+<HTML><HEAD>
+<TITLE>Data Structures and Algorithms: Hash Functions</TITLE>
+
+<META name="description" content="Data Structures and Algorithms Course Notes,
+PLDS210 University of Western Australia">
+<META name="keywords" content="data structures,algorithms,abstract data types ">
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<TABLE BGCOLOR="#00c0f0" WIDTH="100%" CELLSPACING=0 CELLPADDING=0>
+<TR BGCOLOR="#00f0f0"><TD ALIGN=right>
+<FONT FACE=helvetica SIZE=+1><I>Data Structures and Algorithms</I></FONT>
+</TD></TR>
+
+<TR><TD><FONT FACE=helvetica SIZE=+2><B>8.3.3 Hashing Functions</B></FONT>
+</TD></TR>
+</TABLE>
+<P>
+
+Choosing a good hashing function, <B>h(k)</B>,
+is essential for hash-table based searching.
+<B>h</B> should distribute the elements of our collection as
+uniformly as possible to the "slots" of the hash table. 
+The key criterion is that there should be a minimum number of collisions.
+<P>
+If the probability that a key, <B>k</B>, occurs in our
+collection is <B>P(k)</B>, then if there are <B>m</B>
+slots in our hash table,
+a <I>uniform hashing function</I>, <B>h(k)</B>, would
+ensure:<P>
+<IMG SRC="fig/uniform_hash.gif">
+<P>
+Sometimes, this is easy to ensure.
+For example, if the keys are randomly distributed in
+(0,<B>r</B>],
+then, 
+<P>
+<CENTER><B>h(k) = floor((mk)/r)</B></CENTER>
+<P>
+will provide uniform hashing.
+<P>
+
+<H4>Mapping keys to natural numbers</H4>
+
+Most hashing functions will first map the keys
+to some set of natural numbers, say (0,r].
+There are many ways to do this,
+for example if the key is a string of ASCII characters,
+we can simply add the ASCII representations of the
+characters mod 255 to produce a number in (0,255) -
+or we could <B>xor</B> them,
+or we could add them in pairs mod 2<SUP>16</SUP>-1,
+or ...
+<P>
+Having mapped the keys to a set of natural numbers,
+we then have a number of possibilities.
+<OL>
+<LI>Use a <B>mod</B> function:<P>
+<B>h(k) = k mod m</B>.
+<P>
+When using this method, we
+usually avoid certain values of <B>m</B>.
+Powers of 2 are usually avoided,
+for <B>k mod 2<SUP>b</SUP></B>
+simply selects the <B>b</B> low order bits of <B>k</B>.
+Unless we know that all the 2<B><SUP>b</SUP></B> possible
+values of the lower order bits are equally likely,
+this will not be a good choice,
+because some bits of the key are not used in the hash function.
+<P>
+Prime numbers which are close to powers of 2 
+seem to be generally good choices for <B>m</B>.
+<P>
+For example, if we have 4000 elements, and we have
+chosen an overflow table organization, but wish to
+have the probability of collisions quite low,
+then we might choose <B>m</B> = 4093.
+(4093 is the largest prime less than 4096 = 2<SUP>12</SUP>.)
+<P>
+<LI>Use the multiplication method:
+<P><UL>
+<LI>Multiply the key by a constant <B>A</B>,
+0 &lt; <B>A</B> &lt; 1,
+<LI>Extract the fractional part of the product,
+<LI>Multiply this value by <B>m</B>.
+</UL><P>
+Thus the hash function is:
+<P><CENTER><B>h(k) = floor(m * (kA - floor(kA)))</B></CENTER>
+<P>
+In this case, the value of <B>m</B> is not critical and
+we typically choose a power of 2 so that we can get the
+following efficient procedure on most digital computers:
+<UL>
+<LI>Choose <B>m</B> = 2<SUP><B>p</B></SUP>.
+<LI>Multiply the <B>w</B> bits of <B>k</B> by
+<B>floor(A * 2<SUP>w</SUP>)</B> to
+obtain a 2<B>w</B> bit product.
+<LI>Extract the <B>p</B> most significant bits of the
+lower half of this product.
+<P>
+It seems that:
+<P><CENTER><B>A</B> = (sqrt(5)-1)/2 = 0.6180339887</CENTER>
+<P>
+is a good choice (<I>see</I> Knuth,
+"Sorting and Searching", v. 3 of "The Art of Computer
+Programming").
+</UL>
+<P>
+<LI> Use universal hashing:<P>
+A malicious adversary can always chose the keys
+so that they all hash to the same slot,
+leading to an average <B>O(n)</B> retrieval time.
+Universal hashing seeks to avoid this by choosing the
+hashing function randomly from a collection of hash 
+functions (<I>cf</I> Cormen <I>et al</I>, p 229- ).
+This makes the probability that the hash function
+will generate poor behaviour small and produces good
+average performance.
+
+
+</OL>
+
+
+
+<P>
+<TABLE WIDTH="100%" BGCOLOR="#00c0f0">
+<TR><TD><H3>Key terms</H3></TD></TR></TABLE>
+<DL>
+<DT><FONT COLOR="#fa0000"><B>Universal hashing</B></FONT>
+   <DD>A technique for choosing a hashing function randomly
+      so as to produce good average performance.
+</DL>
+
+<P>
+
+<TABLE CELLPADDING=5 WIDTH="100%" BGCOLOR="#00f0f0" CELLSPACING=4>
+<TR><TD WIDTH=50%>
+Continue on to <A HREF="dynamic.html">Dynamic Algorithms</A></TD>
+<TD>Back to the <A HREF="ds_ToC.html">Table of Contents</A>
+</TD></TR></TABLE>
+<SMALL>
+&copy; <A HREF=mailto:morris@ee.uwa.edu.au>John Morris</A>, 1998
+</SMALL>
+</BODY>
+</HTML>
+
+
+
