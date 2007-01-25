@@ -13,6 +13,7 @@ Language:  C++
 #include "itkImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+#include "ctcRVFImageIO.h"
 
 // CTC includes
 #include "ctcConfigure.h"
@@ -44,7 +45,12 @@ int main(int argc, char ** argv)
   vul_arg<int> thresh("-t", "Air/Tissue threshold", -800);
   vul_arg_parse(argc, argv);
 
+
+  typedef ctc::RVFImageIO ImageIOType;
   ReaderType::Pointer reader = ReaderType::New(); 
+  ImageIOType::Pointer rvfIO = ImageIOType::New();
+
+  reader->SetImageIO( rvfIO );
   reader->SetFileName(infilename()); 
 
   try 
