@@ -10,6 +10,73 @@ extern void storeCenterline2(TNT::Array3D<int> &Cline, int sizeX, int sizeY, int
 /** distancehook2.cpp  **/
 extern void distancehook(TNT::Array3D<int> &vin, int dimx,int dimy,int dimz);
 
+int pruningIndex3(IndexPair* mIndexPair,  IndexPair* mIndexOut, int validCnt, int window_size, int extra_length)
+{
+	//cout<<"pruningIndex: window_size="<<window_size<<endl;
+	int i, j, cnt, before_Overlap;
+	j=0;  cnt=0;   before_Overlap = 0;
+	
+	float tempCorrel = 0.0;
+	int tempS_Index = 0;
+	int tempL_Index = 0;
+	
+	for(i=0; i<validCnt-1; i++){
+		
+		if(mIndexPair[i].Overlap != _OVERLAP_ ){
+			
+			tempCorrel = mIndexPair[i].SavedCorrel;
+			tempS_Index = mIndexPair[i].SavedS_Index ;
+			tempL_Index = mIndexPair[i].SavedL_Index ;
+			
+			for(j=i+1; j<validCnt; j++){
+				
+				//cout<<"current S_index="<< mIndexPair[i].SavedS_Index<< "+window="<< (mIndexPair[i].SavedS_Index + window_size)<<" next="<<mIndexPair[j].SavedS_Index<<endl;
+				//cout<<"current L_index="<< mIndexPair[i].SavedL_Index<<  "+window="<< (mIndexPair[i].SavedL_Index + window_size)<<" next="<<mIndexPair[j].SavedL_Index<<endl;
+				
+				if( ((mIndexPair[i].SavedS_Index + window_size - extra_length)>=(mIndexPair[j].SavedS_Index-extra_length)) ||
+					( (mIndexPair[i].SavedL_Index + window_size -extra_length)>=(mIndexPair[j].SavedL_Index-extra_length)) ){
+					
+					if( tempCorrel >= mIndexPair[j].SavedCorrel){
+						
+						mIndexPair[j].Overlap =  _OVERLAP_ ;
+					}
+					else {
+						tempCorrel = mIndexPair[j].SavedCorrel;
+						tempS_Index = mIndexPair[j].SavedS_Index ;
+						tempL_Index = mIndexPair[j].SavedL_Index ;						
+					}	
+					
+				}  //   overlapped
+				
+			}  // for-j
+
+			if(cnt == 0) {  
+				mIndexOut[cnt].SavedCorrel = tempCorrel;
+				mIndexOut[cnt].SavedS_Index = tempS_Index- extra_length;
+				mIndexOut[cnt].SavedL_Index = tempL_Index- extra_length;
+				cnt++;
+		       }
+			else if ((tempS_Index != mIndexOut[cnt-1].SavedS_Index)&&(tempL_Index != mIndexOut[cnt-1].SavedL_Index)){
+				mIndexOut[cnt].SavedCorrel = tempCorrel;
+				mIndexOut[cnt].SavedS_Index = tempS_Index- extra_length;
+				mIndexOut[cnt].SavedL_Index = tempL_Index- extra_length;
+				cnt++;				
+			}
+							
+		} // if(mIndexPair[i].Overlap != _OVERLAP_)
+	}  // for-i	
+	
+
+	
+	for(i=0;i<cnt;i++){
+		
+		cout<<i<<" pruned S index="<<mIndexOut[i].SavedS_Index<<" L index="<<mIndexOut[i].SavedL_Index<<endl;
+	}
+	
+	return cnt;
+}
+
+
 int pruningIndex2(IndexPair* mIndexPair,  IndexPair* mIndexOut, int validCnt, int window_size)
 {
 	//cout<<"pruningIndex: window_size="<<window_size<<endl;
@@ -853,7 +920,8 @@ int FindFeatures5Add(ClineVoxel &Cv1, ClineVoxel &Cv2, int m, int window_size, i
 	  
 	  if((DvSy_Plus <= 0)&&(DvSy_Minus >0)) { 		     // on maxima
 		  
-		  if(OK_ZERO_NUM !=copyZAroundZeroY2(vL, wvL, window_indexL, halfWindow)) continue; 	  
+       	    if(OK_ZERO_NUM !=copyZAroundZeroY2(vS, wvS, window_indexS, halfWindow)) continue; 
+		  //if(OK_ZERO_NUM !=copyZAroundZeroY2(vL, wvL, window_indexL, halfWindow)) continue; 	  
 		  //copyZAroundZeroY(vS, wvS, window_indexS, halfWindow);  // in order to compare the correlation of Y elements between the similar Z window candidates.
 		  //cout << " %%%% vS       indexS    =        "<<window_indexS<<" -1:"<<vS[window_indexS-1].y<<" 0:"<<vS[window_indexS].y<<" +1:"<<vS[window_indexS+1].y <<endl;
 	  

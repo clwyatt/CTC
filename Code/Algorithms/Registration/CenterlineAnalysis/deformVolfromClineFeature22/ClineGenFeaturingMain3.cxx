@@ -13,6 +13,7 @@ extern int FindFeatures3(ClineVoxel &Cv1, ClineVoxel &Cv2, int m, int window_siz
 extern int FindFeatures4(ClineVoxel &Cv1, ClineVoxel &Cv2, int m, int window_size, int plusSearchRange, int minusSearchRange, IndexPair* mIndexPair, float fixed_correl);
 extern int FindFeatures5(ClineVoxel &Cv1, ClineVoxel &Cv2, int m, int window_size, int plusSearchRange, int minusSearchRange, IndexPair* mIndexPair, float fixed_correl);
 extern int FindFeatures5Add(ClineVoxel &Cv1, ClineVoxel &Cv2, int m, int window_size, int plusSearchRange, int minusSearchRange, IndexPair* mIndexPair, float fixed_correl);
+extern int pruningIndex3(IndexPair* mIndexPair,  IndexPair* mIndexOut, int validCnt, int window_size, int extra_length);
 //extern void ReconstructFeaturedCline(IndexPair* mIndexPair, int validCnt, int window_size, ClineVoxel &cS, ClineVoxel &cT, MatchedPair  &matchedPair);
 extern void ReconstructFeaturedCline(IndexPair* mIndexPair, int validCnt, int window_size, ClineVoxel &cS, ClineVoxel &cT, MatchedPair *matchedPair);
 extern void ReconstructFeaturedClineMORE(IndexPair* mIndexPair, int validCnt, int window_size, ClineVoxel &cS, ClineVoxel &cT, MatchedPair *matchedPair);
@@ -96,7 +97,10 @@ int main( int argc, char * argv[] )
 	//float fixed_correl = 0.852;
 	
 	int m=20, window_size = 40; // window_size should be even number by wook
-	int MORE_window_size = window_size + 20;   // More Version
+	int extra = 20;
+	
+	
+	int MORE_window_size = window_size + 2*extra;   // More Version
 	
 	float fixed_correl = 0.3;
 	int longerSearchLength = 100, shorterSearchLength = 20;
@@ -120,8 +124,9 @@ int main( int argc, char * argv[] )
 	double elapsed_time;
 	
 	start_time =clock();   // check start time
-	validCntZ = FindFeatures5Add(src, trg, m, window_size, plusSearchRange, minusSearchRange, mIndexPairOrg, fixed_correl);  // use Y-Z extrema respectively 	
-	PrunedCnt = pruningIndex2(mIndexPairOrg,  mIndexPairZ, validCntZ, MORE_window_size);
+	validCntZ = FindFeatures5Add(src, trg, m, window_size, plusSearchRange, minusSearchRange, mIndexPairOrg, fixed_correl);  // use Y-Z extrema respectively 
+	PrunedCnt = pruningIndex3(mIndexPairOrg,  mIndexPairZ, validCntZ, MORE_window_size, extra);
+//	PrunedCnt = pruningIndex2(mIndexPairOrg,  mIndexPairZ, validCntZ, MORE_window_size);
 	
 	MatchedPair matchedPair[PrunedCnt];
 	//ReconstructFeaturedClineMORE(mIndexPairZ, validCntZ, MORE_window_size , src, trg, matchedPair);
