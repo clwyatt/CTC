@@ -35,6 +35,8 @@ class DField4Clines{
 		   void storeClineDField(string &ClineVectorFile, ReaderType::Pointer reader, IndexPair* mIndexPair, int ClineSize);
 		   void computeNeighborClineDField(float sigmaSquare, float dist, int currentIndex, int baseIndex);
 		   void computeNeighborClineAuxDField(float sigmaSquare, float dist, int currentIndex, int baseIndex);
+		   void computeNeighborClineDFieldUsingLinerInterpolation(int LowFeaturedIndex, int HighFeaturedIndex,  int currentIndex);
+		   void computeNeighborClineAuxDFieldUsingLinerInterpolation(int LowFeaturedIndex, int HighFeaturedIndex,  int currentIndex);
 		   ~DField4Clines(){}
 };
 

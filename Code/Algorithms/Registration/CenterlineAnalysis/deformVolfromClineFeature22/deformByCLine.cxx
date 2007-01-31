@@ -1019,6 +1019,32 @@ void  GroupObjVoxel::storeVolumeDField(ReaderType::Pointer reader, string &Volum
 	cout << "End of GroupObjVoxel::storeVolumeDField"<<endl;  
 }
 
+void DField4Clines::computeNeighborClineDFieldUsingLinerInterpolation(int LowFeaturedIndex, int HighFeaturedIndex,  int currentIndex)
+{
+	int m, n, m_n;
+	m = currentIndex - LowFeaturedIndex;
+	n = HighFeaturedIndex - currentIndex;
+	m_n = m+n;
+	
+	DFieldCline[currentIndex].DField.x =(float)( (n * DFieldCline[LowFeaturedIndex].DField.x) +(m * DFieldCline[HighFeaturedIndex].DField.x))/m_n;
+	DFieldCline[currentIndex].DField.y =(float)( (n * DFieldCline[LowFeaturedIndex].DField.y) +(m * DFieldCline[HighFeaturedIndex].DField.y))/m_n;
+	DFieldCline[currentIndex].DField.z =(float)( (n * DFieldCline[LowFeaturedIndex].DField.z) +(m * DFieldCline[HighFeaturedIndex].DField.z))/m_n;
+	
+}
+
+void DField4Clines::computeNeighborClineAuxDFieldUsingLinerInterpolation(int LowFeaturedIndex, int HighFeaturedIndex,  int currentIndex)
+{
+	int m, n, m_n;
+	m = currentIndex - LowFeaturedIndex;
+	n = HighFeaturedIndex - currentIndex;
+	m_n = m+n;
+	
+	auxDFieldCline[currentIndex].DField.x =(float)( (n * auxDFieldCline[LowFeaturedIndex].DField.x) +(m * auxDFieldCline[HighFeaturedIndex].DField.x))/m_n;
+	auxDFieldCline[currentIndex].DField.y =(float)( (n * auxDFieldCline[LowFeaturedIndex].DField.y) +(m * auxDFieldCline[HighFeaturedIndex].DField.y))/m_n;
+	auxDFieldCline[currentIndex].DField.z =(float)( (n * auxDFieldCline[LowFeaturedIndex].DField.z) +(m * auxDFieldCline[HighFeaturedIndex].DField.z))/m_n;
+	
+}
+
 
 void DField4Clines::computeNeighborClineDField(float sigmaSquare, float dist, int currentIndex, int baseIndex)
 {
@@ -1187,6 +1213,12 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 			
 			if( LowFeaturedIndex != HighFeaturedIndex){
 		
+				for(i=LowFeaturedIndex; i<=HighFeaturedIndex; i++){
+					
+					computeNeighborClineDFieldUsingLinerInterpolation( LowFeaturedIndex, HighFeaturedIndex, i);
+					
+				}
+/*				
 				numInbetweenIndex =HighFeaturedIndex - LowFeaturedIndex -1 ;  // cout << "numInbetweenIndex ="<<  numInbetweenIndex << endl;
 		
 				k=0;
@@ -1205,7 +1237,7 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 					computeNeighborClineDField(sigmaSquare, relativeDist, i, HighFeaturedIndex);
 					//cout <<"k="<<k<<endl;   k++;
 				}// for -i : High region				
-				
+*/				
 			} // if((LowFeaturedIndex != HighFeaturedIndex)								
 			
 			/////////////////////////////////////////////////////////////////////////////////
@@ -1238,8 +1270,13 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 			//cout << "HighFeaturedIndex="<<  HighFeaturedIndex << endl;
 			
 			if( auxLowFeaturedIndex != auxHighFeaturedIndex){
-		
-				auxnumInbetweenIndex =auxHighFeaturedIndex - auxLowFeaturedIndex -1 ;  // cout << "numInbetweenIndex ="<<  numInbetweenIndex << endl;
+				
+				for(i=auxLowFeaturedIndex; i<=auxHighFeaturedIndex; i++){
+					
+					computeNeighborClineAuxDFieldUsingLinerInterpolation( auxLowFeaturedIndex, auxHighFeaturedIndex, i);
+					
+				}		
+/*				auxnumInbetweenIndex =auxHighFeaturedIndex - auxLowFeaturedIndex -1 ;  // cout << "numInbetweenIndex ="<<  numInbetweenIndex << endl;
 		
 				k=0;
 				for(i=auxLowFeaturedIndex; i<=((int)floor((float)auxnumInbetweenIndex/2)+auxLowFeaturedIndex); i++){
@@ -1257,7 +1294,7 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 					computeNeighborClineAuxDField(sigmaSquare, auxrelativeDist, i, auxHighFeaturedIndex);
 					//cout <<"k="<<k<<endl;   k++;
 				}// for -i : High region				
-				
+*/				
 			} // if((auxLowFeaturedIndex != auxHighFeaturedIndex)								
 #endif	
 			
@@ -1318,7 +1355,13 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 			//cout << "HighFeaturedIndex="<<  HighFeaturedIndex << endl;
 			
 			if( LowFeaturedIndex != HighFeaturedIndex){
-		
+				
+				for(i=LowFeaturedIndex; i<=HighFeaturedIndex; i++){
+					
+					computeNeighborClineDFieldUsingLinerInterpolation( LowFeaturedIndex, HighFeaturedIndex, i);
+					
+				}				
+/*				
 				numInbetweenIndex =HighFeaturedIndex - LowFeaturedIndex -1 ;  // cout << "numInbetweenIndex ="<<  numInbetweenIndex << endl;
 		
 				k=0;
@@ -1337,7 +1380,7 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 					computeNeighborClineDField(sigmaSquare, relativeDist, i, HighFeaturedIndex);
 					//cout <<"k="<<k<<endl;   k++;
 				}// for -i : High region				
-				
+*/				
 			} // if((LowFeaturedIndex != HighFeaturedIndex)		
 			
 			/////////////////////////////////////////////////////////////////////////////////
@@ -1350,7 +1393,13 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 			//cout << "HighFeaturedIndex="<<  HighFeaturedIndex << endl;
 			
 			if( auxLowFeaturedIndex != auxHighFeaturedIndex){
-		
+	
+				for(i=auxLowFeaturedIndex; i<=auxHighFeaturedIndex; i++){
+					
+					computeNeighborClineAuxDFieldUsingLinerInterpolation( auxLowFeaturedIndex, auxHighFeaturedIndex, i);
+					
+				}				
+/*				
 				auxnumInbetweenIndex =auxHighFeaturedIndex - auxLowFeaturedIndex -1 ;  // cout << "numInbetweenIndex ="<<  numInbetweenIndex << endl;
 		
 				k=0;
@@ -1369,7 +1418,7 @@ void DField4Clines::fillFeaturedCline2(int validCnt, int win_size, int ClineSize
 					computeNeighborClineAuxDField(sigmaSquare, auxrelativeDist, i, auxHighFeaturedIndex);
 					//cout <<"k="<<k<<endl;   k++;
 				}// for -i : High region				
-				
+*/				
 			} // if((auxLowFeaturedIndex != auxHighFeaturedIndex)				
 #endif			
 			
