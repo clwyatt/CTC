@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_unit_coords </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_unit_coords </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Returns map grid coordinates for the units of a Self-Organizing Map.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  Co = som_unit_coords(sTopol);
+  Co = som_unit_coords(sM.topol);
+  Co = som_unit_coords(msize);
+  Co = som_unit_coords(msize,'hexa');
+  Co = som_unit_coords(msize,'rect','toroid');
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Calculates the map grid coordinates of the units of a SOM based on 
+ the given topology. The coordinates are such that they can be used to
+ position map units in space. In case of 'sheet' shape they can be 
+ (and are) used to measure interunit distances. 
+
+ NOTE: for 'hexa' lattice, the x-coordinates of every other row are shifted 
+ by +0.5, and the y-coordinates are multiplied by sqrt(0.75). This is done 
+ to make distances of a unit to all its six neighbors equal. It is not 
+ possible to use 'hexa' lattice with higher than 2-dimensional map grids.
+
+ 'cyl' and 'toroid' shapes: the coordinates are initially determined as 
+ in case of 'sheet' shape, but are then bended around the x- or the 
+ x- and then y-axes to get the desired shape. 
+
+</PRE>
+
+<H3> Possible bugs </H3>
+
+<PRE>
+ I don't know if the bending operation works ok for high-dimensional
+ map grids. Anyway, if anyone wants to make a 4-dimensional
+ toroid map, (s)he deserves it.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  topol          Map grid dimensions.
+        (struct) topology struct or map struct, the topology 
+                 (msize, lattice, shape) of the map is taken from 
+                 the appropriate fields (see e.g. SOM_SET)
+        (vector) the vector which gives the size of the map grid
+                 (msize-field of the topology struct).
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  lattice (string) The map lattice, either 'rect' or 'hexa'. Default
+                   is 'rect'. 'hexa' can only be used with 1- or 
+                   2-dimensional map grids.
+  shape   (string) The map shape, either 'sheet', 'cyl' or 'toroid'. 
+                   Default is 'sheet'. 
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  Co   (matrix) coordinates for each map units, size is [munits k] 
+                where k is 2, or more if the map grid is higher
+                dimensional or the shape is 'cyl' or 'toroid'
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ Simplest case:
+  Co = som_unit_coords(sTopol);
+  Co = som_unit_coords(sMap.topol);
+  Co = som_unit_coords(msize);
+  Co = som_unit_coords([10 10]);
+
+ If topology is given as vector, lattice is 'rect' and shape is 'sheet'
+ by default. To change these, you can use the optional arguments:
+  Co = som_unit_coords(msize, 'hexa', 'toroid');
+
+ The coordinates can also be calculated for high-dimensional grids:
+  Co = som_unit_coords([4 4 4 4 4 4]);
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_unit_dists.html"><B>som_unit_dists</B></a>
+<TD> Calculate interunit distance along the map grid.
+<TR><TD><a href="som_unit_neighs.html"><B>som_unit_neighs</B></a>
+<TD> Calculate neighborhoods of map units.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_dreval </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_dreval </H1>
+
+<P><B> [sig,cm,truex,truey] = som_dreval(sR,D,sigmea,inds1,inds2,andor)</B></P>
+<PRE>
+ SOM_DREVAL Evaluate the significance of the given descriptive rule.
+
+ [sig,Cm,truex,truey] = som_dreval(cR,D,sigmea,[inds1],[inds2],[andor]) 
+ 
+  sR      (struct) a rule struct, or an array of rule structs
+  D       (matrix) the data, of size [dlen x nr]
+  sigmea  (string) significance measure ('accuracy','accuracyI','mutuconf'), 
+                   see definitions below
+  [inds1] (vector) indeces belonging to the group
+                   (by default: the whole data set) 
+  [inds2] (vector) indeces belonging to the contrast group
+                   (by default: the rest of the data set)
+  [andor] (string) 'and' or 'or': which conjunction operator to use
+                   to join the rules for each variable
+
+  sig     (scalar) significance of the rule
+  cm      (vector) length 4, vectorized confusion matrix ([a,c,b,d]: see below)
+  truex   (vector) binary vector indicating for each item in the 
+                   group whether it was true or not
+  truey   (vector) binary vector indicating for each item in the 
+                   contrast group whether it was true or not
+
+ Descriptive rule significance is measured as the match between the 
+ given groups (inds1 = G1, inds2 = G2) and the rule being true or false.
+ 
+          G1    G2   
+       ---------------    accuracy  = (a+d) / (a+b+c+d)
+ true  |  a  |   b   |    
+       |--------------    mutuconf  =  a*a  / ((a+b)(a+c)) 
+ false |  c  |   d   | 
+       ---------------    accuracyI =   a   / (a+b+c)
+
+ See also  SOM_DRSIGNIF, SOM_DRMAKE.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

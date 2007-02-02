@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / knn </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> knn </H1>
+
+<P><B> [C,P]=knn(d, Cp, K)</B></P>
+<PRE>
+KNN K-Nearest Neighbor classifier using an arbitrary distance matrix
+
+  [C,P]=knn(d, Cp, [K])
+
+  Input and output arguments ([]'s are optional): 
+   d     (matrix) of size NxP: This is a precalculated dissimilarity (distance matrix).
+           P is the number of prototype vectors and N is the number of data vectors
+           That is, d(i,j) is the distance between data item i and prototype j.
+   Cp    (vector) of size Px1 that contains integer class labels. Cp(j) is the class of 
+            jth prototype.
+   [K]   (scalar) the maximum K in K-NN classifier, default is 1
+   C     (matrix) of size NxK: integers indicating the class 
+           decision for data items according to the K-NN rule for each K.
+           C(i,K) is the classification for data item i using the K-NN rule
+   P     (matrix) of size NxkxK: the relative amount of prototypes of 
+           each class among the K closest prototypes for each classifiee. 
+           That is, P(i,j,K) is the relative amount of prototypes of class j 
+           among K nearest prototypes for data item i.
+
+ If there is a tie between representatives of two or more classes
+ among the K closest neighbors to the classifiee, the class i selected randomly 
+ among these candidates.
+
+ IMPORTANT  If K>1 this function uses 'sort' which is considerably slower than 
+            'max' which is used for K=1. If K>1 the knn always calculates 
+            results for all K-NN models from 1-NN up to K-NN.   
+
+ EXAMPLE 1 
+
+ sP;                           % a SOM Toolbox data struct containing labeled prototype vectors
+ [Cp,label]=som_label2num(sP); % get integer class labels for prototype vectors                 
+ sD;                           % a SOM Toolbox data struct containing vectors to be classified
+ d=som_eucdist2(sD,sP);        % calculate euclidean distance matrix
+ class=knn(d,Cp,10);           % classify using 1,2,...,10-rules
+ class(:,5);                   % includes results for 5NN 
+ label(class(:,5))             % original class labels for 5NN
+
+ EXAMPLE 2 (leave-one-out-crossvalidate KNN for selection of proper K)
+
+ P;                          % a data matrix of prototype vectors (rows)
+ Cp;                         % column vector of integer class labels for vectors in P 
+ d=som_eucdist2(P,P);        % calculate euclidean distance matrix PxP
+ d(eye(size(d))==1)=NaN;     % set self-dissimilarity to NaN:
+                             % this drops the prototype itself away from its neighborhood 
+                             % leave-one-out-crossvalidation (LOOCV)
+ class=knn(d,Cp,size(P,1));  % classify using all possible K
+                             % calculate and plot LOOC-validated errors for all K
+ failratep = ...
+  100*sum((class~=repmat(Cp,1,size(P,1))))./size(P,1); plot(1:size(P,1),failratep) 
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

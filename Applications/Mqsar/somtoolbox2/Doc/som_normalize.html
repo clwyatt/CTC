@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_normalize </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_normalize </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Add/apply/redo normalization on data structs/sets.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  sS = som_normalize(sS)
+  sS = som_normalize(sS,method)
+   D = som_normalize(D,sNorm)
+  sS = som_normalize(sS,csNorm)
+  sS = som_normalize(...,comps)
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ This function is used to (initialize and) add, redo and apply 
+ normalizations on data/map structs/sets. If a data/map struct is given, 
+ the specified normalizations are added to the '.comp_norm' field of the 
+ struct after ensuring that all normalizations specified therein have
+ status 'done'. SOM_NORMALIZE actually uses function SOM_NORM_VARIABLE 
+ to handle the normalization operations, and only handles the data 
+ struct/set specific stuff itself.
+
+ The different normalization methods are listed below. For more 
+ detailed descriptions, see SOM_NORM_VARIABLE.
+
+   method     description
+   'var'      Variance is normalized to one (linear operation).
+   'range'    Values are normalized between [0,1] (linear operation).
+   'log'      Natural logarithm is applied to the values: 
+                xnew = log(x-m+1)
+              where m = min(x).
+   'logistic' Logistic or softmax trasformation which scales all
+              possible values between [0,1].
+   'histD'    Histogram equalization, values scaled between [0,1].
+   'histC'    Approximate histogram equalization with partially 
+              linear operations. Values scaled between [0,1].
+   'eval'     freeform operations
+
+ To enable undoing and applying the exactly same normalization to
+ other data sets, normalization information is saved into a 
+ normalization struct, which has the fields: 
+
+   .type   ; struct type, ='som_norm'
+   .method ; normalization method, a string
+   .params ; normalization parameters
+   .status ; string: 'uninit', 'undone' or 'done'
+
+ Normalizations are always one-variable operations. In the data and map
+ structs the normalization information for each component is saved in the
+ '.comp_norm' field, which is a cell array of length dim. Each cell
+ contains normalizations for one vector component in a struct array of
+ normalization structs. Each component may have different amounts of
+ different kinds of normalizations. Typically, all normalizations are
+ either 'undone' or 'done', but in special situations this may not be the
+ case. The easiest way to check out the status of the normalizations is to
+ use function SOM_INFO, e.g. som_info(sS,3)
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+   sS                The data to which the normalization is applied.
+            (struct) Data or map struct. Before adding any new 
+                     normalizations, it is ensured that the
+                     normalizations for the specified components in the
+                     '.comp_norm' field have status 'done'. 
+            (matrix) data matrix 
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+   method            The normalization(s) to add/use. If missing, 
+                     or an empty variable ('' or []) is given, the 
+                     normalizations in the data struct are used.
+            (string) Identifier for a normalization method to be added: 
+                     'var', 'range', 'log', 'logistic', 'histD' or 'histC'. The 
+                     same method is applied to all specified components
+                     (given in comps). The normalizations are first 
+                     initialized (for each component separately, of
+                     course) and then applied.
+            (struct) Normalization struct, or an array of structs, which
+                     is applied to all specified components. If the 
+                     '.status' field of the struct(s) is 'uninit', 
+                     the normalization(s) is initialized first.
+                     Alternatively, the struct may be map or data struct
+                     in which case its '.comp_norm' field is used
+                     (see the cell array option below).
+            (cell array) In practice, the '.comp_norm' field of 
+                     a data/map struct. The length of the array 
+                     must be equal to the dimension of the given 
+                     data set (sS). Each cell contains the
+                     normalization(s) for one component. Only the
+                     normalizations listed in comps argument are
+                     applied though.
+            (cellstr array) norm and denorm operations in a cellstr array
+                     which are evaluated with EVAL command with variable
+                     name 'x' reserved for the variable.
+
+   comps    (vector) The components to which the normalization(s) is
+                     applied. Default is to apply to all components.
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+   sS                Modified and/or updated data.
+            (struct) If a struct was given as input argument, the
+                     same struct is returned with normalized data and
+                     updated '.comp_norm' fields. 
+            (matrix) If a matrix was given as input argument, the 
+                     normalized data matrix is returned.
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+  To add (initialize and apply) a normalization to a data struct: 
+
+    sS = som_normalize(sS,'var'); 
+
+  This uses 'var'-method to all components. To add a method only to
+  a few selected components, use the comps argument: 
+
+    sS = som_normalize(sS,'log',[1 3:5]); 
+
+  To ensure that all normalization operations have indeed been done: 
+
+    sS = som_normalize(sS); 
+
+  The same for only a few components: 
+
+    sS = som_normalize(sS,'',[1 3:5]); 
+
+  To apply the normalizations of a data struct sS to a new data set D: 
+
+    D = som_normalize(D,sS); 
+  or 
+    D = som_normalize(D,sS.comp_norm); 
+
+  To normalize a data set: 
+
+    D = som_normalize(D,'histD'); 
+
+  Note that in this case the normalization information is lost.
+
+  To check out the status of normalization in a struct use SOM_INFO: 
+
+    som_info(sS,3)
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_denormalize.html"><B>som_denormalize</B></a>
+<TD> Undo normalizations of a data struct/set.
+<TR><TD><a href="som_norm_variable.html"><B>som_norm_variable</B></a>
+<TD> Normalization operations for a set of scalar values.
+<TR><TD><a href="som_info.html"><B>som_info</B></a>
+<TD> User-friendly information of SOM Toolbox structs.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

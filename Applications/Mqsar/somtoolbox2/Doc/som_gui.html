@@ -1,0 +1,355 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<head>
+<title>SOM Toolbox </title>
+</head>
+<body>
+<BODY BGCOLOR="#FFFFFF">
+
+<A NAME="begin">
+<center>
+<H1>
+Help SOM Toolbox -- Initialization & Training GUI
+</H1>
+</center>
+</A>
+
+<H3> Purpose </H3>
+
+A graphical user interface for initialization and training
+of Self-Organizing Maps.
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  som_gui([sD])
+</PRE></UL>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  sD          Training data.
+     (struct) data struct
+     (matrix) data matrix, size [dlen dim]
+</PRE>
+
+<H3>Help Topics</H3>
+
+<DL>
+
+<DT><A HREF="#intro">Introduction</A></DT>
+<DD>
+     What is <B>SOM Toolbox -- Initialization & Training GUI</B> ? 
+</DD>
+
+  
+<DT><A HREF="#load">Load data</A></DT>
+<DD>
+  Load data.
+  <BR>
+  From workspace
+  <BR>
+  From file
+</DD>
+
+<DT><A HREF="#pre">Preprocess data</A></DT>
+<DD>
+  Preprocess
+  <BR>
+</DD>
+
+<DT><A HREF="#init">Initialize map</A></DT>
+<DD>
+  Change default values
+  <BR>
+  Initialize
+</DD>
+     
+<DT><A HREF="#train">Train map</A></DT>
+<DD>
+  Change default values
+  <BR>
+  Train
+</DD>
+
+<DT><A HREF="#save">Save trained map</A></DT>
+<DD>
+  Save map
+</DD>
+
+<DT><A HREF="#vis">Visualize map</A></DT>
+<DD>
+  Visualize map
+</DD>
+
+<DT><A HREF="#restart">Restart from the beginning </A></DT>
+<DD>
+  Restart 
+</DD>
+
+<DT><A HREF="#close">Close </A></DT>
+<DD>
+  Close
+</DD>     
+<DT><A HREF="#main">Main window </A></DT>
+<DD>
+  Main window
+</DD>
+<DT><A HREF="#releted">Help </A></DT>
+<DD>
+  GUI help.<BR>		
+  More information about SOM and SOM Toolbox.
+</DD>    
+</DL>     
+
+<HR>
+
+
+<A NAME="intro">
+<H3>Introduction</H3>
+<B>SOM Toolbox -- Initialization & Training GUI</B> is Graphigal User Interface
+for initializating and training SOM. It is based on matlab functions in
+Somtoolbox vs.2. 
+
+
+
+
+<A NAME="load">
+<H3>Loading the data set</H3>
+</A>
+
+You can load the data set from <A HREF="#mainwin"> main window </A> by pushing
+the button <B>LOAD DATA</B> in upper left corner of window or by selecting
+<B>Load Data</B> from menu <B>Load/Save</B>. When the button is pushed or 
+menu is selected, then the <B>Load GUI</B> is activated, see figure below. 
+Data can be loaded  from workspace or from the file. Select the radiobutton 
+<B>Workspace</B> if you want to load data from workspace or select radiobutton
+<B>File</B> if you want to load data from file. 
+If you selected <B>File</B> then select the appropriate file type from 
+popupmenu, you can choose either <B>dat file</B> (SOMPAK format) or
+<B>mat file</B>, which is ordinary matlab <B>.mat file</B>. Write the name of
+data in upper editfield if you have chosen <B>workspace</B> or write the file
+name in another editfield below that. You can also push button <B>Browse</B> 
+and then you see all the choises that you have in 
+<A HREF="browsewin.jpg">browse window</A> or 
+in 
+<A HREF="wspace.jpg">workspace window.</A> 
+After that press button 
+<B>Load</B> and selected data will be loaded and Load GUI disapear and control
+return back to Main GUI. Note that there is also one checkbox called 
+<B>Missing value char</B> and one empty field related to that. If you select 
+<B>File</B> and after that file type <B>dat file</B> you can redefine char, 
+which is ignored in case of <B>dat file</B>, default value is tab
+
+<P>
+<CENTER>
+<IMG SRC="loadgui.jpg" ALT="Load GUI">
+<BR>
+<B>Figure 1. Load GUI</B>
+</CENTER>
+</P>
+
+<A NAME="pre">
+<H3>Preprocessing the data</H3>
+</A>
+
+After you have loaded the data then you can preprocess it. Select the
+menu called <B>Tools</B> from the menubar and from there select
+<B>Preprocess Data</B> and <A HREF="preprocess.html"> preprocessing
+GUI</A> will be activated.  After you have preprocessed data save it
+to the workspace and close the Preprocessin GUI after that you see
+little <A HREF="reload.gif"> question dialog box</A>, which askes the
+name saved data, default value is the name of data before
+preprocessing. After that the data is preprocessed and new default
+values are shown in main window.
+
+<A NAME="init">
+<H3>Map initialization</H3>
+</A>
+
+
+
+In <A HREF="#mainwin">main window</A> the static fields show default 
+initialization parameters for the training data. if you press button 
+<B>INITIALIZE</B> and map will be initialized according to these parameters. 
+You can also change these parameters by pressing button <B>Change values</B>.
+After that Initialization GUI, see figure below, will be activated and you can
+change initialization parameters from there. Possible options are:
+<DL>
+  <DT> <B>Type:</B>
+  <DD> Type of initilailzation, either <B>random</B> or <B>linear</B>	
+  <DT> <B>Lattice:</B>
+  <DD> Form of map, either <B>rectancular</B> or <B>hexagonal</B>	
+  <DT> <B>Shape:</B>
+  <DD> Shape of map, <B>sheet</B>, <B>cylinder</B> or <B>toroid</B>
+  <DT> <B>Map size:</B>
+  <DD> Size of map in form vertical*horizontal map units
+  <DT> <B>Munits:</B>
+  <DD> Total number of map units, so that the proportio  of horizontal and vertical map units is same as in default map size.		
+</DL>
+
+Press <B>OK</B> when you are changesd the parameters and the new parameters are 
+set and the initialization gui will disapper and control returns to Main GUI. 
+Press button  <B>INITIALIZE</B> and map will be initilized according to new 
+parameters.
+<P>
+<CENTER>
+<IMG SRC="initgui.jpg" ALT="Change Initialization GUI" >
+<BR>
+<B>Figure 2. Initialization GUI</B>
+</CENTER>
+</P>
+	
+<A NAME="train">
+<H3>Map training</H3>
+</A>
+
+After initialization you can train the map. Training have two phases,
+rough training and finetune phase. You can see default parameter for training
+in static fields of <A HREF="#mainwin">main window</A>. General values are 
+common both for the rough and finetune phase and varying values show spesific 
+values for both two phases. You can train the map with these values by pushing
+<B>TRAIN</B> button. It is also possible do only the finetune phase, by
+pushing <B>Only Finetune</B> radiobutton down. You can also change these
+default values by pressing <B>Change values</B> button in botom of training
+part. After that you can choose training algorithm, either sequential or
+batch training, from the 
+<A HREF="questdlg.jpg">question box</A>. 
+After choosing the appropriate algorithm you can select parameters from 
+parameter window, see below. The values you see first are the default values. 
+Possible options are:
+<DL>
+  <DT> <B>Mask:</B>
+  <DD> BMU search mask, size dim*1
+  <DT> <B>Neigh:</B>
+  <DD> Neighborhood function, <B>gaussian</B>, <B>cutgauss</B>, <B>ep</B> or <B>bubble</B>,
+  <DT> <B>Tracking:</B>
+  <DD> Tracking level value between 0-3
+  <DT> <B>Length type:</B>
+  <DD> Training length type, either <B>samples</B> or <B>epochs</B>
+  <DT> <B>Order:</B>
+  <DD> Sample order, either <B>ordered</B> or <B>random</B>
+  <DT> <B>Learning func:</B>
+  <DD> Learning rate function, <B>inv</B>, <B>linear</B> or <B>power</B>
+  <DT> <B>Radius initial:</B>
+  <DD> Initial training radius
+  <DT> <B>Radius final:</B>
+  <DD> Final training radius
+  <DT> <B>Alpha initial:</B>
+  <DD> Initial learning rate
+  <DT> <B>Training length:</B>
+  <DD> Training length
+</DL>
+
+<B>NOTE</B>, however that all of these values are not used in batch training
+and so you can not see or change these values. For example length type
+is allways epochs in batch training so this value is hidden from you and
+you cannot change it. You approve you choises by pressing button
+<B>Set parameters</B>. After that parameter window will disapper and
+control returns back to main window. Then you can press <B>TRAIN</B>
+button map will be trained.
+
+
+<P>
+<CENTER>
+<IMG SRC="paragui.jpg" ALT="Change Parameters GUI">
+<BR>
+<B>Figure 3. Change training parameters GUI</B>
+</CENTER>
+</P>
+
+<A NAME="save">
+<H3>Save trained map</H3>
+</A>
+
+After training you can save the trained map. Choose manu <B>Load/Save</B> from
+the menubar and there <B>Save map</B> and either <B>Save in workspace</B> or
+<B>Write cod-file</B>. If you choose <B>Save in workspace</B>, then
+<A HREF="savemap.gif">question box</A>
+asks the map name in workspace and the map is saved in that name.
+If you choose <B>Save map</B>, then 
+<A HREF="browse.gif">browse window</A>
+asks the name of file where the map is saved. The Map is written to 
+<B>.cod file</B>, which is SOMPAK format.
+
+<A NAME="vis">
+<H3>Visualize trained map</H3>
+</A>
+
+You can visualize trained map by selecting <B>Tools</B> from menubar and
+then selecting <B>Visualize map</B>. After that Visualization GUI is activated
+and you can visualize map.
+
+<A NAME="restart">
+<H3>Start from beginning</H3>
+</A>
+
+If you want to start from the beginning, this might be handy if you make some
+mistake or you want to train another map, then the best way to do it is
+by selectin <B>Tools</B> from the menu bar and <B>Clear all</B> from there.
+
+<A NAME="close">
+<H3>Close the program</H3>
+</A>
+
+You can close the program when ever you wish by pressing <B>CLOSE</B> button
+in main window or by selecting <B>Tools</B> from menubar and 
+<B>Close Figure</B>
+from there. 
+
+<A NAME="main">
+<H3>Main window</H3>
+</A>
+
+The main window has three separate parts, which are <B>Information</B>,
+<B>Initialization</B> and <B>Training</B>. <B>Information</B> part include 
+useful information about map, data and actions which have been carried out.
+The Status field contain information about the last action which have
+been carried out. The map field contains the name of map and the data
+field contain the name of training data.
+
+<P>
+<B>Initialization</B> part contain all the information and actions needed
+to initialization of map. The static fields show the default initialization
+values for the particular data set. It is possible to change these
+values by pushing the button <B>Change values</B> in bottom of initialization
+part.
+<P>
+<B>Training</B> part contains all the information and actions needed to train
+the map. Also in this case, static fields show default training values.
+<I>Genenral values</I> are common for both rough and finetune training.
+<I>Varying values</I> are separate for these two phases. It is possible
+change these values by pushing the button <B>Change values</B>  in bottom
+of training part. There is also radiobutton <B>only finetune</B>, when
+this button is activated the <B>Rough</B> values change inactive and only
+<B>finetune</B> is carried out.
+<A NAME="mainwin">
+<P>
+<CENTER>
+<IMG SRC="mwindow.jpg" ALT="GUI window">
+<BR>
+<B>Figure 4. Main GUI</B>	
+</CENTER>
+<P>
+</A>
+
+<A NAME="releted">
+<P>
+<H3>Help</H3>
+There is menu called <B>Help/Info</B> in main window where you can 
+find help. <B>WWW Help</B> shows this page and <B>Help window</B> shows this 
+page in ascii format.<B>About GUI</B> shows some general information about 
+this GUI in help window. If you didn't find answer to your problem
+then you can try to look your answer in following web pages.
+
+<BR>
+<A HREF="#begin">Back to begining</A>
+
+<P>
+</A>
+</body>
+</HTML>
+
+
+
+

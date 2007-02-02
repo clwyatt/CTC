@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_lininit </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_lininit </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Initializes a SOM linearly along its greatest eigenvectors.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  sMap = som_lininit(D);
+  sMap = som_lininit(D,sMap);
+  sMap = som_lininit(D,'munits',100,'hexa');
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Initializes a SOM linearly. If necessary, a map struct is created
+ first. The initialization is made by first calculating the eigenvalues
+ and eigenvectors of the training data. Then, the map is initialized
+ along the mdim greatest eigenvectors of the training data, where
+ mdim is the dimension of the map grid.
+
+</PRE>
+
+<H3> References </H3>
+
+<PRE>
+ Kohonen, T., "Self-Organizing Map", 2nd ed., Springer-Verlag, 
+    Berlin, 1995, pp. 106-107.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  D                 The training data.
+           (struct) Data struct. If this is given, its '.comp_names' and 
+                    '.comp_norm' fields are copied to the map struct.
+           (matrix) data matrix, size dlen x dim
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  argID (string) Argument identifier string (see below).
+  value (varies) Value for the argument (see below).
+
+  The optional arguments can be given as 'argID',value -pairs. If an
+  argument is given value multiple times, the last one is used. 
+
+  Here are the valid argument IDs and corresponding values. The values 
+  which are unambiguous (marked with '*') can be given without the 
+  preceeding argID.
+  'dlen'         (scalar) length of the training data
+  'data'         (matrix) the training data
+                *(struct) the training data
+  'munits'       (scalar) number of map units
+  'msize'        (vector) map size
+  'lattice'     *(string) map lattice: 'hexa' or 'rect'
+  'shape'       *(string) map shape: 'sheet', 'cyl' or 'toroid'
+  'topol'       *(struct) topology struct
+  'som_topol','sTopol'    = 'topol'
+  'map'         *(struct) map struct
+  'som_map','sMap'        = 'map'
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  sMap     (struct) The initialized map struct.
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+  sMap = som_lininit(D);
+  sMap = som_lininit(D,sMap);
+  sMap = som_lininit(D,'msize',[10 10]);
+  sMap = som_lininit(D,'munits',100,'rect');
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_map_struct.html"><B>som_map_struct</B></a>
+<TD> Create a map struct.
+<TR><TD><a href="som_randinit.html"><B>som_randinit</B></a>
+<TD> Initialize a map with random values.
+<TR><TD><a href="som_make.html"><B>som_make</B></a>
+<TD> Initialize and train self-organizing map.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

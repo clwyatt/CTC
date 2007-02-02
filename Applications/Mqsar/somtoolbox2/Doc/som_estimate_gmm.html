@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_estimate_gmm </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_estimate_gmm </H1>
+
+<P><B> [K,P] = som_estimate_gmm(sM, sD)</B></P>
+<PRE>
+SOM_ESTIMATE_GMM Estimate a gaussian mixture model based on map.
+
+ [K,P] = som_estimate_gmm(sM, sD)
+
+  Input and output arguments:
+   sM    (struct) map struct
+   sD    (struct) data struct
+         (matrix) size dlen x dim, the data to use when estimating
+                  the gaussian kernels
+
+   K     (matrix) size munits x dim, kernel width parametes for 
+                  each map unit
+   P     (vector) size 1 x munits, a priori probability of each map unit
+
+ See also SOM_PROBABILITY_GMM.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

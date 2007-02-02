@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_vs2to1 </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_vs2to1 </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Converts SOM Toolbox version 2 structs to version 1 structs.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  sS1 = som_vs2to1(sS2)
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ This function is offered to allow the change of new map and data structs
+ to old ones. There are quite a lot of changes between the versions,
+ especially in the map struct, and this function makes it possible to 
+ use the old functions with new structs.
+
+ Note that part of the information is lost in the conversion. Especially, 
+ training history is lost, and the normalization is, except in the simplest
+ cases (like all have 'range' or 'var' normalization) screwed up.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  sS2       (struct) som SOM Toolbox version 2.0 struct (map, data, 
+                     training or normalization struct)
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  sS1       (struct) the corresponding SOM Toolbox version 2.0 struct
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+  sM = som_vs2to1(sMnew);
+  sD = som_vs2to1(sDnew);
+  sT = som_vs2to1(sMnew.trainhist(1));
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_set.html"><B>som_set</B></a>
+<TD> Set values and create SOM Toolbox structs.
+<TR><TD><a href="som_vs1to2.html"><B>som_vs1to2</B></a>
+<TD> Transform structs from 1.0 version to 2.0.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

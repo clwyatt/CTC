@@ -1,0 +1,292 @@
+<HTML>
+<HEAD>
+<TITLE> SOM Toolbox / preprocess</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<TABLE BORDER=0 WIDTH="100%" CELLPADDING=0 CELLSPACING=0><TR>
+<TD VALIGN=baseline><FONT SIZE=+2>SOM Toolbox</FONT></TD>
+<TD VALIGN=baseline ALIGN=right><A HREF="../../helpdesk.html" TARGET="_top">Help Desk</A></TD>
+</TR></TABLE>
+<HR>
+<A NAME="begin">
+<CENTER> <H1> SOM Toolbox - Preprocessing GUI </H1> </CENTER>
+</A>
+<H3> Syntax </H3>
+<UL>
+<PRE>
+  preprocess(sD)
+</PRE>
+</UL>
+<H3> Input parameters </H3>
+ sD (struct or vector of structs)  'som_data' -struct or vector of 'som_data' 
+-structs
+<H3> Introduction </H3>
+Preprocessing GUI for SOM Toolbox is a tool for manipulating 'som_data'
+-structs. GUI contains several preprocessing tools for data set.
+<H3> Using GUI </H3>
+Preprocessing GUI is shown in a Figure 1:
+<BR>
+<BR>
+<CENTER><IMG SRC="preproc.jpg" ALT="Preprocess">
+<BR>
+<B> Figure 1. Preprocess </B>
+</CENTER>
+<P>
+In the upper left corner under the text '<I>DATA SETS</I>' is popup -menu that
+selects the current data set. Loading, saving and renaming is performed
+by opening a <A HREF="#dataSetManagement">'<I>DATA SET MANAGEMENT</I>' -gui</A>
+using the button under this popup -menu. '<I>SELECTED DATA SET</I>' -field 
+contains information of the current data set.
+<P>
+Field '<I>COMPONENT LIST</I>' contains the names of the components. Components
+for preprocessing can be chosen from this field by using the mouse. A discrete
+selection can be made by pressing <I>&lt;CTRL&gt;</I> -key during the 
+selection. 
+<P>
+Pushbuttons beside the '<I>COMPONENT LIST</I>' -field visualize the
+chosen components.
+<UL> 
+<LI> <I> PLOT </I> visualizes data points one after another.
+<LI> <I> BOX-PLOT</I> uses <I>Statistical Toolbox's <B>boxplot</B></I> 
+-function (type '<B>help boxplot</B>' in workspace). 
+<LI><I>HISTOGRAM</I> plots histograms  by using <I><B>n</B></I> bins (default 
+<B>n</B> is 30, value can be changed by writing  the new one to the text box 
+beside the <I>HISTOGRAM</I> -button. 
+<LI> <I> XY-PLOT </I> plots the first two chosen components, the second as
+the function of the first one. 
+</UL>
+<P>
+On the right of the buttons is the field '<I>AVERAGE</I>' which shows
+means of the selected vectors. The '<I>Relative Values</I>' -axis shows
+relative statitistics of every components chosen vectors. The left limit
+if the axes is every components minimum and the right side maximum. Tha black
+lines shows interval containing values of the chosen vectors. The circles
+in the axis are the means of the chosen vectors and x -marks show show
+medians.
+<P>
+<I>STATISTICS</I> -field contains statistics of the current component,
+and in the <I>HISTOGRAM</I> -axis is the histogram of the current component.
+The current component is drawn in the axis, which is on the left side of the
+histogram. This axis also shows the selected vectors as red circles. The
+vector selections can be made by selecting regions from the axis. The
+<I>SELECT ALL</I> -button selects all vectors. The current component can
+be chosen from the popup -menu under the axis. It should be noticed that
+this selection has nothing to do with the preprocessing operations. It
+only selects the component to be shown in the three fields above the popup 
+-menu.
+<P>The '<I>LOG</I>' -field shows the results of the operation and the
+<I>CLOSE</I> -button closes the application.
+</BODY>
+</HTML>
+<A NAME="dataSetManagement">
+<H3> DATA SET MANAGEMENT </H3>
+</A>
+Loading, saving and renaming data set can be done with the 'Data Set 
+Management' -gui. <I>DATA SET MANAGEMENT</I> -button opens a following GUI:
+<BR>
+<BR>
+<CENTER><IMG SRC="sDman.jpg" ALT="Data Set Management">
+<BR>
+<B> Figure 2. Data Set Management </B>
+</CENTER>
+<P>
+Renaming data set is simple. The new name has to be written to the position
+where the current name is. This is also the case, when components are
+renamed. The <I>RENAME</I> -button beside the '<I>COMPONENTS</I>' -field
+completes renaming components.
+<P>
+Data sets can be loaded from and saved to the workspace by using the arrow 
+buttons. The variables in the workspace are shown under the '<I>WORKSPACE</I>'
+-text and the data sets in the memory of the <I>preprocess</I> -tool are shown
+under the text '<I>DATA SETS</I>'. The darkened data set is copied or saved.
+<P>
+'<I>Data Set Management</I>' -gui has '<I>Tools</I>' -menu that contains
+the following operations:
+<UL>
+<LI>'<I>Copy</I>' copies a darkened data set.
+<LI>'<I>Delete</I>' deletes a darkened data set.
+<LI>'<I>Refresh</I>' refreshes the workspace variable set. 
+</UL>
+<H3> Menus of the Preprocess -tool </H3>
+<I>Preprocess</I> -tool contains the following menus:
+<UL>
+<LI>Normalization
+<LI>Components
+<LI>List
+</UL>
+The '<I>Normalization</I>' -menu contains the following functions:
+<UL>
+<LI><I>Scale [0,1]</I> normalizes the normalizes the chosen components
+between the interval [0,1].
+<LI><I>Scale Var=1</I> scales normalizes the components chosen so that
+their means will become 0 and variance 1.
+<LI><I>Hist D</I>, See <A HREF="som_normalize.html">
+som_normalize</A>
+<LI><I>Hist C</I>, See <A HREF="som_normalize.html">
+som_normalize</A>
+<LI><I>Log</I>, See <A HREF="som_normalize.html">
+som_normalize</A>
+<LI><I>Eval (1 comp)</I> evaluates the expression given by user. The Reserved
+word for the expression is <B><I>x</I></B> (the first chosen component).
+</UL>
+<P>
+The '<I>Components</I>' -menu contains the following functions:
+<UL>
+<LI><I>Move component</I> moves the first chosen component to the position
+wanted.
+<LI><I>Copy Component</I> copies the first chosen component to the position
+wanted.
+<LI><I>Add: N binary types</I> creates N new binary components (N is the
+number of different values in the chosen component.) Value in the new
+component in the <B>k</B>th position is 1, if the value indicating the new
+component is the same as the <B>k</B>th value in the chosen component, other
+values are zeros.
+<LI><I>Add: zeros</I> creates a new component containing zeros.
+<LI><I>Remove component</I> removes one component.
+<LI><I>Remove selected vectors</I> removes the vectors that can be seen as
+red circles in the axis under the <I>SELECT ALL</I> -button. It is possible
+to save the values removed to the workspace.
+<LI><I>Select all components</I> sets all the components selected.
+</UL>
+<P>
+The '<I>Misc</I>' -menu contains submenus and miscellanous operations.
+<UL>
+<LI><I>Calculate</I> (submenu)
+<LI><I>Process</I> (submenu)
+<LI><I>Get LOG-file</I> saves all the operations done as an m-file.
+<LI><I>Indices of the selected vectors</I> saves indices as an vector to
+the workspace.
+<LI><I>Undo</I> cancels only the previous operation.
+</UL>
+<P>
+The '<I>Calculate</I>' -submenu contains the following operations:
+<UL>
+<LI><I>Number of values</I> calculates the number of different values
+of the components chosen and prints them to the <I>LOG</I> -field.
+<LI><I>Number of selected vectors</I> calculates the number of
+selected vectors and prints it to the <I>LOG</I> -field.
+<LI><I>Correlation</I> calculates the correlation of the first two
+selected vectors and prints it to the <I>LOG</I> -field.
+</UL>
+<P>
+The '<I>Process</I>' -submenu contains the following operations: 
+<UL>
+<LI><I>Unit length</I> scales vectors of the chosen components to
+the unit length.
+<LI><I>Eval</I> evaluates the expression given by the user. The reserved
+words are:
+<UL>
+<LI><B><I>D</I></B>, the current data set
+<LI><B><I>xs</I></B>, the chosen components
+<LI><B><I>x</I></B>, the first of the chosen components
+<LI><B><I>cs</I></B>, indices of the chosen components
+<LI><B><I>c</I></B>, index of the first chosen component
+<LI><B><I>dim</I></B>, number of the components
+<LI><B><I>dlen</I></B>, number of the vectors
+</UL>
+<LI><A HREF="#Clipping"><I>Clipping</I></A> opens a gui for data filtering.
+<LI><A HREF="#Delay"><I>Delay</I></A> opens a gui for setting delays to data.
+<LI><A HREF="#Windowed"><I>Windowed</I></A> opens a gui for <I>Windowed</I> 
+-operation.
+<LI><A HREF="#SelVect"><I>Select Vectors</I></A> opens a gui for selecting 
+vectors.
+</UL>
+<A NAME="Clipping"><H3>The <I>Clipping</I> -gui</H3></A>
+By selecting <I>Clipping</I> from the <I>Misc/Processing</I> opens the
+following gui:
+<BR>
+<BR>
+<CENTER><IMG SRC="clip.jpg" ALT="Clipping">
+<BR>
+<B> Figure 3. Clipping </B>
+</CENTER>
+<P>
+<I>Clipping</I> selects values of the chosen component by upper (<I>Smaller 
+than </I> -field) and lower (<I>Bigger than</I> -field) limits and values that
+are equal to some value (<I>Equal to</I> -field). Values are combined by
+<B><I>union</I></B>- (<I>OR</I> -option) or <B><I>intersect</I></B>- 
+(<I>AND</I> -option) operation and then replaced by the value given by 
+user (<I>Replace with</I> -field). The filtering is performed by pushing 
+<I>Replace</I> -button. If <I>Among selected</I> -option is used, the 
+selection is made among the selected vectors, otherwise it is made among 
+all vectors (<I>All vectors</I> -option). <I>Close button</I> closes
+this gui.
+<A NAME="Delay"><H3>The <I>Delay</I> -gui</H3></A>
+By selecting <I>Delay</I> from the <I>Misc/Processing</I> opens a following
+gui:
+<BR>
+<BR>
+<CENTER><IMG SRC="delay.jpg" ALT="Delay">
+<BR>
+<B> Figure 4. Delay </B>
+</CENTER>
+<P>
+The <I>Delay</I> -field sets the length of the delay.
+If the <I>Clip this</I> -option is chosen, the number of the vectors of
+the data set stays the same. The values that don't match to any of the
+old vectors are clipped away from the component to be delayed. 
+<B><I>NaN</I></B>s will be added to the empty places. If <I>Clip all</I>
+option is used, points where otherwise would be <B><I>NaN</I></B>s
+when used the former way, will be clipped away from all the components.
+Also, the number of vectors wii decrease. <I>Expand all</I> -option does
+not clip anything away from the component to be delayed. The number of
+vectors will increase and the new vectors will have <B><I>NaN</I></B>s
+everywhere else, but in the delayed component.
+<A NAME="Windowed"><H3>The <I>Windowed</I> gui</H3></A>
+By selecting <I>Windowed</I> from the <I>Misc/Processing</I> opens a following
+gui:
+<BR>
+<BR>
+<CENTER><IMG SRC="window.jpg" ALT="Windowed">
+<BR>
+<B> Figure 5. Windowed </B>
+</CENTER>
+<P>
+The length of operating window is set to the field <I>Window length</I>. The
+field containing options <I>Centered</I>, <I>Previous</I> or <I>Next</I>
+indicates whether the operational point of the window is in the middle 
+(<I>Centered</I>), in the beginning (<I>Next</I>) or in the end 
+(<I>Previous</I>).The four options in the middle of the gui (<I>Mean</I>,
+<I>Median</I>,<I>Max</I>,<I>Min</I>) indicates which operation is evaluated
+in the window. The rightmost options, whether the number of vectors of the
+data set increases (<I>Expand</I>) or stays the same (<I>Clip</I>).
+<P>
+The window is moved over the current component and the operation is evaluated
+in every point. The result of the operation is set to the operational point
+of the window.
+<A NAME="SelVect"><H3>The <I>Select Vectors</I> gui</H3></A>
+By selecting <I>Select Vectors</I> from the <I>Misc/Processing</I> opens a 
+following gui:
+<BR>
+<BR>
+<CENTER><IMG SRC="selVect.jpg" ALT="Select Vectors">
+<BR>
+<B> Figure 5. Select Vectors </B>
+</CENTER>
+The <I>Select Vectors</I> -gui selects vectors in the same way as does
+the <A HREF="#Clipping"><I>Clipping</I></A> -gui. The difference is that
+it does only the selection part and does not replace values.
+<P>
+<I>Select Vectors</I> selects values of the chosen component by upper 
+(<I>Smaller than </I> -field) and lower (<I>Bigger than</I> -field) limits 
+and values that are equal to some value (<I>Equal to</I> -field). Values are 
+combined by <B><I>union</I></B> (<I>OR</I> -option) or <B> 
+<I>intersect</I></B> (<I>AND</I> -option) - operation.  If <I>Among 
+selected</I> -option is used, the selection is made among the selected 
+vectors, otherwise it is made among all vectors (<I>All vectors</I> -option).
+Vector indices that are given to the field <I>Vectors</I> are added to
+the selection. <I>OK</I> -button evaluates selection and <I>Close</I> -button 
+closes this gui.
+<HR><BR>
+<CENTER>[ <A HREF="../../helpdesk.html" TARGET="_top">Help Desk</A> | <A HREF="somtoolbox.html">SOM Toolbox</A> ]</CENTER>
+<BR>
+
+
+
+
+
+
+
+
+
+

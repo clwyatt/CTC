@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / vis_valuetype </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> vis_valuetype </H1>
+
+<P><B> flag=vis_valuetype(value, valid, str);</B></P>
+<PRE>
+ VIS_VALUETYPE Used for type checks in SOM Toolbox visualization routines
+
+  flag = vis_valuetype(value, valid, str)
+
+  Input and output arguments:
+   value  (varies) variable to be checked
+   valid  (cell array) size 1xN, cells are strings or vectors (see below)
+   str    (string) 'all' or 'any' (default), determines whether
+                   all or just any of the types listed in argument 'valid' 
+                   should be true for 'value'
+
+   flag   (scalar) 1 or 0 (true or false) 
+
+ This is an internal function of SOM Toolbox visualization.  It makes
+ various type checks. For example:
+
+  % Return 1 if X is a numeric scalar otherwise 0:
+  f=vis_valuetype(X,{'1x1'});
+
+  % Return 1 if X is a ColorSpec, that is, a 1x3 vector presenting an RGB
+  % value or any of strings 'red','blue','green','yellow','magenta','cyan',
+  % 'white' or 'black' or their shortenings  'r','g','b','y','m','c','w','k': 
+  f=vis_valueype(X,{'1x3rgb','colorstyle'})
+
+  % Return 1 if X is _both_ 10x3 size numeric matrix and has RGB values as rows
+  f=vis_valuetype(X,{'nx3rgb',[10 3]},'all')
+
+ Strings that may be used in argument valid: 
+  id             is true if value is 
+ 
+  [n1 n2 ... nn] any n1 x n2 x ... x nn sized numeric matrix
+  '1x1'          scalar (numeric)
+  '1x2'          1x2 vector (numeric)
+  'nx1'          any nx1 numeric vector
+  'nx2'              nx2
+  'nx3'              nx3
+  'nxn'          any numeric square matrix
+  'nxn[0,1]'     numeric square matrix with values in interval [0,1]
+  'nxm'          any numeric matrix
+  '1xn'          any 1xn numeric vector
+  '1x3rgb'       1x3 vector v for which all(v>=0 & v<=1), e.g., a RGB code
+  'nx3rgb'       nx3 numeric matrix that contains n RGB values as rows
+  'nx3dimrgb'    nx3xdim numeric matrix that contains RGB values
+  'nxnx3rgb'     nxnx3 numeric matrix of nxn RGB triples
+  'none'         string 'none'
+  'xor'          string 'xor'
+  'indexed'      string 'indexed'
+  'colorstyle'   strings 'red','blue','green','yellow','magenta','cyan','white' 
+                 or 'black', or 'r','g','b','y','m','c','w','k'                 
+  'markerstyle'  any of Matlab's marker chars '.','o','x','+','*','s','d','v',
+                 '^','<','>','p'or 'h'
+  'linestyle'    any or Matlab's line style strings '-',':','--', or '-.'
+  'cellcolumn'   a nx1 cell array
+  'topol_cell'   {lattice, msize, shape} 
+  'topol_cell_no_shape' {lattice, msize}
+  'string'       any string (1xn array of char)  
+  'chararray'    any MxN char array
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

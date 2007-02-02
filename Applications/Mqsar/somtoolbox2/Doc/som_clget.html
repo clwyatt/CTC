@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_clget </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_clget </H1>
+
+<P><B> a = som_clget(sC, mode, ind)</B></P>
+<PRE>
+SOM_CLGET Get properties of specified clusters.
+
+  a = som_clget(sC, mode, ind)
+ 
+     inds = som_clget(sC,'dinds',20); 
+     col  = som_clget(sC,'depth',[1 2 3 20 54]); 
+
+  Input and output arguments: 
+    sC     (struct) clustering struct
+    mode   (string) what kind of property is requested
+                    'binds' (a union over) indeces of base clusters 
+                            belonging to the specified cluster(s)
+                    'dinds' (a union over) indeces of the data vectors 
+                            belonging to the specified cluster(s)
+                    'dlen'  number of data vectors belonging 
+                            to each of the specified cluster(s)
+                    'depth' depths of the specified clusters
+                            (depth of the root cluster is 0, 
+                             depth of its children are 1, etc.)
+                    'child' (a union over) children clusters 
+                             of specified cluster(s), including
+                             the clusters themselves
+                    'base'  base partitioning based on given 
+                            clusters
+    ind    (vector) indeces of the clusters
+    
+    a      (vector) the answer
+
+ See also  SOM_CLSTRUCT, SOM_CLPLOT.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

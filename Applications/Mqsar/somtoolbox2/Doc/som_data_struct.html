@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_data_struct </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_data_struct </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Creates a data structure. 
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  sD = som_data_struct(D);
+  sD = som_data_struct(...,'argID',value,...);
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Creates a data struct. The struct contains, in addition to the data
+ matrix, component names, normalization operations for the components,
+ labels for each vector, and a name for the whole data set. All of these
+ can be given in the optional arguments of the function. If left
+ unspecified, they are given default values. 
+
+  Field         Type         Size / default value    
+  ------------------------------------------------------------------------
+   .type        (string)     'som_data'               
+   .data        (matrix)     size dlen x dim             
+   .name        (string)     'unnamed'
+   .labels      (cellstr)    size dlen x m, {''; ''; ... ''}
+   .comp_names  (cellstr)    size dim x 1, {'Variable1', 'Variable2', ...}
+   .comp_norm   (cell array) size dim x 1, {[], [], ... []}
+   .label_names (cellstr)    size m x 1, []
+
+ '.type' field is the struct identifier. Do not change it.
+ '.data' field is the data matrix, each row is one data vector
+ '.name' field is the identifier for the whole data struct
+ '.labels' field contains the labels for each of the vectors. The ith
+         of '.labels' contains the labels for ith data vector. Note that 
+         if some vectors have more labels than others, the others are
+         are given empty labels ('') to pad the '.labels' array up.
+ '.comp_names' field contains the names of the vector components
+ '.comp_norm' field contains normalization information for each
+         component. Each cell of '.comp_norm' is itself a cell array of
+         normalization structs. If no normalizations are performed for 
+         the particular component, the cell is empty ([]).
+ '.label_names' is similar to .comp_names field holding the names for
+         each data label column
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  D  (matrix) The data matrix, size dlen x dim. The data matrix may 
+              contain unknown values, indicated by NaNs. 
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  argID (string) Argument identifier string (see below).
+  value (varies) Value for the argument (see below).
+
+  The optional arguments can be given as 'argID',value -pairs as
+  listed below. If an argument is given value multiple times, the
+  last one is used.
+
+   'labels'     (string array / cellstr) labels for each data vector,
+                 size dlen x m
+   'name'       (string) data name
+   'comp_names' (string array / cellstr) component names, size dim x 1
+   'comp_norm'  (cell array) normalization operations for each
+                 component, size dim x 1. Each cell is either empty, 
+                 or a cell array of normalization structs.
+   'label_names'(string array / cellstr) label names, size m x 1
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  sD (struct) the data struct
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ Simplest case:
+  D  = rand(8, 3); % 8 3-dimensional vectors
+  sD = som_data_struct(D);
+
+ With optional arguments, the other fields can be given values:
+  labs   = cell(8, 1); labs{1, 1} = 'first_label';
+  cnames = {'first'; 'second'; 'third'};
+
+  sD = som_data_struct(D,'labels',labs,'name','a data struct');
+  sD = som_data_struct(D,'comp_names',cnames);
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_set.html"><B>som_set</B></a>
+<TD> Set values and create SOM Toolbox structs.
+<TR><TD><a href="som_map_struct.html"><B>som_map_struct</B></a>
+<TD> Create a map struct.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

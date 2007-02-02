@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / kmeans_clusters </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> kmeans_clusters </H1>
+
+<P><B> [centers,clusters,errors,ind] = kmeans_clusters(sD, n_max, c_max, verbose)</B></P>
+<PRE>
+ KMEANS_CLUSTERS Clustering with k-means with different values for k.
+
+ [c, p, err, ind] = kmeans_clusters(sD, [n_max], [c_max], [verbose])
+
+   [c, p, err, ind] = kmeans_clusters(sD);
+  
+  Input and output arguments ([]'s are optional):
+   D         (struct) map or data struct
+             (matrix) size dlen x dim, the data 
+   [n_max]   (scalar) maximum number of clusters, default is sqrt(dlen)
+   [c_max]   (scalar) maximum number of k-means runs, default is 5
+   [verbose] (scalar) verbose level, 0 by default
+
+   c         (cell array) c{i} contains cluster centroids for k=i
+   p         (cell array) p{i} contains cluster indeces for k=i
+   err       (vector) squared sum of errors for each value of k
+   ind       (vector) Davies-Bouldin index value for each clustering
+
+ Makes a k-means to the given data set with different values of
+ k. The k-means is run multiple times for each k, and the best of
+ these is selected based on sum of squared errors. Finally, the
+ Davies-Bouldin index is calculated for each clustering. 
+
+ For example to cluster a SOM: 
+    [c, p, err, ind] = kmeans_clusters(sM); % find clusterings
+    [dummy,i] = min(ind); % select the one with smallest index
+    som_show(sM,'color',{p{i},sprintf('%d clusters',i)}); % visualize
+    colormap(jet(i)), som_recolorbar % change colormap
+  
+ See also KMEANS.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

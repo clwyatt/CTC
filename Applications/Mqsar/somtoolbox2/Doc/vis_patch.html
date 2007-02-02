@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / vis_patch </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> vis_patch </H1>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  p = vis_patch(lattice)
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Forms a map unit patch for SOM_CPLANE function. Mainly a subroutine
+ of SOM_CPLANE, although can be used for on its own as well.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+ lattice (string)
+
+    'hexa'  produces vertex coordiantes for a hexagoanl patch which 
+            has its center on (0,0), unit width, and a height of
+            1.3334 units. This is not a regular hexagon but such that
+            the node which has topological coordinates (a,b) has its
+            center in the visualization at coordinates (a,b) for odd
+            a and at (a,b+.5) for even a. The non-regular look of the
+            patch is taken care simply by changing the axis ratio.
+
+    'rect'  produces vertex coordinates for a uniform rectangular patch.
+            having its center on (0,0) and unit sidelength. Used as a
+            subfunction in SOM_CPLANE.
+
+    'hexagon' produces vertex coordinates for a regular hexagonal patch.
+            It may be used in som_cplane if, for some reason, truly
+            regular hexagons are needed instead of the default unit
+            markers which are not uniform, but have integer
+            y-coordinates in the lattice.
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+ p (matrix) The 2-dimensional vertex coordinates: 
+
+   case 'rect'        case 'hexa'                case 'hexagon'
+    p=[[-.5 -.5];...     p=[[0     0.6667];...    p=[[0     0.5774];...
+       [-.5  .5];...        [0.5   0.3333];...       [0.5   0.2887];...
+       [ .5  .5];...        [0.5  -0.3333];...       [0.5  -0.2887];...
+       [ .5 -.5]];          [0    -0.6667];...       [0    -0.5774];...
+                            [-0.5 -0.3333];...       [-0.5 -0.2887];...
+                            [-0.5  0.3333]];         [-0.5  0.2887]]; 
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+  som_cplane(vis_patch('rect'),[6 5],'none');
+  % this produces the same result as som_cplane('rect',[6 5], 'none') 
+
+  som_cplane(vis_patch('hexa'), vis_unit_coord('hexa',[6 5]), 'none');
+  % produces in principle the same result as 
+  % som_cplane(vis_patch('hexa'),[6 5],'none'), 
+  % _but_ in this case the axis are not rescaled and the non-regular 
+  % shape of hexagons can be seen.
+
+  som_cplane(vis_patch('hexagon'), som_unit_coords([6 5],'hexa'), 'none');
+  % produces a truly regular hexa lattice 
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="vis_unit_coord.html"><B>vis_unit_coord</B></a>
+<TD> The default 'hexa' and 'rect' coordinates in visualizations
+<TR><TD><a href="som_unit_coords.html"><B>som_unit_coords</B></a>
+<TD> Locations of units on the SOM grid.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

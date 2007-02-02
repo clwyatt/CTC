@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_seqtrain </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_seqtrain </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Trains a Self-Organizing Map using the sequential algorithm. 
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  sM = som_seqtrain(sM,D);
+  sM = som_seqtrain(sM,sD);
+  sM = som_seqtrain(...,'argID',value,...);
+  sM = som_seqtrain(...,value,...);
+  [sM,sT] = som_seqtrain(M,D,...);
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Trains the given SOM (sM or M above) with the given training data
+ (sD or D) using sequential SOM training algorithm. If no optional
+ arguments (argID, value) are given, a default training is done, the
+ parameters are obtained from SOM_TRAIN_STRUCT function. Using
+ optional arguments the training parameters can be specified. Returns
+ the trained and updated SOM and a train struct which contains
+ information on the training.
+
+</PRE>
+
+<H3> References </H3>
+
+<PRE>
+ Kohonen, T., "Self-Organizing Map", 2nd ed., Springer-Verlag, 
+    Berlin, 1995, pp. 78-82.
+ Kohonen, T., "Clustering, Taxonomy, and Topological Maps of
+    Patterns", International Conference on Pattern Recognition
+    (ICPR), 1982, pp. 114-128.
+ Kohonen, T., "Self-Organized formation of topologically correct
+    feature maps", Biological Cybernetics 43, 1982, pp. 59-69.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  sM          The map to be trained. 
+     (struct) map struct
+     (matrix) codebook matrix (field .data of map struct)
+              Size is either [munits dim], in which case the map grid 
+              dimensions (msize) should be specified with optional arguments,
+              or [msize(1) ... msize(k) dim] in which case the map 
+              grid dimensions are taken from the size of the matrix. 
+              Lattice, by default, is 'rect' and shape 'sheet'.
+  D           Training data.
+     (struct) data struct
+     (matrix) data matrix, size [dlen dim]
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  argID (string) Argument identifier string (see below).
+  value (varies) Value for the argument (see below).
+
+  The optional arguments can be given as 'argID',value -pairs. If an
+  argument is given value multiple times, the last one is
+  used. The valid IDs and corresponding values are listed below. The values 
+  which are unambiguous (marked with '*') can be given without the 
+  preceeding argID.
+
+   'mask'       (vector) BMU search mask, size dim x 1. Default is 
+                         the one in sM (field '.mask') or a vector of
+                         ones if only a codebook matrix was given.
+   'msize'      (vector) map grid dimensions. Default is the one
+                         in sM (field sM.topol.msize) or 
+                         'si = size(sM); msize = si(1:end-1);' 
+                         if only a codebook matrix was given. 
+   'radius'     (vector) neighborhood radius 
+                         length = 1: radius_ini = radius
+                         length = 2: [radius_ini radius_fin] = radius
+                         length > 2: the vector given neighborhood
+                                     radius for each step separately
+                                     trainlen = length(radius)
+   'radius_ini' (scalar) initial training radius
+   'radius_fin' (scalar) final training radius
+   'alpha'      (vector) learning rate
+                         length = 1: alpha_ini = alpha
+                         length > 1: the vector gives learning rate
+                                     for each step separately
+                                     trainlen is set to length(alpha)
+                                     alpha_type is set to 'user defined'
+   'alpha_ini'  (scalar) initial learning rate
+   'tracking'   (scalar) tracking level: 0, 1 (default), 2 or 3
+                         0 - estimate time 
+                         1 - track time and quantization error 
+                         2 - plot quantization error
+                         3 - plot quantization error and two first 
+                             components 
+   'trainlen'   (scalar) training length (see also 'tlen_type')
+   'trainlen_type' *(string) is the trainlen argument given in 'epochs'
+                         or in 'samples'. Default is 'epochs'.
+   'sample_order'*(string) is the sample order 'random' (which is the 
+                         the default) or 'ordered' in which case
+                         samples are taken in the order in which they 
+                         appear in the data set
+   'train'     *(struct) train struct, parameters for training. 
+                         Default parameters, unless specified, 
+                         are acquired using SOM_TRAIN_STRUCT (this 
+                         also applies for 'trainlen', 'alpha_type',
+                         'alpha_ini', 'radius_ini' and 'radius_fin').
+   'sTrain', 'som_train' (struct) = 'train'
+   'neigh'     *(string) The used neighborhood function. Default is 
+                         the one in sM (field '.neigh') or 'gaussian'
+                         if only a codebook matrix was given. Other 
+                         possible values is 'cutgauss', 'ep' and 'bubble'.
+   'topol'     *(struct) topology of the map. Default is the one
+                         in sM (field '.topol').
+   'sTopol', 'som_topol' (struct) = 'topol'
+   'alpha_type'*(string) learning rate function, 'inv', 'linear' or 'power'
+   'lattice'   *(string) map lattice. Default is the one in sM
+                         (field sM.topol.lattice) or 'rect' 
+                         if only a codebook matrix was given. 
+   'shape'     *(string) map shape. Default is the one in sM
+                         (field sM.topol.shape) or 'sheet' 
+                         if only a codebook matrix was given. 
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  sM          the trained map
+     (struct) if a map struct was given as input argument, a 
+              map struct is also returned. The current training 
+              is added to the training history (sM.trainhist).
+              The 'neigh' and 'mask' fields of the map struct
+              are updated to match those of the training.
+     (matrix) if a matrix was given as input argument, a matrix
+              is also returned with the same size as the input 
+              argument.
+  sT (struct) train struct; information of the accomplished training
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ Simplest case:
+  sM = som_seqtrain(sM,D);  
+  sM = som_seqtrain(sM,sD);  
+
+ To change the tracking level, 'tracking' argument is specified:
+  sM = som_seqtrain(sM,D,'tracking',3);
+
+ The change training parameters, the optional arguments 'train', 
+ 'neigh','mask','trainlen','radius','radius_ini', 'radius_fin', 
+ 'alpha', 'alpha_type' and 'alpha_ini' are used. 
+  sM = som_seqtrain(sM,D,'neigh','cutgauss','trainlen',10,'radius_fin',0);
+
+ Another way to specify training parameters is to create a train struct:
+  sTrain = som_train_struct(sM,'dlen',size(D,1),'algorithm','seq');
+  sTrain = som_set(sTrain,'neigh','cutgauss');
+  sM = som_seqtrain(sM,D,sTrain);
+
+ By default the neighborhood radius goes linearly from radius_ini to
+ radius_fin. If you want to change this, you can use the 'radius' argument
+ to specify the neighborhood radius for each step separately:
+  sM = som_seqtrain(sM,D,'radius',[5 3 1 1 1 1 0.5 0.5 0.5]);
+
+ By default the learning rate (alpha) goes from the alpha_ini to 0
+ along the function defined by alpha_type. If you want to change this, 
+ you can use the 'alpha' argument to specify the learning rate
+ for each step separately: 
+  alpha = 0.2*(1 - log([1:100]));
+  sM = som_seqtrain(sM,D,'alpha',alpha);
+
+ You don't necessarily have to use the map struct, but you can operate
+ directly with codebook matrices. However, in this case you have to
+ specify the topology of the map in the optional arguments. The
+ following commads are identical (M is originally a 200 x dim sized matrix):
+  M = som_seqtrain(M,D,'msize',[20 10],'lattice','hexa','shape','cyl');
+
+  M = som_seqtrain(M,D,'msize',[20 10],'hexa','cyl');
+
+  sT= som_set('som_topol','msize',[20 10],'lattice','hexa','shape','cyl');
+  M = som_seqtrain(M,D,sT);
+
+  M = reshape(M,[20 10 dim]);
+  M = som_seqtrain(M,D,'hexa','cyl');
+
+ The som_seqtrain also returns a train struct with information on the 
+ accomplished training. This is the same one as is added to the end of the 
+ trainhist field of map struct, in case a map struct is given.
+  [M,sTrain] = som_seqtrain(M,D,'msize',[20 10]);
+
+  [sM,sTrain] = som_seqtrain(sM,D); % sM.trainhist{end}==sTrain
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_make.html"><B>som_make</B></a>
+<TD> Initialize and train a SOM using default parameters.
+<TR><TD><a href="som_batchtrain.html"><B>som_batchtrain</B></a>
+<TD> Train SOM with batch algorithm.
+<TR><TD><a href="som_train_struct.html"><B>som_train_struct</B></a>
+<TD> Determine default training parameters.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_unit_dists </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_unit_dists </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Returns interunit distances between the units of a Self-Organizing Map
+ along the map grid.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  Ud = som_unit_dists(sTopol);
+  Ud = som_unit_dists(sM.topol);
+  Ud = som_unit_dists(msize);
+  Ud = som_unit_dists(msize,'hexa');
+  Ud = som_unit_dists(msize,'rect','toroid');
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Calculates the distances between the units of a SOM based on the 
+ given topology. The distance are euclidian and they are measured
+ along the map grid (in the output space). 
+
+ In case of 'sheet' shape, the distances can be measured directly
+ from the unit coordinates given by SOM_UNIT_COORDS. 
+
+ In case of 'cyl' and 'toroid' shapes this is not so. In these cases
+ the coordinates are calculated as in the case of 'sheet' shape and
+ the shape is then taken into account by shifting the map grid into
+ different positions. 
+
+ Consider, for example, a 4x3 map. The basic position of map units 
+ is shown on the left (with '1' - 'C' each denoting one map unit). 
+ In case of a 'cyl' shape, units on the left and right edges are
+ neighbors, so for this purpose the map is copied on the left and
+ right sides of the map, as on right. 
+
+    basic               left     basic    right
+    -------             -------  -------  -------
+    1  5  9             1  5  9  1  5  9  1  5  9
+    2  6  a             2  6  a  2  6  a  2  6  a  
+    3  7  b             3  7  b  3  7  b  3  7  b 
+    4  8  c             4  8  c  4  8  c  4  8  c 
+
+ For the 'toroid' shape a similar trick is done, except that the 
+ copies are placed all around the basic position:
+
+             1  5  9  1  5  9  1  5  9
+             2  6  a  2  6  a  2  6  a  
+             3  7  b  3  7  b  3  7  b 
+             4  8  c  4  8  c  4  8  c 
+             1  5  9  1  5  9  1  5  9
+             2  6  a  2  6  a  2  6  a  
+             3  7  b  3  7  b  3  7  b 
+             4  8  c  4  8  c  4  8  c 
+             1  5  9  1  5  9  1  5  9
+             2  6  a  2  6  a  2  6  a  
+             3  7  b  3  7  b  3  7  b 
+             4  8  c  4  8  c  4  8  c 
+
+ From this we can see that the distance from unit '1' is 1 to units
+ '9','2','4' and '5', and sqrt(2) to units 'C','A','8' and '6'. Notice 
+ that in the case of a 'hexa' lattice and 'toroid' shape, the size
+ of the map in y-direction should be even. The reason can be clearly
+ seen from the two figures below. On the left the basic positions for
+ a 3x3 map. If the map is copied above itself, it can be seen that the
+ lattice is broken (on the right):
+
+     basic positions                 example of broken lattice
+     ---------------                 -------------------------
+                                     1  4  7 
+                                      2  5  8
+                                     3  6  9
+     1  4  7                         1  4  7 
+      2  5  8                         2  5  8
+     3  6  9                         3  6  9
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  topol          Map grid dimensions.
+        (struct) topology struct or map struct, the topology 
+                 (msize, lattice, shape) of the map is taken from 
+                 the appropriate fields (see e.g. SOM_SET)
+        (vector) the vector which gives the size of the map grid
+                 (msize-field of the topology struct).
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  lattice (string) The map lattice, either 'rect' or 'hexa'. Default
+                   is 'rect'. 'hexa' can only be used with 1- or 
+                   2-dimensional map grids.
+  shape   (string) The map shape, either 'sheet', 'cyl' or 'toroid'. 
+                   Default is 'sheet'. 
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  Ud   (matrix) distances from each map unit to each other map unit,
+                size is [munits munits]
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ Simplest case:
+  Ud = som_unit_dists(sTopol);
+  Ud = som_unit_dists(sMap.topol);
+  Ud = som_unit_dists(msize);
+  Ud = som_unit_dists([10 10]);
+
+ If topology is given as vector, lattice is 'rect' and shape is 'sheet'
+ by default. To change these, you can use the optional arguments:
+  Ud = som_unit_dists(msize, 'hexa', 'toroid');
+
+ The distances can also be calculated for high-dimensional grids:
+  Ud = som_unit_dists([4 4 4 4 4 4]);
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_unit_coords.html"><B>som_unit_coords</B></a>
+<TD> Calculate grid coordinates.
+<TR><TD><a href="som_unit_neighs.html"><B>som_unit_neighs</B></a>
+<TD> Calculate neighborhoods of map units.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

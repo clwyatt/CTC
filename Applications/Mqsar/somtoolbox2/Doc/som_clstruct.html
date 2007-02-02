@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_clstruct </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_clstruct </H1>
+
+<P><B> sC = som_clstruct(Z,varargin)</B></P>
+<PRE>
+SOM_CLSTRUCT Create a clustering struct or set its field values.
+
+  sC = som_clstruct(Z, [argID, value, ...]) 
+
+    Z  = linkage(pdist(sM.codebook));
+    sC = som_clstruct(Z); 
+    sC = som_clstruct(sC,'coord',som_vis_coords(lattice,msize));
+    sC = som_clstruct(sC,'color',som_colorcode(sM));
+    sC = som_clstruct(sC,'base',sC.base(som_bmus(sM,sD)));
+
+  Input and output arguments ([]'s are optional): 
+   Z         (matrix) size clen-1 x 3, where clen is the number of 
+                      base clusters. This is a clustering matrix 
+                      similar to that produced by LINKAGE in 
+                      Statistical Toolbox. See SOM_LINKAGE.
+             (struct) clustering struct (as produced by this function)
+   [argID,   (string) See below. Each pair is the fieldname and 
+    value]   (varies) the value to be given to that field.
+
+   sC        (struct) clustering struct
+ 
+   The clustering struct is based on the assumption that there 
+   is a base partitioning of the SOM (or data) which is saved in 
+   the .base field of the struct. Then a hierarchical clustering
+   is applied to this base partitioning. The results are saved to 
+   .tree field of the struct. Each cluster (base and combined)
+   has also three properties: height, coordinate and color, which 
+   are used in the visualizations. The fields of the struct are:
+     .type   (string) 'som_clustering'
+     .name   (string) Identifier for the clustering.
+     .tree   (matrix) Size clen-1 x 3, as argument Z above. 
+     .base   (vector) Size dlen x 1, the basic groups of data 
+                      forming the base clusters, e.g. as a result 
+                      of partitive clustering. Allowed values are 
+                       1:clen indicating the base cluster
+                              to which the data belongs to. 
+                       NaN    indicating that the data has
+                              been ignored in the clustering
+                      By default [1:clen]. 
+     .height (vector) Size 2*clen-1 x 1, (clustering) height for each 
+                      cluster. By default 0 for each base cluster and
+                      .tree(:,3) for the others.
+     .coord  (matrix) Size 2*clen-1 x *, coordinate for each cluster, 
+                      By default the coordinates are set so that 
+                      the base clusters are ordered on a line, and the
+                      position of each combined cluster is average of 
+                      the base clusters that constitute it.
+     .color  (matrix) Size 2*clen-1 x 3, color for each cluster. 
+                      By default the colors are set so that the 
+                      base clusters are ordered on a line, like above,
+                      and then colors are assigned from the 'hsv' 
+                      colormap to the base clusters. The color
+                      of each combined cluster is average as above.
+
+ Height, coord and color can also be specified in alternate forms:
+   'height' (vector) size 2*clen-1 x 1, if given explicitly
+                     size clen-1 x 1, specified heights of the 
+                          combined clusters (the base cluster heights
+                          are all = 0)
+                     size 0 x 0, default value is used
+   'coord'  (matrix) size 2*clen-1 x *, if given explicitly
+                     size clen x *, to give coordinates for base 
+                          clusters; the coordinate of combined clusters
+                          are averaged from these
+                     size dlen x *, to give coordinates of the 
+                          original data: the cluster coordinates are
+                          averaged from these based on base clusters
+                     size 0 x 0, default value is used
+   'color'  (matrix) as 'coord'
+
+ See also  SOM_CLPLOT, SOM_CLVALIDITY, SOM_CLGET, SOM_CLLINKAGE.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

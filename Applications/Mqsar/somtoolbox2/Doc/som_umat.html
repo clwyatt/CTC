@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_umat </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_umat </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Computes the unified distance matrix of a SOM.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  U = som_umat(sM)  
+  U = som_umat(...,'argID',value,...)
+  U = som_umat(...,value,...)
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Compute and return the unified distance matrix of a SOM. 
+ For example a case of 5x1 -sized map:
+            m(1) m(2) m(3) m(4) m(5)
+ where m(i) denotes one map unit. The u-matrix is a 9x1 vector:
+    u(1) u(1,2) u(2) u(2,3) u(3) u(3,4) u(4) u(4,5) u(5) 
+ where u(i,j) is the distance between map units m(i) and m(j)
+ and u(k) is the mean (or minimum, maximum or median) of the 
+ surrounding values, e.g. u(3) = (u(2,3) + u(3,4))/2. 
+
+ Note that the u-matrix is always calculated for 'sheet'-shaped map and
+ the map grid must be at most 2-dimensional.
+
+</PRE>
+
+<H3> References </H3>
+
+<PRE>
+ Ultsch, A., Siemon, H.P., "Kohonen's Self-Organizing Feature Maps
+   for Exploratory Data Analysis", in Proc. of INNC'90,
+   International Neural Network Conference, Dordrecht,
+   Netherlands, 1990, pp. 305-308.
+ Kohonen, T., "Self-Organizing Map", 2nd ed., Springer-Verlag, 
+    Berlin, 1995, pp. 117-119. 
+ Iivarinen, J., Kohonen, T., Kangas, J., Kaski, S., "Visualizing 
+   the Clusters on the Self-Organizing Map", in proceedings of
+   Conference on Artificial Intelligence Research in Finland,
+   Helsinki, Finland, 1994, pp. 122-126.
+ Kraaijveld, M.A., Mao, J., Jain, A.K., "A Nonlinear Projection
+   Method Based on Kohonen's Topology Preserving Maps", IEEE
+   Transactions on Neural Networks, vol. 6, no. 3, 1995, pp. 548-559.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  sM (struct) SOM Toolbox struct or the codebook matrix of the map.
+     (matrix) The matrix may be 3-dimensional in which case the first 
+              two dimensions are taken for the map grid dimensions (msize).
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  argID (string) Argument identifier string (see below).
+  value (varies) Value for the argument (see below).
+
+  The optional arguments are given as 'argID',value -pairs. If the 
+  value is unambiguous, it can be given without the preceeding argID.
+  If an argument is given value multiple times, the last one is used. 
+
+  Below is the list of valid arguments: 
+   'mask'      (vector) mask to be used in calculating
+                        the interunit distances, size [dim  1]. Default is 
+                        the one in sM (field sM.mask) or a vector of
+                        ones if only a codebook matrix was given.
+   'topol'     (struct) topology of the map. Default is the one
+                        in sM (field sM.topol).
+   'sTopol','som_topol' (struct) = 'topol'
+   'msize'     (vector) map grid dimensions
+   'lattice'   (string) map lattice 'rect' or 'hexa'
+   'mode'      (string) 'min', 'mean', 'median' or 'max'
+                        Map unit value computation method. In fact, 
+                        eval-function is used to evaluate this, so 
+                        you can give other computation methods as well.
+                        Default is 'median'. 
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  U   (matrix) the unified distance matrix of the SOM 
+               size 2*n1-1 x 2*n2-1, where n1 = msize(1) and n2 = msize(2)
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+  U = som_umat(sM);  
+  U = som_umat(sM.codebook,sM.topol,'median','mask',[1 1 0 1]);
+  U = som_umat(rand(10,10,4),'hexa','rect'); 
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_show.html"><B>som_show</B></a>
+<TD> show the selected component planes and the u-matrix
+<TR><TD><a href="som_cplane.html"><B>som_cplane</B></a>
+<TD> draw a 2D unified distance matrix
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

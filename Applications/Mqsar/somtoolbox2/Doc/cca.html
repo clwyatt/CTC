@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / cca </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> cca </H1>
+
+<P><B> [P] = cca(D, P, epochs, Mdist, alpha0, lambda0)</B></P>
+<PRE>
+CCA Projects data vectors using Curvilinear Component Analysis.
+
+ P = cca(D, P, epochs, [Dist], [alpha0], [lambda0])
+
+  P = cca(D,2,10);           % projects the given data to a plane
+  P = cca(D,pcaproj(D,2),5); % same, but with PCA initialization
+  P = cca(D, 2, 10, Dist);   % same, but the given distance matrix is used
+  
+  Input and output arguments ([]'s are optional):
+   D          (matrix) the data matrix, size dlen x dim
+              (struct) data or map struct            
+   P          (scalar) output dimension
+              (matrix) size dlen x odim, the initial projection
+   epochs     (scalar) training length
+   [Dist]     (matrix) pairwise distance matrix, size dlen x dlen.
+                       If the distances in the input space should
+                       be calculated otherwise than as euclidian
+                       distances, the distance from each vector
+                       to each other vector can be given here,
+                       size dlen x dlen. For example PDIST
+                       function can be used to calculate the
+                       distances: Dist = squareform(pdist(D,'mahal'));
+   [alpha0]   (scalar) initial step size, 0.5 by default
+   [lambda0]  (scalar) initial radius of influence, 3*max(std(D)) by default
+  
+   P          (matrix) size dlen x odim, the projections
+
+ Unknown values (NaN's) in the data: projections of vectors with
+ unknown components tend to drift towards the center of the
+ projection distribution. Projections of totally unknown vectors are
+ set to unknown (NaN).
+
+ See also SAMMON, PCAPROJ. 
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

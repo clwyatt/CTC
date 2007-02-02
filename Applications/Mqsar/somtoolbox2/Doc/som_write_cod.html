@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_write_cod </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_write_cod </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Writes a self-organizing map struct to a file in SOM_PAK format.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  som_write_cod(sMap,filename); 
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ This function is offered for compatibility with SOM_PAK, a SOM 
+ software package in C. It writes map struct to files in SOM_PAK format.
+
+ See SOM_READ_COD for description of the SOM_PAK map file format.
+ Because the SOM_PAK package does not support many of the features and
+ options of the SOM Toolbox, some of the information is changed, or even
+ lost. 
+
+ SOM_PAK does not support 3- or higher dimensional map grids. These cannot
+         be exported using this function.  
+ SOM_PAK always supposes that the map has 'sheet' shape. 
+ SOM_PAK only supports 'bubble' and 'gaussian' neighborhood functions.
+         Any other neighborhood function is changed to 'gaussian'.
+ SOM_PAK doesn't support component names. However, the component names are
+         written on a comment line which begins with '#n '. Any spaces (' ') 
+         in the component names are replaced with underscores ('_').      
+ Information on map name, mask, training history and normalizations is lost.
+
+ This function is only offered for compatibility with SOM_PAK. In general,
+ when saving map structs in files, use 'save filename.mat sMap'. This is
+ faster and retains all information of the map.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  sMap       (struct) the SOM struct to be written
+  filename   (string) the name of the input file
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+  som_write_cod(sMap,'map1.cod');
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_read_cod.html"><B>som_read_cod</B></a>
+<TD> Read a map from a file in SOM_PAK format.
+<TR><TD><a href="som_read_data.html"><B>som_read_data</B></a>
+<TD> Reads data from an ascii file.
+<TR><TD><a href="som_write_data.html"><B>som_write_data</B></a>
+<TD> Writes data struct into a file in SOM_PAK format.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

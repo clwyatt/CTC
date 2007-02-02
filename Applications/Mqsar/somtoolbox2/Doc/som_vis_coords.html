@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_vis_coords </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_vis_coords </H1>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  Co = som_vis_coords(lattice, msize)
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ This function calculates the coordinates of map units in 'hexa' and
+ 'rect' lattices in 'sheet' shaped map for visualization purposes. It
+ differs from SOM_UNIT_COORDS in the sense that hexagonal lattice is
+ calculated in a "wrong" way in order to get integer coordinates for
+ the units. Another difference is that it may be used to calculate
+ the coordinates of units _and_ the center points of the lines
+ connecting them (edges) by using 'hexaU' or 'rectU' for lattice. 
+ This property may be used for drawing u-matrices.
+
+ The unit number 1 is set to (ij) coordinates (1,1)+shift
+                 2                            (2,1)+shift
+
+  ... columnwise
+
+             n-1th                        (n1-1,n2)+shift
+             nth                            (n1,n2)+shift
+
+ where grid size = [n1 n2] and shift is zero, except for 
+ the even lines of 'hexa' lattice, for which it is +0.5.
+
+ For 'rectU' and 'hexaU' the unit coordinates are the same and the
+ coordinates for connections are set according to these. In this case
+ the ordering of the coordinates is the following:
+   let
+     U  = som_umat(sMap); U=U(:); % make U a column vector
+     Uc = som_vis_coords(sMap.topol.lattice, sMap.topol.msize); 
+   now the kth row of matrix Uc, i.e. Uc(k,:), contains the coordinates 
+   for value U(k). 
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  lattice  (string) The local topology of the units: 
+                    'hexa', 'rect', 'hexaU' or 'rectU'
+  msize    (vector) size 1x2, defining the map grid size. 
+                    Notice that only 2-dimensional grids
+                    are allowed.
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  Co       (matrix) size Mx2, giving the coordinates for each unit.
+                    M=prod(msize) for 'hexa' and 'rect', and 
+                    M=(2*msize(1)-1)*(2*msize(2)-1) for 'hexaU' and 'rectU'
+
+</PRE>
+
+<H3> Features </H3>
+
+<PRE>
+ Only 'sheet' shaped maps are considered. If coordinates for 'toroid'
+ or 'cyl' topologies are required, you must use SOM_UNIT_COORDS
+ instead.
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ Though this is mainly a subroutine for visualizations it may be
+ used, e.g., in the following manner:
+
+ % This makes a hexagonal lattice, where the units are rectangular
+ % instead of hexagons.
+    som_cplane('rect',som_vis_coords('hexa',[10 7]),'none');
+
+ % Let's make a map and calculate a u-matrix: 
+    sM=som_make(data,'msize',[10 7],'lattice','hexa');
+    u=som_umat(sM); u=u(:);
+ % Now, these produce equivalent results:
+    som_cplane('hexaU',[10 7],u);
+    som_cplane(vis_patch('hexa')/2,som_vis_coords('hexaU',[10 7]),u);
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_grid.html"><B>som_grid</B></a>
+<TD> Visualization of a SOM grid
+<TR><TD><a href="som_cplane.html"><B>som_cplane</B></a>
+<TD> Visualize a 2D component plane, u-matrix or color plane
+<TR><TD><a href="som_barplane.html"><B>som_barplane</B></a>
+<TD> Visualize the map prototype vectors as bar diagrams
+<TR><TD><a href="som_plotplane.html"><B>som_plotplane</B></a>
+<TD> Visualize the map prototype vectors as line graphs
+<TR><TD><a href="som_pieplane.html"><B>som_pieplane</B></a>
+<TD> Visualize the map prototype vectors as pie charts
+<TR><TD><a href="som_unit_coords.html"><B>som_unit_coords</B></a>
+<TD> Locations of units on the SOM grid
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_drmake </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_drmake </H1>
+
+<P><B> [sR,best,sig,Cm] = som_drmake(D,inds1,inds2,sigmea,nanis)</B></P>
+<PRE>
+ SOM_DRMAKE Make descriptive rules for given group within the given data. 
+
+ sR = som_drmake(D,[inds1],[inds2],[sigmea],[nanis]) 
+ 
+  D        (struct) map or data struct
+           (matrix) the data, of size [dlen x dim]
+  [inds1]  (vector) indeces belonging to the group
+                    (the whole data set by default)
+  [inds2]  (vector) indeces belonging to the contrast group
+                    (the rest of the data set by default)
+  [sigmea] (string) significance measure: 'accuracy', 
+                    'mutuconf' (default), or 'accuracyI'.
+                    (See definitions below).
+  [nanis]  (scalar) value given for NaNs: 0 (=FALSE, default),
+                    1 (=TRUE) or NaN (=ignored)
+
+  sR      (struct array) best rule for each component. Each 
+                   struct has the following fields:
+    .type     (string) 'som_rule'
+    .name     (string) name of the component
+    .low      (scalar) the low end of the rule range
+    .high     (scalar) the high end of the rule range
+    .nanis    (scalar) how NaNs are handled: NaN, 0 or 1
+
+  best    (vector) indeces of rules which make the best combined rule
+  sig     (vector) significance measure values for each rule, and for the combined rule
+  Cm      (matrix) A matrix of vectorized confusion matrices for each rule, 
+                   and for the combined rule: [a, c, b, d] (see below). 
+ 
+ For each rule, such rules sR.low <= x < sR.high are found 
+ which optimize the given significance measure. The confusion
+ matrix below between the given grouping (G: group - not G: contrast group) 
+ and rule (R: true or false) is used to determine the significance values:
+
+          G    not G    
+       ---------------    accuracy  = (a+d) / (a+b+c+d)
+ true  |  a  |   b   |    
+       |--------------    mutuconf  =  a*a  / ((a+b)(a+c)) 
+ false |  c  |   d   | 
+       ---------------    accuracyI =   a   / (a+b+c)
+
+ See also  SOM_DREVAL, SOM_DRTABLE.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

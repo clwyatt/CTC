@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_set </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_set </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Create and set values for fields of SOM Toolbox structs (except
+ visualization struct). Can also be used to check the validity of structs.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  sMap   = som_set('som_map');
+  sData  = som_set(sData);
+  sNorm  = som_set(...,'field',contents,...);
+  [sTopol,ok]      = som_set(sTopol,...);
+  [sTrain,ok,msgs] = som_set('som_train',...);
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ The function is used to create and set values for fields of SOM
+ Toolbox structs, except visualization structs. The given values are
+ first checked for validity, and if they are not valid, an error
+ message is returned. The function can also be used to check the
+ validity of all the fields of the struct by supplying a struct as
+ the first and only argument.
+
+ NOTE: Using SOM_SET to create structures does _not_ guarantee that the
+ structs are valid (try e.g. sM = som_set('som_map'); som_set(sM)). The
+ initial values that the function gives to the fields of the structs are
+ typically invalid. It is recommended that when creating map or data 
+ structs, the corresponding functions SOM_MAP_STRUCT and SOM_DATA_STRUCT 
+ are used instead of SOM_SET. However, when giving values for the fields, 
+ SOM_SET tries to guarantee that the values are valid.
+
+ If a string is given as the first argument, the corresponding 
+ structure is first created and the field-content pairs are then
+ applied to it. 
+
+ There can be arbitrarily many field-contents pairs. The pairs
+ are processed sequentially one pair at a time. For each pair,
+ the validity of the contents is checked and the corresponding 
+ items in the returned 'ok'-vector and 'msgs'-cellstring are set.
+ - if the contents is ok, the status is set to 1 and message to ''
+ - if the contents is suspicious, status is set to 1, but a
+   message is produced
+ - if the contents is invalid, status is set to 0 and an error
+   message is produced. The contents are _not_ given to the field.
+ If there is only one output argument, the status and messages
+ for each pair are printed to standard output.
+
+ The different field-contents pairs have no effect on each other.
+ If a field is given a value multiple times, the last valid one 
+ stays in effect.
+
+ In some cases, the order of the given fields is significant.
+ For example in the case of 'som_map', the validity of some fields, 
+ like '.comp_names', depends on the input space dimension, which is
+ checked from the '.data' field (dim = size(sD.data,2) to be specific).
+ Therefore, the '.data' field (or '.codebook' field in case of map 
+ struct) should always be given a value first. Below is a list of 
+ this kind of dependancies:
+
+ som_map:   'comp_names', 'comp_norm', 'msize', 'topol.msize',
+            'labels' and 'mask' depend on 'codebook'
+            new value for 'codebook' should have equal size to the old
+            one (unless the old one was empty)
+ som_data:  'comp_names' and 'comp_norm' depend on 'data'
+            new value for 'data' should have equal dimension (size(data,2))
+            as the old one (unless the old one was empty)
+
+</PRE>
+
+<H3> Known bugs </H3>
+
+<PRE>
+ Checking the values given to som_grid struct has not been
+ implemented. Use SOM_GRID function to give the values.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  sS          The struct.
+     (struct) A SOM Toolbox struct.
+     (string) Identifier of a SOM Toolbox struct: 'som_map', 
+              'som_data', 'som_topol', 'som_norm' or 'som_train'
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  field     (string) Field identifier string (see below).
+  contents  (varies) Value for the field (see below).
+
+  Below is the list of valid field identifiers for the different 
+  SOM Toolbox structs. 
+
+  'som_map' (map struct)
+    'codebook'    : matrix, size [munits, dim] 
+    'labels'      : cell array of strings, 
+                    size [munits, maximum_number_of_labels]
+    'topol'       : topology struct (prod(topol.msize)=munits)
+    'mask'        : vector, size [dim, 1]
+    'neigh'       : string ('gaussian' or 'cutgauss' or 'bubble' or 'ep')
+    'trainhist'   : struct array of train structs
+    'name'        : string
+    'comp_names'  : cellstr, size [dim, 1], e.g. {'c1','c2','c3'}
+    'comp_norm'   : cell array, size [dim, 1], of cell arrays 
+                    of normalization structs
+    Also the following can be used (although they are fields
+    of the topology struct)
+    'msize'       : vector (prod(msize)=munits)
+    'lattice'     : string ('rect' or 'hexa')
+    'shape'       : string ('sheet' or 'cyl' or 'toroid')
+
+  'som_data' (data struct)
+    'data'        : matrix, size [dlen, dim]
+    'name'        : string
+    'labels'      : cell array of strings, 
+                    size [dlen, m]
+    'comp_names'  : cellstr, size [dim, 1], e.g. {'c1','c2','c3'}
+    'comp_norm'   : cell array, size [dim, 1], of cell arrays 
+                    of normalization structs
+    'label_names' : cellstr, size [m, 1]
+
+ 'som_topol' (topology struct)
+    'msize'       : vector
+    'lattice'     : string ('rect' or 'hexa')
+    'shape'       : string ('sheet' or 'cyl' or 'toroid')
+
+ 'som_norm' (normalization struct)
+    'method'      : string
+    'params'      : varies
+    'status'      : string ('done' or 'undone' or 'uninit')
+
+ 'som_train' (train struct)
+    'algorithm'   : string ('seq' or 'batch' or 'lininit' or 'randinit')
+    'data_name'   : string
+    'mask'        : vector, size [dim, 1]
+    'neigh'       : string ('gaussian' or 'cutgauss' or 'bubble' or 'ep')
+    'radius_ini'  : scalar
+    'radius_fin'  : scalar
+    'alpha_ini'   : scalar
+    'alpha_type'  : string ('linear' or 'inv' or 'power')
+    'trainlen'    : scalar
+    'time'        : string
+
+ 'som_grid' (grid struct) : checking the values has not been implemented yet!
+    'lattice'     : string ('rect' or 'hexa') or 
+                    (sparce) matrix, size munits x munits
+    'shape'       : string ('sheet' or 'cyl' or 'toroid')
+    'msize'       : vector, size 1x2
+    'coord'       : matrix, size munits x 2 or munits x 3
+    'line'        : string (linespec, e.g. '-', or 'none')
+    'linecolor'   : RGB triple or string (colorspec, e.g. 'k') or 
+                    munits x munits x 3 (sparce) matrix or cell
+                    array of RGB triples 
+    'linewidth'   : scalar or munits x munits (sparce) matrix
+    'marker'      : string (markerspec, e.g. 'o', or 'none') or 
+                    munits x 1 cell or char array of these
+    'markersize'  : scalar or munits x 1 vector
+    'markercolor' : RGB triple or string (colorspec, e.g. 'k')
+    'surf'        : [], munits x 1 or munits x 3 matrix of RGB triples
+    'label'       : [] or munits x 1 char array or 
+                    munits x l cell array of strings 
+    'labelcolor'  : RGB triple or string (colorspec, e.g. 'g' or 'none')
+    'labelsize'   : scalar
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+  sS    (struct)  the created / updated struct
+  ok    (vector)  length = number of field-contents pairs, gives
+                  validity status for each pair (0=invalid, 1 otherwise)
+  msgs  (cellstr) length = number of field-contents pairs, gives
+                  error/warning message for each pair ('' if ok)
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ To create a struct:
+  sM  = som_set('som_map');
+  sD  = som_set('som_data');
+  sTo = som_set('som_topol');
+  sTr = som_set('som_train');
+  sN  = som_set('som_norm');
+  sG  = som_set('som_grid');
+
+ To check the the contents of a struct: 
+  som_set(sS);
+  [dummy,ok]      = som_set(sS);
+  [dummy,ok,msgs] = som_set(sS);
+
+ To give values to fields: 
+  sTo = som_set(sTo,'msize',[10 10],'lattice','hexa','shape','toroid');
+  sM  = som_set('som_map','codebook',rand(100,4),'topol',sTo);
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_info.html"><B>som_info</B></a>
+<TD> Prints information the given struct.
+<TR><TD><a href="som_map_struct.html"><B>som_map_struct</B></a>
+<TD> Create map struct.
+<TR><TD><a href="som_data_struct.html"><B>som_data_struct</B></a>
+<TD> Create data struct.
+<TR><TD><a href="som_topol_struct.html"><B>som_topol_struct</B></a>
+<TD> Create topology struct.
+<TR><TD><a href="som_train_struct.html"><B>som_train_struct</B></a>
+<TD> Create training struct.
+<TR><TD><a href="som_grid.html"><B>som_grid</B></a>
+<TD> Create and visualize grid struct.
+<TR><TD><a href="som_vs1to2.html"><B>som_vs1to2</B></a>
+<TD> Conversion from version 1.0 structs to 2.0.
+<TR><TD><a href="som_vs2to1.html"><B>som_vs2to1</B></a>
+<TD> Conversion from version 2.0 structs to 1.0.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_write_data </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_write_data </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Writes data structs/matrices to a file in SOM_PAK format.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  som_write_data(sD,'filename')
+  som_write_data(D,'filename')
+  som_write_data(...,'missing')
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ This function is offered for compatibility with SOM_PAK, a SOM software
+ package in C. It writes data structs/matrices to a file in SOM_PAK format.
+
+ See SOM_READ_DATA for a decription of the SOM_PAK data file format. Since
+ the format does not support information on normalizations, that
+ information is lost, as well as the data name. The component names are
+ written on a comment line which begins with '#n' and label names on
+ comment line which begins with '#l', respectively. Any spaces (' ') in the
+ component names and in the label names are replaced with
+ underscores ('_').
+
+ This function is only offered for compatibility with SOM_PAK. In
+ general, when saving data in files, use 'save filename.mat sData'. This is
+ faster and retains all information of the data struct.
+
+ The string to use for missing values (NaNs) in the written file can
+ be given with the last argument. Notice that if you use SOM_PAK to
+ read the files, you need to set the SOM_PAK environment variable
+ LVQSOM_MASK_STR accordingly, e.g. to 'NaN' if you use the default
+ replacement. For more information, see the SOM_PAK instructions.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+  data        (struct or matrix) data to be written
+  filename    (string) output filename
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+  missing     (string) string used to denote missing components (NaNs); 
+               default is 'NaN'
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ The basic usage is:
+  som_write_data(sData,'system.data')
+
+ To write a data matrix to a file in plain SOM_PAK format, give a
+ data matrix as the first argument: 
+  som_write_data(D,'system.data')
+
+ By default, all NaNs in the data matrix are written as 'NaN':s. The
+ third argument can be used to change this:
+  som_write_data(sData,'system.data','+')
+  som_write_data(sData,'system.data','missing')
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_read_data.html"><B>som_read_data</B></a>
+<TD> Reads data from an ascii file.
+<TR><TD><a href="som_read_cod.html"><B>som_read_cod</B></a>
+<TD> Read a map from a file in SOM_PAK format.
+<TR><TD><a href="som_write_cod.html"><B>som_write_cod</B></a>
+<TD> Writes data struct into a file in SOM_PAK format.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

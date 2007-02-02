@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_bmucolor </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_bmucolor </H1>
+
+<P><B> bmu_colors=som_bmucolor(bmus, m, colors);</B></P>
+<PRE>
+ SOM_BMUCOLOR Returns the colors of the bmus according to a map colorcode
+
+ bmu_colors=som_bmucolor(bmus, msize, colors);
+
+ INPUT ARGUMENTS ([]'s are optional)
+
+ bmus   (matrix) Nx1 vector of BMU indexes
+ msize  (map struct, topol struct or 1x2 vector) 
+          gives the map grid size 
+ colors (matrix) colormap(s): munits x 3 x d matrix of RGB vectors
+
+ OUTPUT ARGUMENTS 
+
+ bmu_colors (Nx3xd matrix) color of the data point according to its BMU's 
+              color(s).
+
+ Idea is to get a color for each data point that links it to its BMU. 
+
+ EXAMPLE
+
+ We want to show how an time series is projected  to a map. Instead of 
+ a trajectory, we use 'color linking'
+
+ map=som_make(multi_dim_signal); 
+ bmus=som_bmu(map,multi_dim_signal);
+ Colors=som_bmucolor(bmus, map, som_colorcode(map,'rgb1'));
+ colorsignal(Colors, multi_dim_signal);
+
+ See also SOM_COLORCODE.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

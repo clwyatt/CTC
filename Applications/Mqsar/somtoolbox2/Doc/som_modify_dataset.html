@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_modify_dataset </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_modify_dataset </H1>
+
+<P><B> sD = som_modify_dataset(sD,action,varargin)</B></P>
+<PRE>
+SOM_MODIFY_DATASET Add or remove components or samples to/from a data struct.
+
+ sD = som_modify_dataset(sD, 'addcomp', D, [indsto], [cnames})
+ sD = som_modify_dataset(sD, 'addsamp', D, [indsto], ['norm'])
+ sD = som_modify_dataset(sD, 'removecomp', [inds])
+ sD = som_modify_dataset(sD, 'removesamp', inds)
+ sD = som_modify_dataset(sD, 'extractcomp', [inds])
+ sD = som_modify_dataset(sD, 'extractsamp', inds)
+ sD = som_modify_dataset(sD, 'movecomp', inds, indsto)
+ sD = som_modify_dataset(sD, 'movesamp', inds, indsto)
+
+  Input and output arguments ([]'s are optional)
+   sD      (struct) data struct
+   action  (string) 'addcomp', 'addsamp', 'removecomp', 'removesamp', 
+                    'extractcomp', 'extractsamp', 'movecomp', or 'movesamp' 
+
+   other input arguments depend on the action
+
+   'addcomp': 
+   D        (matrix) data matrix, size [dlen x d]
+            (struct) data struct, size of .data field [dlen x d]
+   [indsto] (vector) new indeces of the components, length=d
+   [cnames] (cellstr) of size d x 1, the component names
+
+   'addsamp': 
+   D        (matrix) data matrix, size [n x dim] 
+   [indsto] (vector) new indeces of the samples, length=n
+   ['norm'] (string) specified if the normalization procedure
+                     should be applied to the new samples
+
+   'removecomp', 'extractcomp': 
+   [inds]   (vector) indeces of the components to be removed/extracted. 
+                     If not given, a prompt will appear from which the
+                     user can select the appropriate components.
+
+   'removesamp', 'extractsamp': 
+   inds     (vector) indeces of the samples to be removed/extracted
+
+   'movecomp', 'movesamp': 
+   inds     (vector) indeces of the components/samples to be moved
+   indsto   (vector) new indeces of the components/samples 
+
+ See also SOM_DATA_STRUCT.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

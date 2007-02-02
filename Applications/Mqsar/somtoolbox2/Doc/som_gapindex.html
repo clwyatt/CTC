@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_gapindex </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_gapindex </H1>
+
+<P><B> [t,r,Cd,S] = som_gapindex(sM, base, between)</B></P>
+<PRE>
+ SOM_GAPINDEX Gap clustering evaluation index.
+
+ [t,r] = som_gapindex(sM, base, [between])
+
+  Input and output arguments ([]'s are optional):  
+    sM        (struct) map struct
+    base      (vector) clusters indeces for each map unit, map units
+                       with index<=0 or NaN are not taken into account
+    [between] (vector) indices of prototypes which are "between" clusters:
+                       the associated distances are doubled
+ 
+    t         (scalar) Gap index index for the clustering (=mean(r))
+    r         (vector) maximum Gap index for each cluster (size max(base) x 1)    
+ 
+ See also  KMEANS, KMEANS_CLUSTERS, SOM_GAPINDEX.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

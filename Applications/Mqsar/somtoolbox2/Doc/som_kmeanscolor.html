@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_kmeanscolor </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_kmeanscolor </H1>
+
+<P><B> [color,best,kmeans]=som_kmeanscolor(sM,C,initRGB,contrast)</B></P>
+<PRE>
+ SOM_KMEANSCOLOR Map unit color code according to K-means clustering
+
+ color = som_kmeanscolor(sM, C, [initRGB], [contrast]) 
+
+  color        = som_kmeanscolor(sM,15,som_colorcode(sM,'rgb1'),'enhance');
+  [color,best] = som_kmeanscolor(sM,15,[],'normal');
+  
+  Input and output arguments ([]'s are optional):
+   sM       (struct) map struct
+   C        (scalar) maximum number of clusters
+   initRGB  (string, matrix) color code string accepted by SOM_COLORCODE
+                     or an Mx3 matrix of RGB triples, where M is the number
+                     of map units. Default: SOM_COLORCODEs default
+   contrast (string) 'flat', 'enhanced' color contrast mode, default:
+                     'enhanced'
+
+   color    (matrix) MxCx3 of RGB triples
+   best     (scalar) index for "best" clustering according to 
+                     Davies-Boulding index; color(:,:,best) includes the 
+                     corresponding color code.
+   kmeans   (cell)   output of KMEANS_CLUSTERS in a cell array.
+ 
+ The function gives a set of color codings according to K-means 
+ clustering. For clustering, it uses function KMEANS_CLUSTERS for map units, 
+ and it calculates color codings for 1,2,...,C clusters. 
+ The idea of coloring is that the color of a cluster is the mean of the 
+ original colors (RGB values) of the map units belonging to that cluster, 
+ see SOM_CLUSTERCOLOR. The original colors are defined by  SOM_COLORCODE
+ by default. Input 'contrast' simply specifies whether or not 
+ to linearly redistribute R,G, and B values so that minimum is 0 and 
+ maximum 1 ('enahanced')  or to use directly the output of 
+ SOM_CLUSTERCOLOR ('flat'). KMEANS_CLUSTERS uses certain heuristics to 
+ select the best of 5 trials for each  number of clusters. Evaluating the 
+ clustering multiple times may take some time. 
+
+ EXAMPLE
+ 
+  load iris; % or any other map struct sM 
+  [color,b]=som_kmeanscolor(sM,10);
+  som_show(sM,'color',color,'color',{color(:,:,b),'"Best clustering"');
+ 
+ See also SOM_SHOW, SOM_COLORCODE, SOM_CLUSTERCOLOR, KMEANS_CLUSTERS
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

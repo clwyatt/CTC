@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_clspread </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_clspread </H1>
+
+<P><B> base = som_clspread(sM,base,cldist,Ne,verbosity)</B></P>
+<PRE>
+ SOM_CLSPREAD Partition the given data by flooding.
+
+  part = som_clspread(sM,part,cldist,[Ne],[verbos])
+
+  Input and output arguments ([]'s are optional):
+   sM       (struct) map or data struct
+            (matrix) size dlen x dim, the data set            
+   base     (vector) initial partition, where if base(i) is
+                      0         i should be assigned to some cluster
+                      NaN       i should not be assigned to any cluster
+                      otherwise i belongs to cluster base(i)
+   cldist   (string) cluster distance measure: 'single', 'average',
+                     'complete', 'neighf', 'ward', 'centroid', 'BMU'  
+   [Ne]     (scalar) 0 = not constrined to neighborhood
+                     1 = constrained   
+            (matrix) size dlen x dlen, indicating possible connections
+   [verbos] (scalar) 1 (default) = show status bar
+                     0  = don't
+
+ See also SOM_CLDIST. 
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

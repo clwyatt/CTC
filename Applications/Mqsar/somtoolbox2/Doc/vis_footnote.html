@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / vis_footnote </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> vis_footnote </H1>
+
+<P><B> h=vis_footnote(txt)</B></P>
+<PRE>
+ VIS_FOOTNOTE Adds a movable text to the current figure
+
+  h = vis_footnote(T)
+
+  Input and output arguments ([]'s are optional)
+   [T]  (string) text to be written
+        (scalar) font size to use in all strings 
+
+   h    (vector) handles to axis objects created by this function 
+
+ This function sets a text to the current figure. If T is a string,
+ it's written as it is to the same place. If T is a scalar, the font
+ size of all text objects created by this function are changed to the
+ pointsize T. If no input argument is given the function only returns
+ the handles to all objects created by this function. The texts may
+ be dragged to a new location at any time using mouse.  Note that the
+ current axis will be the parent of the text object after dragging.
+
+ String 'Info' is set to the Tag property field of the objects. 
+ 
+ EXAMPLES
+
+ % add movable texts to the current figure and change their
+ % fontsize to 20 points
+ vis_footnote('Faa'); vis_footnote('Foo'); vis_footnote(20);
+ 
+ % delete all objects created by this function from the current figure
+ delete(vis_footnote);
+ 
+ See also SOM_SHOW.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

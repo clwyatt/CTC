@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_cplane </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_cplane </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Visualizes a 2D component plane or u-matrix
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  h = som_cplane(topol, color)
+  h = som_cplane(lattice, msize, color)
+  h = som_cplane(lattice, msize, color)
+  h = som_cplane(..., size) 
+  h = som_cplane(..., size, pos) 
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ Creates some basic visualizations of the SOM grid: the component plane and
+ the unified distance matrix. The routine draws the SOM grid as a patch
+ object according to the specifications given in the input arguments and
+ returns its object handle.
+
+ Each unit of the map is presented by a polygon whose color, size, shape
+ and location can be specified in various ways. The usual procedure 
+ is to choose the lattice and map size used in the map training. Then
+ the function creates the standard sheet shaped topological 
+ representation of the map grid with hexagonal or rectangular units.
+ When the values from a map codebook component (or from SOM_UMAT) 
+ are given to the function it produces an indexed coloring for the 
+ units (as in SURF command). Another possibility is to give a fixed 
+ RGB color for each unit explicitly.
+
+ Special effects (variable unit size, location or shape) can be produced
+ giving different types of input variables.
+
+</PRE>
+
+<H3> Known bugs </H3>
+
+<PRE>
+ Using 1x3 or 3x1 grids causes problem, as the MATLAB will treat the color 
+ information vector 1x3 or 3x1 as a single RGB triple. So, using indexed 
+ colors is not possible for this particular map size.
+
+ It is not possible to specify explicit coordinates for map
+ consistig of just one unit as then the msize is interpreted as
+ map size.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+ Note: M is the number of map units
+
+ lattice  The basic shape of the map units 
+
+   (string) 'hexa' or 'rect' creates standard component plane; 
+            'hexaU' or 'rectU' creates standard u-matrix.
+   (matrix) Lx2 matrix defines the cornes of an arbitary polygon to be used
+            as the unit marker. (L is the number of patch vertex: L=6 for 
+            'hexa' and L=4 for 'rect') 
+
+ msize    The size of the map grid     
+
+   (vector) [n1 n2] vector defines the map size (height n1 units, width 
+            n2 units, total M=n1 x n2 units). The units will be placed to their 
+            topological locations to form a uniform hexagonal or rectangular grid.
+   (matrix) Mx2 matrix defines arbitrary coordinates for the M units
+            In this case the argument 'lattice' defines the unit form only. 
+
+ topol    Topology of the map grid
+
+   (struct) map or topology struct from which the topology is taken
+
+ color    Unit colors
+
+   (string) (ColorSpec) gives the same color for each unit, 'none'
+            draws black unit edges only.
+   (vector) Mx1 column vector gives indexed color for each unit using the 
+            current colormap (see help colormap).   
+   (matrix) Mx3 matrix of RGB triples as rows gives each unit a fixed color.
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+ Note: M is the number of map units. 
+ Note: if unspecified or given empty values ('' or []) default
+ values are used for optional input arguments.
+
+ s        The size scaling factors for the units
+
+   (scalar) scalar gives each unit the same size scaling: 
+            0   unit disappears (edges can be seen as a dot).
+            1   by default unit has its normal size (ie. no scaling)
+            >1  unit overlaps others      
+   (matrix) Mx1 double: each unit gets individual size scaling
+
+ pos      Position of origin          
+
+   (vector) This argument exists to be able drawing component planes
+            in arbitrary locations in a figure. Note the operation:
+            if this argument is given, the axis limits setting
+            part in the routine is skipped and the limits setting
+            will be left to be done by MATLAB's default
+            operation. 
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+ h (scalar) handle to the created patch object
+
+</PRE>
+
+<H3> Object tags </H3>
+
+<PRE>
+ One object handle is returned: field Tag is set to
+  'planeC'  for component plane     
+  'planeU'  for U-matrix
+
+</PRE>
+
+<H3> Features </H3>
+
+<PRE>
+ There are some extra features in following arguments
+
+ size
+  - MxL matrix: radial scaling: the distance between 
+    the center of node m and its kth vertex is scaled by
+    s(m,k).
+  - Mx1x2 matrix: the uniform scaling is done separately for
+    x- and y-directions
+  - MxLx2 matrix: the scaling is done separately to x- and y-
+    directions for each vertex.
+
+ color
+    Each vertex may be given individual color. 
+    The PATCH object interpolates the colors on the 
+    face if shading is turned to interp. 
+  - 1xMxL matrix: colormap index for each vertex
+  - LxMx3 matrix: RGB color for each vertex
+
+ Note: In both cases (size and color) the ordering of the patch
+ vertices in the "built-in" patches is the following
+
+          'rect'      'hexa'
+            1 3          1 
+            2 4         5 2
+                        6 3
+                         4
+
+ The color interpolation result seem to depend on the order 
+ in which the patch vertices are defined. Anyway, it gives 
+ unfavourable results in our case especially with hexa grid: 
+ this is a MATLAB feature.
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+ m=som_make(rand(100,4),'msize',[6 5])         % make a map
+
+ % show the first variable plane using indexed color coding
+
+ som_cplane(m.topol.lattice,m.topol.msize,m.codebook(:,1));  
+ or som_cplane(m.topol,m.codebook(:,1));  
+ or som_cplane(m,m.codebook(:,1));  
+
+ % show the first variable using different sized black units
+
+ som_cplane(m,'k',m.codebook(:,1));
+
+ % Show the u-matrix. First we have to calculate it. 
+ % Note: som_umat returns a matrix therefore we write u(:) to get 
+ % a vector which contains the values in the proper order.
+
+ u=som_umat(m); 
+ som_cplane('hexaU', m.topol.msize, u(:)); 
+
+ % Show three first variables coded as RGB colors
+ % and turn the unit edges off
+
+ h=som_cplane(m, m.codebook(:,1:3),1)
+ set(h,'edgecolor','none');
+
+ % Try this! (see section FEATURES)
+
+ som_cplane('rect',[5 5],'none',rand(25,4));
+ som_cplane('rect',[5 5],rand(1,25,4));
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_barplane.html"><B>som_barplane</B></a>
+<TD> Visualize the map prototype vectors as bar diagrams
+<TR><TD><a href="som_plotplane.html"><B>som_plotplane</B></a>
+<TD> Visualize the map prototype vectors as line graphs
+<TR><TD><a href="som_pieplane.html"><B>som_pieplane</B></a>
+<TD> Visualize the map prototype vectors as pie charts
+<TR><TD><a href="som_umat.html"><B>som_umat</B></a>
+<TD> Compute unified distance matrix of self-organizing map
+<TR><TD><a href="vis_patch.html"><B>vis_patch</B></a>
+<TD> Define the basic patches used in som_cplane
+<TR><TD><a href="som_vis_coords.html"><B>som_vis_coords</B></a>
+<TD> The default 'hexa' and 'rect' coordinates in visualizations
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

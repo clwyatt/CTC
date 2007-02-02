@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_table_struct </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_table_struct </H1>
+
+<P><B> sTable = som_table_struct(values,headers,span,colfmt)</B></P>
+<PRE>
+SOM_TABLE_STRUCT Create a table struct.
+  
+ sTable = som_table_struct(values,[headers],[span],[colfmt])
+ 
+  Input and output arguments ([]'s are optional): 
+   values      (cell array) size nrow x ncol, the contents of the table 
+               (char array) size nrow x *
+               (matrix)     size nrow x ncol
+   [headers]   (cell array) size 1 x ncol, header row of the table 
+               (empty)      by default, empty headers are used ('')
+   [span]      (matrix)     size nrow x ncol x 2, span of each cell of the 
+                            table: span(:,:,1) gives horizontal span and 
+                            span(:,:,2) gives vertical span. If the value
+                            for a cell is greater than 1, it should be 
+                            followed by a corresponding number of zeros
+                            for the following cells (left or down)
+               (empty)      by default ones(nrow,ncol,1)
+   [colfmt]    (string)     the format of each column as given in LaTeX, 
+                            only used if the table is printed as 'ps' or 'pdf', 
+                            by default colfmt = ''
+   
+   sTable      (struct)     the table struct, with the following fields:
+         .headers  (cell array) header row, size 1 x ncol
+         .values   (cell array) values,  size nrow x ncol
+         .span     (matrix)     span of each cell, size nrow x ncol x 2
+
+ See also  SOM_TABLE_MODIFY, SOM_TABLE_PRINT.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

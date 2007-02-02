@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_label </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_label </H1>
+
+<H3> Purpose </H3>
+
+<PRE>
+ Add (or remove) labels to (from) map and data structs.
+
+</PRE>
+
+<H3> Syntax </H3>
+
+<UL><PRE>
+  sTo = som_label(sTo, 'clear', inds)
+  sTo = som_label(sTo, 'prune', inds)
+  sTo = som_label(sTo, 'add', inds, labels)
+  sTo = som_label(sTo, 'replace', inds, labels)
+
+</PRE></UL>
+
+<H3> Description </H3>
+
+<PRE>
+ This function can be used to give and remove labels in map and data
+ structs. Of course the same operation could be done by hand, but this
+ function offers an alternative and hopefully slightly user-friendlier
+ way to do it.
+
+</PRE>
+
+<H3> Required input arguments </H3>
+
+<PRE>
+   sTo    (struct) data or map struct to which the labels are put 
+   mode   (string) The mode of operation. 
+                    'add'     : adds the given labels
+                    'clear'   : removes labels
+                    'replace' : replaces current labels with given
+                                labels; basically same as 'clear'
+                                followed by 'add'
+                    'prune'   : removes empty labels ('') from between
+                                non-empty labels, e.g. if the labels of
+                                a vector were {'A','','','B','','C'}
+                                they'd become {'A','B','C'}. Some empty
+                                labels may be left at the end of the list.
+
+   inds            Identifies the vectors to which the operation
+                   (given by mode) is applied to.
+          (vector) Linear indexes of the vectors, size n x 1.
+                   Notice! This should be a column vector!
+          (matrix) The labels are in a cell matrix. By giving matrix 
+                   argument for inds, you can address this matrix
+                   directly. The first index gives the vector and the
+                   second index the vertical position of the label in
+                   the labels array. Size n x 2, where n is the 
+                   number of labels. 
+          (string) for 'prune' and 'clear' modes, the string 'all'
+                   means that all vectors should be pruned/cleared
+
+</PRE>
+
+<H3> Optional input arguments </H3>
+
+<PRE>
+   [labels]        The labels themselves. The number of rows much match 
+                   the number of given indeces, except if there is either
+                   only one index or only one label. 
+          (string) Label, e.g. 'label'
+          (string array) Each row is a label, 
+                   e.g. ['label1'; 'label2'; 'label3']
+          (cell array of strings) All labels in a cell are handled 
+                   as a group and are applied to the same vector given 
+                   on the corresponding row of inds.
+                   e.g. three labels: {'label1'; 'label2'; 'label3'}
+                   e.g. a group of labels: {'label1', 'label2', 'label3'}
+                   e.g. three groups: {{'la1'},{'la21','la22'},{'la3'}
+
+</PRE>
+
+<H3> Output arguments </H3>
+
+<PRE>
+   sTo    (struct) the given data/map struct with modified labels
+
+</PRE>
+
+<H3> Examples </H3>
+
+<PRE>
+  This is the basic way to add a label to map structure:
+   sMap = som_label(sMap,'add',3,'label');
+
+  The following examples have identical results: 
+   sMap = som_label(sMap,'add',[4; 13], ['label1'; 'label2']);
+   sMap = som_label(sMap,'add',[4; 13], {{'label1'};{'label2'}});
+
+  Labeling the BMU of a vector x (and removing any old labels)
+   sMap = som_label(sMap,'replace',som_bmus(sMap,x),'BMU');
+
+  Pruning labels 
+   sMap = som_label(sMap,'prune','all');
+
+  Clearing labels from a struct
+   sMap = som_label(sMap,'clear','all');
+   sMap = som_label(sMap,'clear',[1:4, 9:30]');
+
+</PRE>
+
+<H3> See also </H3>
+
+<TABLE NOBORDER WIDTH=80%>
+<TR><TD><a href="som_autolabel.html"><B>som_autolabel</B></a>
+<TD> Automatically label a map/data set.
+<TR><TD><a href="som_show.html"><B>som_show</B></a>
+<TD> Show map planes.
+<TR><TD><a href="som_show_add.html"><B>som_show_add</B></a>
+<TD> Add for example labels to the SOM_SHOW visualization.
+</TABLE>
+<p>
+<hr><br>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

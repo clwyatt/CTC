@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / sompak_sammon </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> sompak_sammon </H1>
+
+<P><B> sMap=sompak_sammon(sMap,ft,cout,ct,rlen)</B></P>
+<PRE>
+SOMPAK_SAMMON Call SOM_PAK Sammon's mapping program from Matlab.
+
+  P = sompak_sammon(sMap,ft,cout,ct,rlen)
+
+ ARGUMENTS ([]'s are optional and can be given as empty: [] or '')
+  sMap   (struct) map struct
+         (string) filename
+  [ft]   (string) 'pak' or 'box'. Argument must be defined, if
+                  input file is used.
+  [cout] (string) output file name. If argument is not defined 
+                  (i.e argument is '[]') temporary file '__abcdef' is
+                  used in operations and *it_is_removed* after 
+                  operations!!!
+  [ct]   (string) 'pak' or 'box'. Argument must be defined, if
+                  output file is used.
+  rlen   (scalar) running length
+
+ RETURNS: 
+  P      (matrix) the mapping coordinates
+
+ Calls SOM_PAK Sammon's mapping program (sammon) from Matlab. Notice
+ that to use this function, the SOM_PAK programs must be in your
+ search path, or the variable 'SOM_PAKDIR' which is a string
+ containing the program path, must be defined in the workspace.
+ SOM_PAK programs can be found from:
+ http://www.cis.hut.fi/research/som_lvq_pak.shtml
+
+ See also SOMPAK_INIT, SOMPAK_SAMMON, SOMPAK_SAMMON_GUI,
+          SOMPAK_GUI, SAMMON.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

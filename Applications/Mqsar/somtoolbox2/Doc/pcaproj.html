@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / pcaproj </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> pcaproj </H1>
+
+<P><B> [P,V,me,l] = pcaproj(D,arg1,arg2)</B></P>
+<PRE>
+PCAPROJ Projects data vectors using Principal Component Analysis.
+
+ [P,V,me,l] = pcaproj(D, odim)
+ P =          pcaproj(D, V, me)
+
+  Input and output arguments ([]'s are optional)
+   D      (matrix) size dlen x dim, the data matrix
+          (struct) data or map struct            
+   odim   (scalar) how many principal vectors are used
+  
+   P      (matrix) size dlen x odim, the projections
+   V      (matrix) size dim x odim, principal eigenvectors (unit length)
+   me     (vector) size 1 x dim, center point of D
+   l      (vector) size 1 x odim, the corresponding eigenvalues, 
+                   relative to total sum of eigenvalues
+                   
+ See also SAMMON, CCA.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

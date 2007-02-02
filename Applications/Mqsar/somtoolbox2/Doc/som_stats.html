@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_stats </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_stats </H1>
+
+<P><B> csS = som_stats(D,varargin)</B></P>
+<PRE>
+SOM_STATS Calculate descriptive statistics for the data.
+  
+ csS = som_stats(D,[sort]); 
+ 
+  csS = som_stats(D); 
+  csS = som_stats(D,'nosort'); 
+  som_table_print(som_stats_table(csS))
+
+  Input and output arguments ([]'s are optional): 
+   D           (matrix) a matrix, size dlen x dim
+               (struct) data or map struct
+   [sort]      (string) 'sort' (default) or 'nosort'
+                        If 'nosort' is specified, the data is not 
+                        sorted, and therefore the values of
+                        nunique, uvalues, ucount, fvalues, fcount, and tiles fields 
+                        are not calculated. This may be useful if
+                        there is a very large amount of data, and
+                        one wants to reduce calculation time.
+
+   csS         (cell array) size dim x 1, of statistics structs with 
+                        the following fields
+      .type             (string) 'som_stat'
+      .name             (string) name of the variable
+      .normalization    (struct array) variable normalization (see SOM_NORMALIZE)
+      .ntotal           (scalar) total number of values
+      .nvalid           (scalar) number of valid values (not Inf or NaN)
+      .min              (scalar) minimum value 
+      .max              (scalar) maximum value 
+      .mean             (scalar) mean value (not Inf or NaN)
+      .std              (scalar) standard deviation (not Inf or NaN)
+      .nunique          (scalar) number of unique values
+      .mfvalue          (vector) most frequent value
+      .mfcount          (vector) number of occurances of most frequent value
+      .values           (vector) at most MAXDISCRETE (see below) sample values 
+      .counts           (vector) number of occurances for each sampled value
+      .tiles            (vector) NT-tile values, for example
+                                    NT=4   for quartiles: 25%, 50% and 75%
+                                    NT=100 for percentiles: 1%, 2%, ... and 99%
+      .hist             (struct) histogram struct with the following fields
+           .type        (string) 'som_hist'
+           .bins        (vector) histogram bin centers 
+           .counts      (vector) count of values in each bin
+           .binlabels   (cellstr) labels for the bins (denormalized bin
+                                  center values)
+           .binlabels2  (cellstr) labels for the bins (denormalized bin
+                                  edge values, e.g. '[1.4,2.5['
+
+   Constants: 
+      MAXDISCRETE = 10
+      NT          = 10
+
+ See also  SOM_STATS_PLOT, SOM_STATS_TABLE, SOM_TABLE_PRINT, SOM_STATS_REPORT.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

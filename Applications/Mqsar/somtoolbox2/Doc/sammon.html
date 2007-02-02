@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / sammon </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> sammon </H1>
+
+<P><B> P = sammon(D, P, varargin)</B></P>
+<PRE>
+SAMMON Computes Sammon's mapping of a data set.
+
+ P = sammon(D, P, [value], [mode], [alpha], [Mdist])
+
+  P = sammon(D,2);            % projection to 2-dim space
+  P = sammon(sMap,3);         % projects the codebook vectors
+  P = sammon(sMap,3,[],[],[],Md) % uses distance matrix Md
+  som_grid(sMap,'Coord',P)    % visualization of map projection
+
+  Input and output arguments ([]'s are optional):
+   D        (matrix) size dlen x dim, data to be projected
+            (struct) data or map struct            
+   P        (scalar) output dimension
+            (matrix) size dlen x odim, initial projection matrix
+   [value]  (scalar) all different modes (the next argument) require 
+                     a value, default = 100
+   [mode]   (string) 'steps' or 'errlimit' or 'errchange' or 'seconds',
+                     see below, default is 'steps'
+   [alpha]  (scalar) iteration step size, default = 0.2
+   [Dist]   (matrix) pairwise distance matrix, size dlen x dlen.
+                     If the distances in the input space should
+                     be calculated otherwise than as euclidian
+                     distances, the distance from each vector
+                     to each other vector can be given here,
+                     size dlen x dlen. For example PDIST
+                     function can be used to calculate the
+                     distances: Dist = squareform(pdist(D,'mahal'));
+
+   P        (matrix) size dlen x odim, the projections
+
+ The output dimension must be 2 or higher but (naturally) lower 
+ than data set dimension.
+
+ The mode argument determines the end condition for iteration. If 
+ the mode argument is used, also the value argument has to be 
+ specified. Different mode possibilities are:
+ 'steps'      the iteration is terminated when it is run <value> 
+ 'errlimit'   steps, the iteration is terminated when projection error 
+              is lower than <value>,
+ 'errchange'  the iteration is terminated when change between 
+              projection error on two successive iteration rounds
+	       is less than <value> percent of total error, and
+ 'seconds'    the iteration is terminated after <value> seconds 
+              of iteration.
+
+ See also CCA, PCAPROJ, SOM_GRID.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

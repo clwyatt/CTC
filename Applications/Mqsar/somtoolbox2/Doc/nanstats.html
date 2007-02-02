@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / nanstats </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> nanstats </H1>
+
+<P><B> [me, st, md, no] = nanstats(D)</B></P>
+<PRE>
+NANSTATS Statistical operations that ignore NaNs and Infs.
+
+ [mean, std, median, nans] = nanstats(D)
+
+  Input and output arguments: 
+   D   (struct) data or map struct
+       (matrix) size dlen x dim
+
+   me  (double) columnwise mean
+   st  (double) columnwise standard deviation
+   md  (double) columnwise median
+   no  (vector) columnwise number of samples (finite, not-NaN)
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><title>SOM Toolbox / som_table_modify </title></head>
+<body bgcolor=#f0f0f0>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline><font size=+2>SOM Toolbox</font></td>
+<td valign=baseline align=center><a href="somtoolbox.html">Online documentation</td>
+<td valign=baseline align=right><a href="http://www.cis.hut.fi/projects/somtoolbox/" target="_top">http://www.cis.hut.fi/projects/somtoolbox/</a></td>
+</tr></table>
+<hr>
+<H1> som_table_modify </H1>
+
+<P><B> sT = som_table_modify(sT,action,arg1,arg2,arg3)</B></P>
+<PRE>
+SOM_TABLE_MODIFY Modify table: add or remove columns or rows.
+  
+ sTable = som_table_modify(sTable,action,arg1,[arg2],[arg3])
+ 
+  Input and output arguments ([]'s are optional): 
+   sTable      (struct) table struct
+   action      (string) action id (see below).
+   arg1        (varies) Depending on action, 1 to 3 arguments
+   [arg2]      (varies) are needed. See below.
+   [arg3]      (varies) 
+
+   sTable      (struct) the modified table struct
+
+  Actions and their arguments:
+   'addcol'    Add one or several new columns.
+               arg1 (cell array) new values
+                    (char)       new values (a single column can be given)
+                    (matrix)     new values
+               arg2 (cell array) new headers
+               arg3 (scalar)     at which position the new columns 
+                                 should be inserted (at the end by default)
+   'addrow'    Add one or several new rows.
+               arg1 (cell array) new values
+                    (char)       new values (a single row can be given)
+                    (matrix)     new values
+               arg2 (scalar)     at which position the new rows 
+                                 should be inserted (at the end by default)
+   'removecol' Remove one or several columns.           
+               arg1 (vector)     indeces of columns to be removed
+   'removerow' Remove one or several rows.           
+               arg1 (vector)     indeces of rows to be removed
+ 
+ See also  SOM_TABLE_STRUCT, SOM_TABLE_PRINT.
+
+</PRE>
+<p>
+<hr><br>
+<center>[ <a href="somtoolbox.html">SOM Toolbox online doc</a> ]</center>
+<br>
+<!-- Last updated: May 30 2002 -->
+</body>
+</html>
