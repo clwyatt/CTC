@@ -37,6 +37,7 @@ INCLUDE_DIRECTORIES(
 ${ITK_INCLUDE_DIRS}
 ${CTC_BINARY_DIR}
 ${CTC_SOURCE_DIR}/Utilities/vul
+${CTC_SOURCE_DIR}/Code/Common
 ${CTC_SOURCE_DIR}/Code/IO
 ${CTC_SOURCE_DIR}/Code/Algorithms/Segmentation
 ${CTC_SOURCE_DIR}/Code/Filters
