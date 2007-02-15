@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES(${CTC_SOURCE_DIR}/Code/Common)
 
 SET(CTCIO_SRCS
   ctcRVFImageIO.cxx
+  ctcCTCImageReader.cxx
 )
 
 # Add CTCIO library
