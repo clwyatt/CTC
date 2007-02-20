@@ -20,6 +20,10 @@ namespace ctc
   // The common CTC Image Type
   typedef itk::OrientedImage<CTCPixelType, CTCDimension> CTCImageType;
 
+  // the common binary type
+  typedef unsigned char                             BinaryPixelType;
+  typedef itk::Image<BinaryPixelType, 3>            BinaryImageType;
+
 } // end namespace ctc
 
 #endif // __ctcCTCImage_h
