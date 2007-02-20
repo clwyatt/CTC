@@ -6,7 +6,10 @@ Language:  C++
 #ifndef _ctcSegmentColonFilter_txx
 #define _ctcSegmentColonFilter_txx
 
+#include <limits>
+
 #include "ctcSegmentColonFilter.h"
+
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionIterator.h"
 #include "itkFloodFilledImageFunctionConditionalIterator.h"
@@ -15,39 +18,28 @@ Language:  C++
 namespace ctc
 {
   
-  template <class TInputImageType, class TOutputImageType>
-  SegmentColonFilter<TInputImageType, TOutputImageType>::SegmentColonFilter()
+  SegmentColonFilter::SegmentColonFilter()
   {
-    
-    m_constShortROSMarker = -3024;
-    
-    m_ChangeLabelFilter = ChangeLabelFilterType::New();
     m_ThresholdFilter = ThresholdFilterType::New();
     m_BGRegionGrowFilter = RegionGrowFilterType::New();
     m_DistanceFilter = DistanceFilterType::New();
     m_DownsampleFilter = DownsampleFilterType::New();
 
-    downsampleFactor = 2;
+    m_DownsampleFactor = 2;
 
-    // TODO need to switch these based on pixel type
-    m_MinPixelValue = -1024;
-    m_MaxPixelValue = 1024;
+    // set default parameters
+    m_MinPixelValue = std::numeric_limits<CTCPixelType>::min();
+    m_MaxPixelValue = std::numeric_limits<CTCPixelType>::max();
     m_Threshold = -800;
     m_MaxIterations = 10;
     m_MinDistanceThreshold = 10;
     
   }
   
-  template <class TInputImageType, class TOutputImageType>
-  void SegmentColonFilter<TInputImageType, TOutputImageType>::
-  GenerateData()
+  void SegmentColonFilter::GenerateData()
   {
-    // remap pixels flagged as being outside the region of support
-    m_ChangeLabelFilter->SetInput( this->GetInput() );
-    m_ChangeLabelFilter->SetChange(m_constShortROSMarker, m_MinPixelValue);
-
     // threshold the image
-    m_ThresholdFilter->SetInput(m_ChangeLabelFilter->GetOutput());
+    m_ThresholdFilter->SetInput(this->GetInput());
     m_ThresholdFilter->SetLowerThreshold(m_MinPixelValue);
     m_ThresholdFilter->SetUpperThreshold(m_Threshold);
     m_ThresholdFilter->SetInsideValue(0);
@@ -55,7 +47,7 @@ namespace ctc
 
     m_ThresholdFilter->Update();
     
-    m_ChangeLabelFilter->SetReleaseDataFlag(true);
+    //m_ChangeLabelFilter->SetReleaseDataFlag(true);
     
     // grow background region starting in the 8 corners
     m_BGRegionGrowFilter->SetInput(m_ThresholdFilter->GetOutput());
@@ -125,14 +117,14 @@ namespace ctc
       DownsampleInterpolatorType::New();
     m_DownsampleFilter->SetInterpolator( downInterpolator );
     BinaryImageType::SpacingType downSpacing;
-    downSpacing[0] = spacing[0] * downsampleFactor;
-    downSpacing[1] = spacing[1] * downsampleFactor;
-    downSpacing[2] = spacing[2] * downsampleFactor;
+    downSpacing[0] = spacing[0] * m_DownsampleFactor;
+    downSpacing[1] = spacing[1] * m_DownsampleFactor;
+    downSpacing[2] = spacing[2] * m_DownsampleFactor;
     m_DownsampleFilter->SetOutputSpacing( downSpacing );
     BinaryImageType::SizeType downSize;
-    downSize[0] = static_cast<SizeValueType>(size[0]/downsampleFactor);
-    downSize[1] = static_cast<SizeValueType>(size[1]/downsampleFactor);
-    downSize[2] = static_cast<SizeValueType>(size[2]/downsampleFactor);
+    downSize[0] = static_cast<SizeValueType>(size[0]/m_DownsampleFactor);
+    downSize[1] = static_cast<SizeValueType>(size[1]/m_DownsampleFactor);
+    downSize[2] = static_cast<SizeValueType>(size[2]/m_DownsampleFactor);
     m_DownsampleFilter->SetSize( downSize );
     m_DownsampleFilter->SetInput(m_ThresholdFilter->GetOutput());
 
@@ -163,13 +155,13 @@ namespace ctc
       DistanceIteratorType;
     typedef itk::BinaryThresholdImageFunction<DistanceImageType> 
       DistanceFunctionType;
-    typename DistanceFunctionType::Pointer dfunction = 
+    DistanceFunctionType::Pointer dfunction = 
       DistanceFunctionType::New();
     dfunction->SetInputImage(m_DistanceFilter->GetOutput());
     dfunction->ThresholdBetween(1, 1536);
     typedef itk::BinaryThresholdImageFunction<BinaryImageType> 
       BinaryFunctionType;
-    typename BinaryFunctionType::Pointer bfunction = 
+    BinaryFunctionType::Pointer bfunction = 
       BinaryFunctionType::New();
     bfunction->SetInputImage(m_ThresholdFilter->GetOutput());
     bfunction->ThresholdBetween(0, 1);
@@ -216,9 +208,9 @@ namespace ctc
 	  }
 
 	BinaryImageType::IndexType seed;
-	seed[0] = maxi[0]*downsampleFactor;
-	seed[1] = maxi[1]*downsampleFactor;
-	seed[2] = maxi[2]*downsampleFactor;
+	seed[0] = maxi[0]*m_DownsampleFactor;
+	seed[1] = maxi[1]*m_DownsampleFactor;
+	seed[2] = maxi[2]*m_DownsampleFactor;
 
 	BinaryFloodIteratorType bfit(m_ThresholdFilter->GetOutput(),
 				       bfunction,
@@ -234,11 +226,12 @@ namespace ctc
       }
 
     this->GraftOutput( m_ThresholdFilter->GetOutput() );
+
   }
   
-  template <class TInputImageType, class TOutputImageType>
-  void SegmentColonFilter<TInputImageType, TOutputImageType>::
-  PrintSelf( std::ostream& os, itk::Indent indent ) const
+  void SegmentColonFilter::PrintSelf( 
+				     std::ostream& os, 
+				     itk::Indent indent ) const
   {
     Superclass::PrintSelf(os,indent);
     

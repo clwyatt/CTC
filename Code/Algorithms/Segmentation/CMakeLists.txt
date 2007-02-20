@@ -1,14 +1,14 @@
 
-#INCLUDE_DIRECTORIES(${CTC_SOURCE_DIR}/Code/Common)
+INCLUDE_DIRECTORIES(${CTC_SOURCE_DIR}/Code/Common)
 
-#SET(CTCSegmentation_SRCS
-#  ctcSegmentColonFilter.cxx
-#)
+SET(CTCSegmentation_SRCS
+  ctcSegmentColonFilter.cxx
+)
 
 # Add CTCSegmentation library
-#ADD_LIBRARY(CTCSegmentation ${CTCSegmentation_SRCS})
+ADD_LIBRARY(CTCSegmentation ${CTCSegmentation_SRCS})
 
-#TARGET_LINK_LIBRARIES(CTCSegmentation
-#ITKCommon
-#)
+TARGET_LINK_LIBRARIES(CTCSegmentation
+ITKCommon
+)
 
