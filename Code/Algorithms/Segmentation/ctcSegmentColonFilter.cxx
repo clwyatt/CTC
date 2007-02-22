@@ -3,9 +3,6 @@ Program:   Wake Forest University - Virginia Tech CTC Software
 Id:        $Id$
 Language:  C++
 *******************************************************************************/
-#ifndef _ctcSegmentColonFilter_txx
-#define _ctcSegmentColonFilter_txx
-
 #include <limits>
 
 #include "ctcSegmentColonFilter.h"
@@ -241,44 +238,4 @@ namespace ctc
   }
   
 }
-
-#endif // _ctcSegmentColonFilter_txx
-
-
-
-
-
-    
-
-
-// //     m_MaskBGFilter->SetInput1(m_ThresholdFilter->GetOutput());
-// //     m_MaskBGFilter->SetInput2(m_BGRegionGrowFilter->GetOutput());
-
-// //     try
-// //       {
-// // 	std::clog << "Calling Mask Filter ";
-// // 	m_MaskBGFilter->Update();
-// // 	std::clog << " Success." << std::endl;
-// //       }
-// //     catch(itk::ExceptionObject & err)
-// //       {
-// // 	std::cerr << "ExceptionObject caught !" << std::endl; 
-// // 	std::cerr << err << std::endl; 
-// // 	exit(EXIT_FAILURE); 
-// //       }
-
-// //     m_ThresholdFilter->SetReleaseDataFlag(true);
-
-//     m_BGRegionGrowFilter->SetReleaseDataFlag(true);
-
-
-
-
-
-//    BinaryImageType::SizeType size = \
-//       m_ThresholdFilter->GetOutput()->GetLargestPossibleRegion().GetSize();
-//     BinaryImageType::SpacingType spacing = \
-//       m_ThresholdFilter->GetOutput()->GetSpacing();
-//     typedef BinaryImageType::SizeType::SizeValueType SizeValueType;
-
 
