@@ -1,2 +1,2 @@
-SUBDIRS(Segmentation)
+SUBDIRS(Segmentation FeatureExtraction)
 
