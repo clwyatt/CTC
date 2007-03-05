@@ -1,2 +1,2 @@
-SUBDIRS(Dicom2RVF RVFInfo)
+SUBDIRS(Dicom2RVF RVFInfo FeatureExtraction)
 
