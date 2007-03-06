@@ -11,6 +11,17 @@ SET (DROP_SITE_PASSWORD "public")
 SET (TRIGGER_SITE 
   "http://${DROP_SITE}/cgi-bin/Submit-CTC-TestingResults.cgi")
 
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET(CTEST_COVERAGE_COMMAND gcov)
+  SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ftest-coverage 
+-fprofile-arcs")
+  SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ftest-coverage 
+-fprofile-arcs")
+  SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -ftest-coverage 
+-fprofile-arcs")
+  LINK_LIBRARIES(gcov)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
 # Project Home Page
 # SET (PROJECT_URL "http://www.bsl.ece.vt.edu")
 
