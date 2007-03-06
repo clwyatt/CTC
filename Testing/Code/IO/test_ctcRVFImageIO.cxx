@@ -8,10 +8,15 @@ Language:  C++
  
 #include <iostream>
 #include <cstdlib>
+#include <string>
 
+// ITK includes
 #include "itkImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+
+// CTC includes
+#include "ctcConfigure.h"
 #include "ctcRVFImageIO.h"
 
 #define ASSERT_EPS 0.1
@@ -20,6 +25,16 @@ using namespace std;
 
 int main(int argc, char ** argv)
 {
+  clog << "Testing ctcRVFImageIO version ";
+  clog <<  CTC_VERSION_STRING << CTC_REVISION_STRING << endl;
+
+  // make sure testing data path is defined
+  if(!getenv("CTC_DATA_DIR"))
+    {
+      cerr << "Error: Environment variable CTC_DATA_DIR not defined" << endl;
+      return EXIT_FAILURE;
+    }
+
   
   if(argc != 3)
     {	
@@ -27,7 +42,13 @@ int main(int argc, char ** argv)
       cerr << argv[0] << " inputImageFile outputImageFile" << endl;
       return(EXIT_FAILURE);
     }
-  
+
+  // get paths to input/output files
+  string infilename = getenv("CTC_DATA_DIR");
+  infilename.append("/");
+  infilename.append(argv[1]);
+  string outfilename = argv[2];
+
   typedef unsigned short   PixelType;
   const unsigned int Dimension = 3;
   typedef itk::Image< PixelType, Dimension > ImageType;
@@ -38,7 +59,7 @@ int main(int argc, char ** argv)
   ReaderType::Pointer reader = ReaderType::New(); 
   ImageIOType::Pointer rvfIO = ImageIOType::New();
 
-  reader->SetFileName( argv[1] ); 
+  reader->SetFileName( infilename.c_str() ); 
   
   reader->SetImageIO( rvfIO );
 
@@ -87,9 +108,9 @@ int main(int argc, char ** argv)
 
   WriterType::Pointer writer = WriterType::New(); 
 
-  writer->SetFileName( argv[2] ); 
+  writer->SetFileName( outfilename.c_str() ); 
   
-  writer->SetImageIO( rvfIO );
+  writer->SetImageIO(rvfIO);
 
   writer->SetInput( reader->GetOutput() );
 

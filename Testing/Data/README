@@ -1,8 +1,12 @@
 Testing Directories and Files
 
-These must be downloaded seperately from the wiki.
+These must be downloaded seperately from the wiki. Untar them into a directory of your
+choosing and set the env var CTC_DATA_DIR to that directory.
 
 DICOM_short_prone/ - prone data from Walter Reed Dataset short integer (remapped CT) voxels
 DICOM_short_supine/ - supine data from Walter Reed Dataset short integer (remapped CT) voxels
 DICOM_ushort_prone/ - prone data from WFU Dataset unsigned short integer (raw CT) voxels
 DICOM_ushort_supine/ - supine data from WFU Dataset unsigned short integer (raw CT) voxels
+
+DICOM_short_prone.rvf  - the DICOM volume "DICOM_short_prone" in rvf format
+DICOM_ushort_supine_coords.txt - coordinates of a polyp in the DICOM_ushort_supine volume

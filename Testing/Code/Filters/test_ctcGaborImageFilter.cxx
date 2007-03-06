@@ -37,13 +37,26 @@ int main(int argc, char ** argv)
   clog << "Testing ctcGaborImageFilter version ";
   clog <<  CTC_VERSION_STRING << CTC_REVISION_STRING << endl; 
   
-  vul_arg<char const*> infilename(0, "Input filename (type short or ushort)");
+  // make sure testing data path is defined
+  if(!getenv("CTC_DATA_DIR"))
+    {
+      cerr << "Error: Environment variable CTC_DATA_DIR not defined" << endl;
+      return EXIT_FAILURE;
+    }
+
+  vul_arg<char const*> infile(0, "Input filename (type short or ushort)");
   vul_arg<char const*> outfilename(0, "Output filename");
   vul_arg<float> sigma("-s", "sigma value", 1.0);
   vul_arg_parse(argc, argv);
 
+
+  // get paths to input/output files
+  string infilename = getenv("CTC_DATA_DIR");
+  infilename.append("/");
+  infilename.append(infile());
+
   ReaderType::Pointer reader = ReaderType::New(); 
-  reader->SetFileName(infilename()); 
+  reader->SetFileName(infilename.c_str()); 
 
   try 
     { 

@@ -33,8 +33,15 @@ int main( int argc, char* argv[] )
 
   clog << "Testing ctcCTCImageReader version ";
   clog <<  CTC_VERSION_STRING << CTC_REVISION_STRING << endl; 
+
+  // make sure testing data path is defined
+  if(!getenv("CTC_DATA_DIR"))
+    {
+      cerr << "Error: Environment variable CTC_DATA_DIR not defined" << endl;
+      return EXIT_FAILURE;
+    }
   
-  vul_arg<char const*> infilename(0, "Dicom directory");
+  vul_arg<char const*> infile(0, "Dicom directory");
   vul_arg<char const*> outfilename(0, "Output filename");
   vul_arg<double> polypx(0, "polyp coordinate - x");
   vul_arg<double> polypy(0, "polyp coordinate - y");
@@ -45,7 +52,12 @@ int main( int argc, char* argv[] )
     
   ctc::CTCImageReader::Pointer reader = ctc::CTCImageReader::New();
 
-  reader->SetDirectory(string(infilename()));
+  // prepend CTC_DATA_DIR
+  string infilename = getenv("CTC_DATA_DIR");
+  infilename.append("/");
+  infilename.append( infile() );
+
+  reader->SetDirectory( infilename );
 
   try
     {

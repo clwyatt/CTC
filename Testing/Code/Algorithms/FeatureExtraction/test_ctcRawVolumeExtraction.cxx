@@ -34,18 +34,30 @@ int main( int argc, char* argv[] )
   clog << "Testing ctcRawVolumeExtraction version ";
   clog <<  CTC_VERSION_STRING << CTC_REVISION_STRING << endl; 
   
-  vul_arg<char const*> infilename(0, "Dicom directory");
+  // make sure testing data path is defined
+  if(!getenv("CTC_DATA_DIR"))
+    {
+      cerr << "Error: Environment variable CTC_DATA_DIR not defined" << endl;
+      return EXIT_FAILURE;
+    }
+
+  vul_arg<char const*> infile(0, "Dicom directory");
   vul_arg<char const*> outfilename(0, "Output filename");
   vul_arg<double> polypx(0, "polyp coordinate - x");
   vul_arg<double> polypy(0, "polyp coordinate - y");
   vul_arg<double> polypz(0, "polyp coordinate - z");
   vul_arg<double> cropsize(0, "half width of region to crop (in mm)");
-
   vul_arg_parse(argc, argv);
     
+
+  // get paths to input/output files
+  string infilename = getenv("CTC_DATA_DIR");
+  infilename.append("/");
+  infilename.append(infile());
+
   ctc::CTCImageReader::Pointer reader = ctc::CTCImageReader::New();
 
-  reader->SetDirectory(string(infilename()));
+  reader->SetDirectory(infilename);
 
   try
     {
