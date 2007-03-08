@@ -177,7 +177,7 @@ class vul_arg_info_list
   };
   //: Construct an empty vul_arg_info_list.
   vul_arg_info_list(autonomy autonomy__ = subset)
-    : help_("-?"), // default help operator!
+    : help_("-h"), // default help operator!
       verbose_(false), autonomy_(autonomy__) {}
 
   ~vul_arg_info_list() {}
