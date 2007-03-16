@@ -222,6 +222,18 @@ namespace ctc
 	pass++;
       }
 
+    // mask out non-colon regions
+    std::clog << "Final Masking ... ";
+    BinaryIteratorType 
+      it3(m_ThresholdFilter->GetOutput(), 
+	  m_ThresholdFilter->GetOutput()->GetRequestedRegion());
+    for( it3.GoToBegin(); !it3.IsAtEnd(); ++it3)
+      {
+	if(it3.Get() == 0)
+	  it3.Set(255);
+      }
+    std::clog << " Done." << std::endl;
+
     this->GraftOutput( m_ThresholdFilter->GetOutput() );
 
   }

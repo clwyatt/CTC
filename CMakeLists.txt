@@ -17,6 +17,14 @@ ELSE(ITK_FOUND)
    MESSAGE(FATAL_ERROR "ITK not found. Please set ITK_DIR.") 
 ENDIF(ITK_FOUND)
 
+# require VTK
+FIND_PACKAGE(VTK) 
+IF(VTK_FOUND) 
+   INCLUDE(${VTK_USE_FILE}) 
+ELSE(VTK_FOUND) 
+   MESSAGE(FATAL_ERROR "VTK not found. Please set VTK_DIR.") 
+ENDIF(VTK_FOUND)
+
 # Output directories.
 SET (LIBRARY_OUTPUT_PATH ${CTC_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${CTC_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all executables.")

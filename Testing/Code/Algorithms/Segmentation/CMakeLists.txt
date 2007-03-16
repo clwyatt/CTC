@@ -7,11 +7,12 @@ CTCIO
 CTCSegmentation 
 ITKBasicFilters 
 ITKCommon 
-ITKIO)
+ITKIO
+vtkIO)
 
 ADD_TEST(test_ctcSegmentColonFilter 
 ${EXECUTABLE_OUTPUT_PATH}/test_ctcSegmentColonFilter
 DICOM_ushort_prone 
-output_ctcSegmentColon.vtk)
+output_ctcSegmentColon)
 
 set_tests_properties (test_ctcSegmentColonFilter PROPERTIES TIMEOUT 3600)
