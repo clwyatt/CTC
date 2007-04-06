@@ -36,7 +36,7 @@ namespace ctc
 
     if(!inside)
       {
-	// throw error 
+	throw false;
       }
     
     // setup crop filter
