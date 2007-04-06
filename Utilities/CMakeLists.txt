@@ -1,2 +1,2 @@
-SUBDIRS(vul)
+SUBDIRS(vul FltkImageViewer)
 
