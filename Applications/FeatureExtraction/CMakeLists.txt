@@ -1,4 +1,7 @@
-ADD_EXECUTABLE(fetool FeatureExtractionTool.cxx ) 
+ADD_EXECUTABLE(fetool 
+FeatureExtractionTool.cxx 
+HistogramFeature.cxx
+OrientedVolumeFeature.cxx) 
 
 TARGET_LINK_LIBRARIES(fetool
 ctcvul

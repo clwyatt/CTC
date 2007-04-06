@@ -12,6 +12,7 @@ Feature Extraction Tool - frontend to various feature extraction methods
 using std::clog;
 using std::cerr;
 using std::endl;
+#include <fstream>
 using std::ifstream;
 using std::ofstream;
 
@@ -19,34 +20,14 @@ using std::ofstream;
 using std::string;
 #include <cctype>
 
-#include <list>
-using std::list;
-
 // ITK includes
 
 // CTC includes
 #include "ctcConfigure.h"
 #include "vul_arg.h"
-#include "ctcCTCImage.h"
-#include "ctcCTCImageReader.h"
 
 // Feature extraction methods
-#include "ctcRawVolumeExtraction.h"
-#include "itkScalarImageToHistogramGenerator.h"
-
-// #define BASE_PATH "/raid/data/VirtualEndoscopy/WFUSM/CTC/"
-
-struct EntryType
-{
-  string mrn;
-  string study;
-  string series;
-  double x, y, z;
-  double size;
-  char true_false;
-};
-
-typedef list<EntryType> DBType;
+#include "FeatureExtractionMethods.h"
 
 
 // this is ugly, should be refactored 
@@ -147,84 +128,6 @@ DBType * parsedb(const char * dbname)
     }
 };
 
-void compute_and_write_feature(ofstream & out, const EntryType & e)
-{
-
-  // construct the directory name
-  string dir = getenv("CTC_IMG_DIR");
-  dir.append(e.mrn);
-  dir.append("/");
-
-  char temp[100];
-  sprintf(&(temp[0]), "%06i.STU/", atoi(e.study.c_str()));
-  dir.append(temp);
-  sprintf(&(temp[0]), "%06i.SER/000001.ACQ", atoi(e.series.c_str()));
-  dir.append(temp);
-  
-  ctc::CTCImageReader::Pointer reader = ctc::CTCImageReader::New();
-
-  reader->SetDirectory(dir);
-
-  try
-    {
-      reader->Update();
-    }
-  catch (itk::ExceptionObject &ex)
-    {
-      std::cout << ex << std::endl;
-      std::clog << reader << std::endl;
-      throw EXIT_FAILURE;
-    }
-
-  typedef ctc::RawVolumeExtraction FilterType;
-  FilterType::Pointer filter = FilterType::New();
-
-  filter->SetInput(reader->GetOutput());
-  itk::Point<double, 3> point;
-  point[0] = e.x;
-  point[1] = e.y;
-  point[2] = e.z;
-  filter->SetDICOMCoordinate(point);
-  filter->SetCropSize(25.0);
-  filter->Update();
-
-  typedef itk::Statistics::ScalarImageToHistogramGenerator< ctc::CTCImageType > 
-    HistFilterType;
-  HistFilterType::Pointer hfilter = HistFilterType::New();
-  hfilter->SetInput(filter->GetOutput());
-  hfilter->SetNumberOfBins(10);
-  hfilter->Compute();
-  typedef HistFilterType::HistogramType  HistogramType;
-
-  const HistogramType * histogram = hfilter->GetOutput();
-
-  const unsigned int histogramSize = histogram->Size();
-  
-  // output
-  out << e.mrn.c_str() << "," 
-      << e.series.c_str() << ","
-      << e.x << ","
-      << e.y << ","
-      << e.z;
-
-  float total = 0;
-  unsigned int bin;
-  for( bin=0; bin < histogramSize; bin++ )
-    {
-      total += histogram->GetFrequency(bin);
-    }
-
-  for( bin=0; bin < histogramSize; bin++ )
-    {
-      out << "," << histogram->GetFrequency(bin)/total;
-    }
-
-  out << endl;  
-  
-};
-
-using namespace ctc;
-
 int main( int argc, char* argv[] )
 {
   // make sure base img path defined
@@ -267,7 +170,7 @@ int main( int argc, char* argv[] )
 	{
 	  try
 	    {
-	      compute_and_write_feature(out, *it);
+	      ExtractOrientedVolumeFeature(out, *it);
 	      num += 1;	      
 	    }
 	  catch(int exitcode)
@@ -279,7 +182,7 @@ int main( int argc, char* argv[] )
 	{
 	  try
 	    {
-	      compute_and_write_feature(out, *it);
+	      ExtractOrientedVolumeFeature(out, *it);
 	      num += 1;
 	    }
 	  catch(int exitcode)
