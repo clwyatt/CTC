@@ -1,2 +1,2 @@
-SUBDIRS(Dicom2RVF RVFInfo FeatureExtraction Legacy)
+SUBDIRS(Dicom2RVF RVFInfo FeatureExtraction Legacy PolypCorrection)
 
