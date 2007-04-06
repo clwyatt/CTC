@@ -25,6 +25,12 @@ ELSE(VTK_FOUND)
    MESSAGE(FATAL_ERROR "VTK not found. Please set VTK_DIR.") 
 ENDIF(VTK_FOUND)
 
+# require FLTK
+FIND_PACKAGE(FLTK)
+IF(FLTK_FOUND)
+   INCLUDE_DIRECTORIES(${FLTK_INCLUDE_DIR})
+ENDIF(FLTK_FOUND)
+
 # Output directories.
 SET (LIBRARY_OUTPUT_PATH ${CTC_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${CTC_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all executables.")
@@ -45,6 +51,7 @@ INCLUDE_DIRECTORIES(
 ${ITK_INCLUDE_DIRS}
 ${CTC_BINARY_DIR}
 ${CTC_SOURCE_DIR}/Utilities/vul
+${CTC_SOURCE_DIR}/Utilities/FltkImageViewer
 ${CTC_SOURCE_DIR}/Code/Common
 ${CTC_SOURCE_DIR}/Code/IO
 ${CTC_SOURCE_DIR}/Code/Algorithms/Segmentation
