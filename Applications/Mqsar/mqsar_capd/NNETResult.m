@@ -46,16 +46,22 @@ function NNETResult(varnamesel, names, stats, TrAct, TrPrdAct, TrBins, TrPrdBins
 	end
 	
 	if ~isempty(nModel)
-		szStr = ['Model ', num2str(nModel),' Test RMS Err: ', num2str(stats.test_rmserror), ...
-                 ' Test Correct rate: ', num2str(stats.test_correct_rate)];
-		szTmp1 = ['Test false positives: ', num2str(stats.test_falsehit), ...
-					'	Test false negatives: ', num2str(stats.test_miss)];
+% 		szStr = ['Model ', num2str(nModel),' Test RMS Err: ', num2str(stats.test_rmserror), ...
+%                  ' Test Correct rate: ', num2str(stats.test_correct_rate)];
+% 		szTmp1 = ['Test false positives: ', num2str(stats.test_falsehit), ...
+%					'	Test false negatives: ', num2str(stats.test_miss)];
+        szModel = sprintf('Model %g\n Variable Number: %g\n Hidden Layer: %s\n', ...
+                            nModel, stats.varnum, mat2str(stats.hiddenlayer));
+        szTrain = sprintf(' Train RMS Error: %g\n Train Correct Rate: %g\n Train False Positive: %g\n Train False Negative: %g\n', ...
+                            stats.rmserror, stats.correct_rate, stats.falsehit, stats.miss);
+        szTest =  sprintf(' Test RMS Error: %g\n Test Correct Rate: %g\n Test False Positive: %g\n Test False Negative: %g\n', ...
+                            stats.test_rmserror, stats.test_correct_rate, stats.test_falsehit, stats.test_miss);
     end
   
-    szStr = [szStr, ' Tr RMS Err: ', num2str(stats.rmserror), ...
-             ' Tr Correct rate: ', num2str(stats.correct_rate), ...
-             ' and variable number: ', num2str(stats.varnum)];
-
+%     szStr = [szStr, ' Tr RMS Err: ', num2str(stats.rmserror), ...
+%              ' Tr Correct rate: ', num2str(stats.correct_rate), ...
+%              ' and variable number: ', num2str(stats.varnum)];
+         
 	szTmp = char(varnamesel(1));
     if ~isempty(xmean)
         szTmp2 = num2str(xmean(1));
@@ -63,19 +69,21 @@ function NNETResult(varnamesel, names, stats, TrAct, TrPrdAct, TrBins, TrPrdBins
     end;
     
 	for i=2:length(varnamesel)
-		szTmp = [szTmp, '   ', char(varnamesel(i))];
+ 		szTmp = [szTmp, '   ', char(varnamesel(i))];
         if ~isempty(xmean)
             szTmp2 = [szTmp2, ' ', num2str(xmean(i))];
             szTmp3 = [szTmp3, ' ', num2str(xstd(i))];
         end;	
 	end
 
-	szTmp1 = [szTmp1, ' Tr false positives: ', num2str(stats.falsehit), ...
-		      '	Tr false negatives: ', num2str(stats.miss), ...
-              '  Hidden Layer: ', num2str(stats.hiddenlayer)];
-
-	fprintf(fmodel, '%s\n%s\n%s\t%s\n', szStr, szTmp1, 'Descriptors:', szTmp);
-	fprintf(fout, '%s\n%s\n%s\n', szStr, szTmp1, szTmp);
+% 	szTmp1 = [szTmp1, ' Tr false positives: ', num2str(stats.falsehit), ...
+% 		      '	Tr false negatives: ', num2str(stats.miss), ...
+%               '  Hidden Layer: ', num2str(stats.hiddenlayer)];
+    
+% 	fprintf(fmodel, '%s\n%s\n%s\t%s\n', szStr, szTmp1, 'Descriptors:', szTmp);
+% 	fprintf(fout, '%s\n%s\n%s\t%s\n', szStr, szTmp1, 'Descriptors:', szTmp);
+ 	fprintf(fmodel, '%s\n%s\n%s\n', szModel, szTrain, szTest);
+ 	fprintf(fout, '%s\n%s\n%s\n', szModel, szTrain, szTest);
 
 	if ~isempty(xmean)
         fprintf(fmodel, '%s\t%s\n%s\t%s\n', 'Scale mean: ', szTmp2, 'Scale std:', szTmp3);

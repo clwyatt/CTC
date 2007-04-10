@@ -339,14 +339,19 @@ global Mdat userdata;
 % Update the userdata info from the GUI handles
 userdata = updateinfo(Mdat,userdata);
 % Import the data and prepare according to user defined filter parameters
-[CmpNames, VarNames, Xmat, Ymat, Ynames, Bins,Maskmat] = prepdata(userdata);
- switch userdata.validation
+% [CmpNames, VarNames, Xmat, Ymat, Ynames, Bins,Maskmat] = prepdata(userdata);
+
+[CmpNames, VarNames, Xmat, Ymat, Ynames, Bins,Maskmat] = ...
+    CTC_dataimport(userdata.trfile, userdata.tstfile);
+
+switch userdata.validation
 case 'None'
     ModelLimit = size(Maskmat, 2);
 case {'Leave-One-Out','Leave-Some-Out'}      
     ModelLimit = 1;
 end;
 
+tic;
 if userdata.modelflag  % Create a model   
     for nModel=1:ModelLimit
         [bestgenome,CrossMat] = qsarmodel(userdata,VarNames,CmpNames,Xmat,Ymat,Bins,Maskmat,nModel);
@@ -354,12 +359,16 @@ if userdata.modelflag  % Create a model
         if nModel ==1
             % Open the model file
             fmodel = fopen(userdata.modelfile, 'w');
-            fprintf(fmodel, '%s\t%s\n', char(strcat(userdata.method, ' model')), char(date));
+            dt = fix(clock());
+            dt = sprintf('%d-%d-%d %d:%d:%d', dt(1), dt(2), dt(3), dt(4), dt(5), dt(6));
+            fprintf(fmodel, '%s\t%s\n', char(strcat(userdata.method, ' model')), dt);
 
             % Check if the output file name is valid
             try
                 fout = fopen(userdata.outputfile, 'w');
-                fprintf(fout, '%s\t%s\n', char(strcat(userdata.method, ' results')), char(date));
+                dt = fix(clock());
+                dt = sprintf('%d-%d-%d %d:%d:%d', dt(1), dt(2), dt(3), dt(4), dt(5), dt(6));                
+                fprintf(fout, '%s\t%s\n', char(strcat(userdata.method, ' results')), dt);
             catch
                 errordlg('Please enter a valid output file name!','I/O Error');
                 return;
@@ -395,6 +404,9 @@ if userdata.predictflag  % Predict bioactivity/Class
         %qsarresult(userdata,bestgenome,VarNames,CmpNames,Xmat,Ymat,Bins,CrossMat,nModel,fmodel,fout)  
     end % for nModel    
 end;
+toc;
+
+
 % --- Executes on button press in Send to Cluster.
 function qsarscript(hObject, eventdata, handles)
 % Generate a script file to launch jobs on daugter nodes

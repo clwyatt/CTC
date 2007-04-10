@@ -92,7 +92,7 @@ while tline ~= -1
         tline = 1;
     end
 end
-fclose(fmodel);  
+% fclose(fmodel);  
 
 for cv = 1:size(CrossMat,2)  
     index = find(CrossMat(:, cv));

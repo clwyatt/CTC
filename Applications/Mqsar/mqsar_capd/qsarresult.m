@@ -26,8 +26,9 @@ for cv=1:size(CrossMat,2)
             [Results(ii).class, Results(ii).prd,Dcenter,Results(ii).stats] = cm_model(tmpX(:,find(bestgenome(:,ii))),tmpBins,tmpXTest(:,find(bestgenome(:,ii))), ...
                                                 tmpBinsTest, userdata.ClassBins,userdata.Cluster);
             % Write the results to the model file      
-            switch userdata.Scaling
-            case 1 % No scaling
+            switch userdata.scaling
+            %case 1 % No scaling
+            case 'None'
                 FcmResult(VarNames(find(bestgenome(:,ii))), Results(ii).stats, Results(ii).class, tmpNames, tmpBins, fout, fmodel, ...
                 'test', nModel, tmpNamesTest, tmpBinsTest, Results(ii).prd); 
             case 2 % Normalize to Mahalanobis distance
