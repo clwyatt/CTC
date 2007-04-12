@@ -170,7 +170,7 @@ int main( int argc, char* argv[] )
 	{
 	  try
 	    {
-	      ExtractOrientedVolumeFeature(out, *it);
+	      SingleScaleEigenstructureFeature(out, *it);
 	      num += 1;	      
 	    }
 	  catch(int exitcode)
@@ -182,7 +182,7 @@ int main( int argc, char* argv[] )
 	{
 	  try
 	    {
-	      ExtractOrientedVolumeFeature(out, *it);
+	      SingleScaleEigenstructureFeature(out, *it);
 	      num += 1;
 	    }
 	  catch(int exitcode)

@@ -26,4 +26,6 @@ void ExtractHistogramFeature(std::ofstream & out, const EntryType & e);
 
 void ExtractOrientedVolumeFeature(std::ofstream & out, const EntryType & e);
 
+void SingleScaleEigenstructureFeature(std::ofstream & out, const EntryType & e);
+
 #endif
