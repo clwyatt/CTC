@@ -3,6 +3,12 @@
 # several libraries and tools. Type build.sh for usage.
 # clw 10/26/06
 
+
+if [[ "${CXX}_0" = "_0" ]]
+then
+    CXX=gcc
+fi
+
 if [ $# -eq 0 ]
 then
   echo "Usage: `basename $0` options (init, rebuild, update)"
@@ -43,7 +49,7 @@ cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK checkout VTK >> cvs.lo
 cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK logout
 
 echo "Building VisualizationToolkit"
-VTKBUILDDIR=VTK-`uname -s`-`uname -m`
+VTKBUILDDIR=VTK-`uname -s`-`uname -m`-$CXX
 mkdir $VTKBUILDDIR
 cd $VTKBUILDDIR
 export CFLAGS=-DUSE_NON_CONST
@@ -83,7 +89,7 @@ cvs -d :pserver:anoncvs@www.itk.org:/cvsroot/Insight co Insight >> cvs.log 2>&1
 cvs -d :pserver:anoncvs@www.itk.org:/cvsroot/Insight logout
 
 echo "Building InsightToolkit"
-ITKBUILDDIR=ITK-`uname -s`-`uname -m`
+ITKBUILDDIR=ITK-`uname -s`-`uname -m`-$CXX
 mkdir $ITKBUILDDIR
 cd $ITKBUILDDIR
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../Insight/ >> make.log 2>&1
@@ -103,7 +109,7 @@ echo "Checking out FLTK from Subversion"
 svn co http://svn.easysw.com/public/fltk/fltk/branches/branch-1.1/ fltk-1.1
 
 echo "Building FLTK"
-FLTKBUILDDIR=FLTK-`uname -s`-`uname -m`
+FLTKBUILDDIR=FLTK-`uname -s`-`uname -m`-$CXX
 mkdir $FLTKBUILDDIR
 cd $FLTKBUILDDIR
 export CXXFLAGS=-fpermissive
@@ -146,7 +152,7 @@ cd BSL-Kit;
 ##########################
 
 echo "Rebuilding VisualizationToolkit"
-VTKBUILDDIR=VTK-`uname -s`-`uname -m`
+VTKBUILDDIR=VTK-`uname -s`-`uname -m`-$CXX
 rm -rf $VTKBUILDDIR
 mkdir $VTKBUILDDIR
 cd $VTKBUILDDIR
@@ -168,7 +174,7 @@ cd BSL-Kit;
 # InsightToolkit Library
 ##########################
 echo "Rebuilding InsightToolkit"
-ITKBUILDDIR=ITK-`uname -s`-`uname -m`
+ITKBUILDDIR=ITK-`uname -s`-`uname -m`-$CXX
 rm -rf  $ITKBUILDDIR
 mkdir $ITKBUILDDIR
 cd $ITKBUILDDIR
@@ -185,7 +191,9 @@ cd BSL-Kit;
 ##########################
 echo "Rebuilding FLTK"
 
-FLTKBUILDDIR=FLTK-`uname -s`-`uname -m`
+FLTKBUILDDIR=FLTK-`uname -s`-`uname -m`-$CXX
+rm -rf $FLTKBUILDDIR
+mkdir $FLTKBUILDDIR
 cd $FLTKBUILDDIR
 export CXXFLAGS=-fpermissive
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../fltk-1.1/ >> make.log 2>&1
