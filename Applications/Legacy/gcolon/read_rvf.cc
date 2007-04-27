@@ -123,6 +123,7 @@ unsigned short * read_rvf_file(char * name, int * xdim, int * ydim, int * zdim)
 	for(int k=0; k < size[2]*size[1]*size[0]; k++){
 	  infile.read((char *)(&temp), sizeof(unsigned short));
 	  if(swabreq) swab(temp);
+	  if(temp == 63536) temp = 0; //remove ROI marker
 	  *(threedp + k) = temp;
 	}
 

@@ -12,6 +12,10 @@
 
 #include "gcolon.h"
 
+#include "itkImage.h"
+#include "itkImportImageFilter.h"
+#include "itkImageFileWriter.h"
+
 
 /*
 * main routine
@@ -58,7 +62,7 @@ int main(int argv, char **argc)
    fprintf(stderr, "File %s read.\n", filename);
 
    //set tolerance on region grower threshold
-   tol = 224;
+   tol = 224; //was 224
 
    //segment background
    region = grow_region(0, 0, 0, xdim, ydim, zdim, tol, data);
@@ -86,6 +90,44 @@ int main(int argv, char **argc)
    dt3d3_4_5((short *)distdata, ydim, xdim, zdim);
    fprintf(stderr, "Done.\n");
 
+//    typedef itk::Image< unsigned short, 3 > ImageType;
+//    typedef itk::ImportImageFilter< unsigned short, 3 > ImportFilterType;
+
+//    ImportFilterType::Pointer importFilter = ImportFilterType::New();
+
+//    ImportFilterType::SizeType size;
+//    size[0] = xdim; // size along X
+//    size[1] = ydim; // size along Y
+//    size[2] = zdim; // size along Z
+//    unsigned int numberOfPixels = size[0]*size[1]*size[2];
+
+//    ImportFilterType::IndexType start;
+//    start.Fill( 0 );
+//    ImportFilterType::RegionType dregion;
+//    dregion.SetIndex( start );
+//    dregion.SetSize( size );
+//    importFilter->SetRegion( dregion );
+   
+//    double origin[3];
+//    origin[0] = 0.0; // X coordinate
+//    origin[1] = 0.0; // Y coordinate
+//    origin[2] = 0.0; // Z coordinate
+//    importFilter->SetOrigin( origin );
+   
+//    double spacing[3];
+//    spacing[0] = 1.0; // along X direction
+//    spacing[1] = 1.0; // along Y direction
+//    spacing[2] = 1.0; // along Z direction
+//    importFilter->SetSpacing( spacing );
+   
+//    importFilter->SetImportPointer( data, numberOfPixels, true );
+
+//    typedef itk::ImageFileWriter< ImageType > WriterType;
+//    WriterType::Pointer writer = WriterType::New();
+//    writer->SetInput(importFilter->GetOutput());
+//    writer->SetFileName("dt.vtk");
+//    writer->Update();
+
    colon = new bframe3d;
    colon->setdim(xdim, ydim, zdim);
    colon->clear();
@@ -110,12 +152,12 @@ int main(int argv, char **argc)
              *(distdata + k*xdim*ydim + i*ydim + j) =  MAGIC_NUMBER;
          }
 
-  FILE *of;
-  of = fopen("binary.raw", "w");
-  fwrite((char *)(distdata), xdim*ydim*zdim*2, 1, of);
-  fclose(of);
+ //  FILE *of;
+//   of = fopen("binary.raw", "w");
+//   fwrite((char *)(distdata), xdim*ydim*zdim*2, 1, of);
+//   fclose(of);
 
-  return 0;
+//   return 0;
 
      //locate maximum from distance transform
      max = 0;
@@ -134,7 +176,8 @@ int main(int argv, char **argc)
 
      fprintf(stderr, "Max = %i\n", max);
 
-     if(max > 10){
+     if(max > 50){
+
        //print coordinates of seed
        printf("Seed is at (%i,%i,%i)\n", sx, sy, sz);
 
@@ -146,7 +189,7 @@ int main(int argv, char **argc)
        //grow colon
        temp_colon = grow_region(sx, sy, sz, xdim, ydim, zdim, tol, data);
 
-       //temp_colon->write("/home/users/cwyatt/data/temp.colon.raw");
+       temp_colon->write("temp_colon.vtk");
 
        //compute curvature
        fprintf(stderr, "Computing curvature.\n");
@@ -168,13 +211,13 @@ int main(int argv, char **argc)
        }
 
       fprintf(stderr, "Selecting planar areas.\n");
-      select_area(colon_flat, 75); //75 for decimated volumes
+      select_area(colon_flat, 150); //75 for decimated volumes
                                    //150 for full size volumes
 
-      //colon_flat->write("/home/users/cwyatt/data/temp.flat.raw");
+      colon_flat->write("flat.vtk");
 
       fprintf(stderr, "Growing across pv\n");
-      colon_dil = grow_region_pv(colon_flat, 0.05, data); //was 0.05
+      colon_dil = grow_region_pv(colon_flat, 0.1, data); //was 0.05
       delete colon_flat;
 
       //colon_dil->write("/home/users/cwyatt/data/temp.dil.raw");
@@ -192,7 +235,7 @@ int main(int argv, char **argc)
        // add new region to colon if not obviously too big.
        // else just add air segmentation
 
-       if(region_size < ((float)(xdim*ydim*zdim))/4)
+       if(region_size < ((float)(xdim*ydim*zdim))/32)
        { //add air plus fluid segmentation
          for(i=0; i < xdim; i++)
 	   for(j=0; j < ydim; j++)
@@ -203,7 +246,7 @@ int main(int argv, char **argc)
        }
        else
        {
-         fprintf(stderr, "Error: fluid region too big, discarding....\n");
+         fprintf(stderr, "DEBUG: fluid region too big, discarding....\n");
          //just add air segmentation
          for(i=0; i < xdim; i++)
 	   for(j=0; j < ydim; j++)
@@ -214,7 +257,7 @@ int main(int argv, char **argc)
        }
        delete temp_region;
        delete temp_colon;
-       loopAgain = 1;
+       loopAgain = 0;
      }
      else
        loopAgain = 0;
@@ -223,7 +266,7 @@ int main(int argv, char **argc)
    // close seed file
    fclose(seedf);
 
-   sprintf(tempfilename, "%s.final", filename);
+   sprintf(tempfilename, "%s.vtk", filename);
    colon->write(tempfilename);
 
    //de-allocate memory

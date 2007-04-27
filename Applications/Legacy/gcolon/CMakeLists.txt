@@ -28,5 +28,8 @@ vector.cc)
 
 ADD_EXECUTABLE(gcolon ${GCOLON_SRCS} ) 
 
-TARGET_LINK_LIBRARIES(gcolon)
+TARGET_LINK_LIBRARIES(gcolon
+ITKBasicFilters
+ITKCommon
+ITKIO)
 

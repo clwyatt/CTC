@@ -6,6 +6,10 @@
 
 #include "bvolume.h"
 
+#include "itkImage.h"
+#include "itkImportImageFilter.h"
+#include "itkImageFileWriter.h"
+
 using namespace std;
 
 //************************************
@@ -550,11 +554,49 @@ void bframe3d::write(char * filename)
             *(data + k*horz_res*vert_res + i*vert_res + j) = 255;
          }
 
-  outfile.open( filename );
-  outfile.write((char *)data, horz_res*vert_res*z_res);
-  outfile.close();
+   typedef itk::Image< unsigned char, 3 > ImageType;
+   typedef itk::ImportImageFilter< unsigned char, 3 > ImportFilterType;
 
-  delete [] data;
+   ImportFilterType::Pointer importFilter = ImportFilterType::New();
+
+   ImportFilterType::SizeType size;
+   size[0] = horz_res; // size along X
+   size[1] = vert_res; // size along Y
+   size[2] = z_res; // size along Z
+   unsigned int numberOfPixels = size[0]*size[1]*size[2];
+
+   ImportFilterType::IndexType start;
+   start.Fill( 0 );
+   ImportFilterType::RegionType region;
+   region.SetIndex( start );
+   region.SetSize( size );
+   importFilter->SetRegion( region );
+   
+   double origin[3];
+   origin[0] = 0.0; // X coordinate
+   origin[1] = 0.0; // Y coordinate
+   origin[2] = 0.0; // Z coordinate
+   importFilter->SetOrigin( origin );
+   
+   double spacing[3];
+   spacing[0] = 1.0; // along X direction
+   spacing[1] = 1.0; // along Y direction
+   spacing[2] = 1.0; // along Z direction
+   importFilter->SetSpacing( spacing );
+   
+   importFilter->SetImportPointer( data, numberOfPixels, true );
+
+   typedef itk::ImageFileWriter< ImageType > WriterType;
+   WriterType::Pointer writer = WriterType::New();
+   writer->SetInput(importFilter->GetOutput());
+   writer->SetFileName(filename);
+   writer->Update();
+
+   //outfile.open( filename );
+   //outfile.write((char *)data, horz_res*vert_res*z_res);
+   //outfile.close();
+   
+   //delete [] data;
 }
 
 
