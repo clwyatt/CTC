@@ -1,0 +1,49 @@
+1: mean square error: 0.953408
+1: accuracy: 0.541667
+2: mean square error: 0.954009
+2: accuracy: 0.536458
+3: mean square error: 0.953696
+3: accuracy: 0.536458
+4: mean square error: 0.955032
+4: accuracy: 0.557292
+5: mean square error: 0.956191
+5: accuracy: 0.541667
+6: mean square error: 0.955324
+6: accuracy: 0.557292
+7: mean square error: 0.887042
+7: accuracy: 0.635417
+8: mean square error: 0.846018
+8: accuracy: 0.630208
+9: mean square error: 0.76828
+9: accuracy: 0.682292
+10: mean square error: 0.767444
+10: accuracy: 0.6875
+11: mean square error: 0.76648
+11: accuracy: 0.671875
+12: mean square error: 0.743396
+12: accuracy: 0.677083
+13: mean square error: 0.741595
+13: accuracy: 0.677083
+14: mean square error: 0.608346
+14: accuracy: 0.765625
+15: mean square error: 0.606339
+15: accuracy: 0.760417
+16: mean square error: 0.533269
+16: accuracy: 0.776042
+17: mean square error: 0.464909
+17: accuracy: 0.802083
+18: mean square error: 0.349885
+18: accuracy: 0.890625
+19: mean square error: 0.319847
+19: accuracy: 0.921875
+20: mean square error: 0.248897
+20: accuracy: 0.947917
+21: mean square error: 0.173782
+21: accuracy: 0.9375
+22: mean square error: 0.144923
+22: accuracy: 0.947917
+23: mean square error: 0.117052
+23: accuracy: 0.96875
+24: mean square error: 0.117041
+24: accuracy: 0.973958
+Calculating the error
