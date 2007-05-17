@@ -1,6 +1,11 @@
 function [rownames, colnames, xdata, ydata, ynames, bins, maskmat]= ...
     CTC_dataimport(file_train, file_test)
 % CTC_DATAIMPORT import train/test data file and construct data for mqsar.
+% 
+% Output:
+%  maskmat - Mask matrix to indicate which patterns in xdata are training 
+%            data and which belong to testing data. [n x 1 vector].
+%            (0 - training, 1 - testing) 
 %
 % each row in both train.dat and test.dat has following format:
 % bin,row id,features
@@ -22,7 +27,6 @@ text_col= textscan(fid, '%s%s%*[^\n]', 'delimiter', ',');
 fclose(fid);
 bin_test = text_col{1};
 rownames_test = text_col{2};
-
 
 rownames = [rownames_train; rownames_test];
 xdata = [xdata_train; xdata_test];
