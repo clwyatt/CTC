@@ -18,6 +18,9 @@ Language:  C++
 #include "itkImageSeriesReader.h"
 #include "itkGDCMSeriesFileNames.h"
 #include "itkImageFileReader.h"
+#include "itkMetaDataObject.h"
+#include "itkMetaDataDictionary.h"
+
 
 namespace ctc
 {
@@ -68,6 +71,31 @@ namespace ctc
     reader->ReleaseDataFlagOn();
 
     reader->Update();
+
+    // check the modality
+    // for some reason this fails sometimes
+    //char name[512];
+    //dicomIO->GetModality(name);
+    //assert(name == "CT");
+
+    // get prone/supine info
+    std::string PatientPosition;
+    std::string tag = "0018|5100";
+    itk::MetaDataDictionary dict;
+    if(dicomIO->GetValueFromTag(tag, PatientPosition))
+      {
+	itk::EncapsulateMetaData<std::string>(dict, 
+					      std::string("Orientation"), 
+					      PatientPosition);
+      }
+    else
+      {
+	itk::EncapsulateMetaData<std::string>(dict, 
+					      std::string("Orientation"), 
+					      std::string("UNKNOWN"));
+      }
+      
+    reader->GetOutput()->SetMetaDataDictionary(dict);
 
     this->GraftOutput( reader->GetOutput() );
   }
