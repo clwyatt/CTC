@@ -20,3 +20,10 @@ Directory Descriptions:
 Contributors:
 - Chris Wyatt, clwyatt@vt.edu
 - Jung Wook Suh, jwsuh@vt.edu
+
+Acknowledgements:
+- SliceBySliceFilter is a slightly modified version of that by Gaetan Lehmann 
+  http://hdl.handle.net/1926/368
+- FLTK slice viewer 
+
+
