@@ -9,14 +9,15 @@ Language:  C++
 
 #include "itkSmartPointer.h"
 #include "itkImageToImageFilter.h"
-
 #include "itkChangeLabelImageFilter.h"
-#include "itkBinaryThresholdImageFilter.h"
+#include "itkScalarImageKmeansImageFilter.h"
+#include "itkSliceBySliceImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
 #include "itkDanielssonDistanceMapImageFilter.h"
 #include "itkResampleImageFilter.h"
 #include "itkIdentityTransform.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkMinMaxCurvatureFlowImageFilter.h"
 
 #include "ctcCTCImage.h"
 
@@ -56,9 +57,16 @@ class ITK_EXPORT SegmentColonFilter :
 protected:
 
   SegmentColonFilter();
-  typedef itk::BinaryThresholdImageFilter
-    <CTCImageType, BinaryImageType> 
-    ThresholdFilterType;
+
+  typedef itk::ScalarImageKmeansImageFilter
+    <  itk::Image<double, 3> > KMeansFilterType;
+
+  typedef itk::MinMaxCurvatureFlowImageFilter<
+    itk::Image<double, 3>, itk::Image<double,3> > SmootherType;
+
+  //  typedef itk::SliceBySliceImageFilter
+  //  < CTCImageType, BinaryImageType > SliceFilterType;
+
   
   typedef itk::ConnectedThresholdImageFilter
     <BinaryImageType, BinaryImageType> 
@@ -69,8 +77,12 @@ protected:
     DistanceFilterType;
 
   typedef itk::ResampleImageFilter
-    <BinaryImageType, BinaryImageType, double>
+    <CTCImageType, CTCImageType, double>
     DownsampleFilterType;
+
+  typedef itk::ResampleImageFilter
+    <BinaryImageType, BinaryImageType, double>
+    UpsampleFilterType;
 
   void GenerateData();
 
@@ -79,10 +91,12 @@ private:
   SegmentColonFilter(Self&);            // intentionally not implemented
   void operator=(const Self&);          // intentionally not implemented
 
-  ThresholdFilterType::Pointer       m_ThresholdFilter;
+  KMeansFilterType::Pointer          m_KMeansFilter;
   RegionGrowFilterType::Pointer      m_BGRegionGrowFilter;
   DistanceFilterType::Pointer        m_DistanceFilter;
   DownsampleFilterType::Pointer      m_DownsampleFilter;
+  UpsampleFilterType::Pointer        m_UpsampleFilter;
+  SmootherType::Pointer              m_SmoothFilter;
 
   long int          m_DownsampleFactor;
   CTCPixelType      m_Threshold;

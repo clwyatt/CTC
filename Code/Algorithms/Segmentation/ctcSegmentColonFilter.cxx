@@ -12,15 +12,20 @@ Language:  C++
 #include "itkFloodFilledImageFunctionConditionalIterator.h"
 #include "itkBinaryThresholdImageFunction.h"
 
+#include "itkCastImageFilter.h"
+#include "itkBinaryMedianImageFilter.h"
+
 namespace ctc
 {
   
   SegmentColonFilter::SegmentColonFilter()
   {
-    m_ThresholdFilter = ThresholdFilterType::New();
+    m_KMeansFilter = KMeansFilterType::New();
     m_BGRegionGrowFilter = RegionGrowFilterType::New();
     m_DistanceFilter = DistanceFilterType::New();
     m_DownsampleFilter = DownsampleFilterType::New();
+    m_UpsampleFilter = UpsampleFilterType::New();
+    m_SmoothFilter = SmootherType::New();
 
     m_DownsampleFactor = 2;
 
@@ -35,81 +40,22 @@ namespace ctc
   
   void SegmentColonFilter::GenerateData()
   {
-    // threshold the image
-    m_ThresholdFilter->SetInput(this->GetInput());
-    m_ThresholdFilter->SetLowerThreshold(m_MinPixelValue);
-    m_ThresholdFilter->SetUpperThreshold(m_Threshold);
-    m_ThresholdFilter->SetInsideValue(0);
-    m_ThresholdFilter->SetOutsideValue(255);
-
-    m_ThresholdFilter->Update();
-    
-    //m_ChangeLabelFilter->SetReleaseDataFlag(true);
-    
-    // grow background region starting in the 8 corners
-    m_BGRegionGrowFilter->SetInput(m_ThresholdFilter->GetOutput());
+    // get size and spacing info
     BinaryImageType::SizeType size = \
-      m_ThresholdFilter->GetOutput()->GetLargestPossibleRegion().GetSize();
-    BinaryImageType::SpacingType spacing = \
-      m_ThresholdFilter->GetOutput()->GetSpacing();
-    typedef BinaryImageType::SizeType::SizeValueType SizeValueType;
+      this->GetInput()->GetLargestPossibleRegion().GetSize();
+    CTCImageType::SpacingType spacing = \
+      this->GetInput()->GetSpacing();
+    typedef CTCImageType::SizeType::SizeValueType SizeValueType;
 
-    BinaryImageType::IndexType seed1;
-    seed1[0] = 0; seed1[1] = 0; seed1[2] = 0;
-    m_BGRegionGrowFilter->AddSeed(seed1);
-    BinaryImageType::IndexType seed2;
-    seed2[0] = 0; seed2[1] = 0; seed2[2] = size[2]-1;
-    m_BGRegionGrowFilter->AddSeed(seed2);
-    BinaryImageType::IndexType seed3;
-    seed3[0] = 0; seed3[1] = size[1]-1; seed3[2] = 0;
-    m_BGRegionGrowFilter->AddSeed(seed3);
-    BinaryImageType::IndexType seed4;
-    seed4[0] = 0; seed4[1] = size[1]-1; seed4[2] = size[2]-1;
-    m_BGRegionGrowFilter->AddSeed(seed4);
-    BinaryImageType::IndexType seed5;
-    seed5[0] = size[0]-1; seed5[1] = 0; seed5[2] = 0;
-    m_BGRegionGrowFilter->AddSeed(seed5);
-    BinaryImageType::IndexType seed6;
-    seed6[0] = size[0]-1; seed6[1] = 0; seed6[2] = size[2]-1;
-    m_BGRegionGrowFilter->AddSeed(seed6);
-    BinaryImageType::IndexType seed7;
-    seed7[0] = size[0]-1; seed7[1] = size[1]-1; seed7[2] = 0;
-    m_BGRegionGrowFilter->AddSeed(seed7);
-    BinaryImageType::IndexType seed8;
-    seed8[0] = size[0]-1; seed8[1] = size[1]-1; seed8[2] = size[2]-1;
-    m_BGRegionGrowFilter->AddSeed(seed8);
-    m_BGRegionGrowFilter->SetLower(0);
-    m_BGRegionGrowFilter->SetUpper(128);
-    m_BGRegionGrowFilter->SetReplaceValue(255);
-    
-    m_BGRegionGrowFilter->Update();
-
-    // mask out the BG region
-    std::clog << "Masking ... ";
-    typedef itk::ImageRegionIterator<BinaryImageType> BinaryIteratorType;
-    BinaryIteratorType 
-      it1(m_ThresholdFilter->GetOutput(), 
-	  m_ThresholdFilter->GetOutput()->GetRequestedRegion());
-    BinaryIteratorType 
-      it2(m_BGRegionGrowFilter->GetOutput(), 
-	  m_BGRegionGrowFilter->GetOutput()->GetRequestedRegion());
-    for( it1.GoToBegin(), it2.GoToBegin(); !it1.IsAtEnd(); ++it1, ++it2)
-      {
-	if(it2.Get() == 255)
-	  it1.Set(255);
-      }
-    std::clog << " Done." << std::endl;
-
-    m_BGRegionGrowFilter->SetReleaseDataFlag(true);
-
-    // downsample to speed up distance computation
+    // downsample to speed up computation and reduce memory requirements
+    std::clog << "Resampling ... ";
     typedef itk::IdentityTransform< double, 3 > DownsampleTransformType;
     DownsampleTransformType::Pointer downTransform = 
       DownsampleTransformType::New();
     downTransform->SetIdentity();
     m_DownsampleFilter->SetTransform( downTransform );
     typedef itk::NearestNeighborInterpolateImageFunction<
-    BinaryImageType, double > DownsampleInterpolatorType;
+      CTCImageType, double > DownsampleInterpolatorType;
     DownsampleInterpolatorType::Pointer downInterpolator = 
       DownsampleInterpolatorType::New();
     m_DownsampleFilter->SetInterpolator( downInterpolator );
@@ -123,15 +69,148 @@ namespace ctc
     downSize[1] = static_cast<SizeValueType>(size[1]/m_DownsampleFactor);
     downSize[2] = static_cast<SizeValueType>(size[2]/m_DownsampleFactor);
     m_DownsampleFilter->SetSize( downSize );
-    m_DownsampleFilter->SetInput(m_ThresholdFilter->GetOutput());
-
+    m_DownsampleFilter->SetInput(this->GetInput());
     m_DownsampleFilter->SetOutputOrigin( \
-       m_ThresholdFilter->GetOutput()->GetOrigin());
-
+      this->GetInput()->GetOrigin());
+    m_DownsampleFilter->SetOutputDirection( \
+      this->GetInput()->GetDirection()); 
     m_DownsampleFilter->Update();
+    std::clog << "Done." << std::endl;
 
-    // apply distance transform to remaining pixels
-    m_DistanceFilter->SetInput(m_DownsampleFilter->GetOutput());
+    typedef itk::CastImageFilter< CTCImageType, itk::Image<double,3> >
+      ToDoubleType;
+    ToDoubleType::Pointer tod = ToDoubleType::New();
+    tod->SetInput(m_DownsampleFilter->GetOutput());
+
+    // non-linearly smooth the image
+//     int rad = atoi(getenv("CTC_COND"));
+//     int iter = atoi(getenv("CTC_ITER"));
+//     float ts = atof(getenv("CTC_TS"));
+//     std::clog << "Stencil Radius: " << rad << std::endl;
+//     std::clog << "Number of iterations: " << iter << std::endl;
+//     std::clog << "Time Step: " << ts << std::endl;
+    std::clog << "Filtering ... ";
+    m_SmoothFilter->SetInput(tod->GetOutput());
+    m_SmoothFilter->SetTimeStep(0.0625);
+    m_SmoothFilter->SetNumberOfIterations(10);
+    m_SmoothFilter->SetStencilRadius(1);
+    m_SmoothFilter->Update();
+    std::clog << "Done." << std::endl;
+
+    // segment the image using k-means
+    std::clog << "Clustering ... ";
+    m_KMeansFilter->SetInput(m_SmoothFilter->GetOutput());
+    m_KMeansFilter->AddClassWithInitialMean(-3000);
+    m_KMeansFilter->AddClassWithInitialMean(-1000);
+    m_KMeansFilter->AddClassWithInitialMean(-100);
+    m_KMeansFilter->AddClassWithInitialMean(30);
+    m_KMeansFilter->AddClassWithInitialMean(400);
+    m_KMeansFilter->AddClassWithInitialMean(600);
+    m_KMeansFilter->Update(); 
+    std::clog << "Done." << std::endl;
+    
+    // upsample to original size
+//     std::clog << "Upsampling ... ";
+//     typedef itk::IdentityTransform< double, 3 > UpsampleTransformType;
+//     UpsampleTransformType::Pointer upTransform = 
+//       UpsampleTransformType::New();
+//     upTransform->SetIdentity();
+//     m_UpsampleFilter->SetTransform( upTransform );
+//     typedef itk::NearestNeighborInterpolateImageFunction<
+//       BinaryImageType, double > UpsampleInterpolatorType;
+//     UpsampleInterpolatorType::Pointer upInterpolator = 
+//       UpsampleInterpolatorType::New();
+//     m_UpsampleFilter->SetInterpolator( upInterpolator );
+//     BinaryImageType::SpacingType upSpacing;
+//     upSpacing[0] = spacing[0];
+//     upSpacing[1] = spacing[1];
+//     upSpacing[2] = spacing[2];
+//     m_UpsampleFilter->SetOutputSpacing( upSpacing );
+//     BinaryImageType::SizeType upSize;
+//     upSize[0] = static_cast<SizeValueType>(size[0]);
+//     upSize[1] = static_cast<SizeValueType>(size[1]);
+//     upSize[2] = static_cast<SizeValueType>(size[2]);
+//     m_UpsampleFilter->SetSize( upSize );
+//     m_UpsampleFilter->SetInput(m_KMeansFilter->GetOutput());
+//     m_UpsampleFilter->SetOutputOrigin( \
+//        this->GetInput()->GetOrigin());
+//     m_UpsampleFilter->Update();
+//     std::clog << "Done." << std::endl;
+
+    //free up some pipline memory
+      m_DownsampleFilter->SetReleaseDataFlag(true);
+      m_SmoothFilter->SetReleaseDataFlag(true);
+      //m_KMeansFilter->SetReleaseDataFlag(true);
+
+    // grow background region starting in the 8 corners
+    m_BGRegionGrowFilter->SetInput(m_KMeansFilter->GetOutput());
+    BinaryImageType::IndexType seed1;
+    seed1[0] = 0; seed1[1] = 0; seed1[2] = 0;
+    m_BGRegionGrowFilter->AddSeed(seed1);
+    BinaryImageType::IndexType seed2;
+    seed2[0] = 0; seed2[1] = 0; seed2[2] = downSize[2]-1;
+    m_BGRegionGrowFilter->AddSeed(seed2);
+    BinaryImageType::IndexType seed3;
+    seed3[0] = 0; seed3[1] = downSize[1]-1; seed3[2] = 0;
+    m_BGRegionGrowFilter->AddSeed(seed3);
+    BinaryImageType::IndexType seed4;
+    seed4[0] = 0; seed4[1] = size[1]-1; seed4[2] = downSize[2]-1;
+    m_BGRegionGrowFilter->AddSeed(seed4);
+    BinaryImageType::IndexType seed5;
+    seed5[0] = downSize[0]-1; seed5[1] = 0; seed5[2] = 0;
+    m_BGRegionGrowFilter->AddSeed(seed5);
+    BinaryImageType::IndexType seed6;
+    seed6[0] = downSize[0]-1; seed6[1] = 0; seed6[2] = downSize[2]-1;
+    m_BGRegionGrowFilter->AddSeed(seed6);
+    BinaryImageType::IndexType seed7;
+    seed7[0] = downSize[0]-1; seed7[1] = downSize[1]-1; seed7[2] = 0;
+    m_BGRegionGrowFilter->AddSeed(seed7);
+    BinaryImageType::IndexType seed8;
+    seed8[0] = downSize[0]-1; 
+    seed8[1] = downSize[1]-1; 
+    seed8[2] = downSize[2]-1;
+    m_BGRegionGrowFilter->AddSeed(seed8);
+    m_BGRegionGrowFilter->SetLower(0);
+    m_BGRegionGrowFilter->SetUpper(1);
+    m_BGRegionGrowFilter->SetReplaceValue(255);
+    
+    m_BGRegionGrowFilter->Update();
+
+    // mask out the BG region and combine air-fluid classes
+    std::clog << "Masking ... ";
+    typedef itk::ImageRegionIterator<BinaryImageType> BinaryIteratorType;
+    BinaryIteratorType 
+      it1(m_KMeansFilter->GetOutput(), 
+	  m_KMeansFilter->GetOutput()->GetRequestedRegion());
+    BinaryIteratorType 
+      it2(m_BGRegionGrowFilter->GetOutput(), 
+	  m_BGRegionGrowFilter->GetOutput()->GetRequestedRegion());
+    for( it1.GoToBegin(), it2.GoToBegin(); !it1.IsAtEnd(); ++it1, ++it2)
+      {
+	if( it2.Get() == 255 )
+	  it1.Set(10);
+	
+	switch( it1.Get() )
+	  {
+	  case 10:
+	    break;
+	  case 1:
+	    it1.Set(0);
+	    break;
+	  case 5:
+	    it1.Set(0);
+	    break;
+	  default:
+	    it1.Set(10);
+	    break;
+	  }
+      }
+    std::clog << " Done." << std::endl;
+
+    m_BGRegionGrowFilter->SetReleaseDataFlag(true);        
+
+    // apply distance transform to remaining pixels-
+    m_DistanceFilter->SetInput(m_KMeansFilter->GetOutput());
     //m_DistanceFilter->InputIsBinaryOn();
 
     try
@@ -160,7 +239,7 @@ namespace ctc
       BinaryFunctionType;
     BinaryFunctionType::Pointer bfunction = 
       BinaryFunctionType::New();
-    bfunction->SetInputImage(m_ThresholdFilter->GetOutput());
+    bfunction->SetInputImage(m_KMeansFilter->GetOutput());
     bfunction->ThresholdBetween(0, 1);
 
     typedef itk::FloodFilledImageFunctionConditionalIterator
@@ -170,7 +249,7 @@ namespace ctc
 
     unsigned int pass = 1;
     
-    while(pass < m_MaxIterations)
+    while(pass < 2)
       {
 	DistanceIteratorType 
 	  dit(m_DistanceFilter->GetOutput(), 
@@ -205,13 +284,13 @@ namespace ctc
 	  }
 
 	BinaryImageType::IndexType seed;
-	seed[0] = maxi[0]*m_DownsampleFactor;
-	seed[1] = maxi[1]*m_DownsampleFactor;
-	seed[2] = maxi[2]*m_DownsampleFactor;
+	seed[0] = maxi[0];
+	seed[1] = maxi[1];
+	seed[2] = maxi[2];
 
-	BinaryFloodIteratorType bfit(m_ThresholdFilter->GetOutput(),
-				       bfunction,
-				       seed);
+	BinaryFloodIteratorType bfit(m_KMeansFilter->GetOutput(),
+				     bfunction,
+				     seed);
 	bfit.GoToBegin();
 	while(!bfit.IsAtEnd())
 	  {
@@ -225,16 +304,31 @@ namespace ctc
     // mask out non-colon regions
     std::clog << "Final Masking ... ";
     BinaryIteratorType 
-      it3(m_ThresholdFilter->GetOutput(), 
-	  m_ThresholdFilter->GetOutput()->GetRequestedRegion());
+      it3(m_KMeansFilter->GetOutput(), 
+	  m_KMeansFilter->GetOutput()->GetRequestedRegion());
     for( it3.GoToBegin(); !it3.IsAtEnd(); ++it3)
       {
-	if(it3.Get() == 0)
+	if(it3.Get() != 128)
 	  it3.Set(255);
       }
     std::clog << " Done." << std::endl;
 
-    this->GraftOutput( m_ThresholdFilter->GetOutput() );
+    // cleanup the flat areas
+//     typedef itk::BinaryMedianImageFilter<
+//       BinaryImageType, BinaryImageType > CleanupFilterType;
+//     CleanupFilterType::Pointer clean = CleanupFilterType::New();
+
+//     BinaryImageType::SizeType indexRadius;
+//     indexRadius[0] = 1; // radius along x
+//     indexRadius[1] = 1; // radius along y
+//     indexRadius[2] = 1; // radius along z
+
+//     clean->SetRadius( indexRadius );
+
+//     clean->SetInput( m_KMeansFilter->GetOutput() );
+//     clean->Update();
+
+    this->GraftOutput( m_KMeansFilter->GetOutput() );
 
   }
   
