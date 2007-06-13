@@ -1,0 +1,136 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CTCDevelopersGuide.tex
+% Abstract: Documentation of CTC Code and Algorithms
+%
+% white paper
+%
+% Created: Chris L. Wyatt 5/22/2007
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt]{book}
+\usepackage{pslatex}
+
+\title{CTC Developers Guide}
+
+\author{Christoper L Wyatt \\
+  Assistant Professor \\
+  Department of Electrical and Computer Engineering\\
+  Virginia Tech\\
+  Blacksburg, VA 24061-0111 \\
+  clwyatt@vt.edu 
+}
+
+\date{May 2007}
+
+\begin{document}
+    
+\maketitle
+
+\tableofcontents
+
+% ------------------------------------------------------------------------ %
+% INTRODUCTION
+%
+\part{Introduction}
+\chapter{Purpose}
+This document describes the software library, applications, and
+algorithms used in the CTC system.
+
+\chapter{CT Colonography}
+CT Colonography (aka Virtual Colonoscopy \cite{Vining1996} is a
+minimally invasive screening procedure for colorectal polyps.
+
+% ------------------------------------------------------------------------ %
+% SEGEMENTATION
+%
+\part{Segmentation}
+\chapter{Literature Review}
+
+\chapter{Methods}
+
+\chapter{Results}
+
+% ------------------------------------------------------------------------ %
+% REGISTRATION
+%
+\part{Registration}
+\chapter{Literature Review}
+
+\chapter{Methods}
+
+\chapter{Results}
+
+% ------------------------------------------------------------------------ %
+% FEATURE EXTRACTION
+%
+\part{Feature Extraction}
+\chapter{Literature Review}
+\section{Yoshida and Nappi 2001}
+Hiroyuki Yoshida and Janne Nappi, Three-Dimensional Computer-Aided
+Diagnosis Scheme for Detection of Colonic Polyps, IEEE Transactions on
+Medical Imaging, 2001 \cite{YoshidaN01}. These are the same features
+used in \cite{YoshidaMMRD02}.
+
+\par 
+The features used are functions of the local principle
+curvatures, $\kappa_1$ and $\kappa_2$, computed point-wise at $p$.
+\begin{itemize}
+\item {\it volumetric shape index}:
+\[
+SI(p) = \frac{1}{2}-\frac{1}{\pi}\arctan{\frac{\kappa_1(p)+\kappa_2(p)}{\kappa_1(p)-\kappa_2(p)}}
+\]
+\item {\it curvedness}:
+\[
+CV(p) = \sqrt{\frac{\kappa_1(p)^2 + \kappa_2(p)^2}{2}} 
+\]
+\end{itemize}
+
+\section{Nappi and Yoshida 2002}
+Janne Nappi and Hiroyuki Yoshida, Automated Detection of Polyps with
+CT Colonography: Evaluation of Volumetric Features for Reduction of
+False-Positive Findings, Academic Radiology, 2002 \cite{NappiY02}.
+\par This paper introduces a feature for false positive reduction,
+computed point-wise at $p$, called the
+{\it directional gradient concentration} (DGC), defined as
+\[
+GC(p)=\frac{1}{N}\sum_{i=1}^{N} e_i^{\max}(p) \; ,
+\]
+where 
+\[
+e_i^{\max}(p) = \max_{R_{\min} \leq n \leq R_{\max}}
+\left\{ 
+\frac{1}{n-R_{\min}+1}\sum_{j=R_{\min}}^{n} \cos{\psi_{ij}(p)}
+\right\} \; .
+\]
+$N$ is the number of directions, $D_i$, in which the surrounding
+gradients are estimated. $\psi_{ij}$ is the angle between a direction
+vector, and the gradient at a position of length $j$ from $p$ in the
+direction $D_i$. $R_{\min}$ and $R_{\max}$ are the bounds on the
+length $j$. Values for these constants are not given.
+
+\par Note, that this is roughly the same as the
+divergence of the gradient.  
+
+\par A modified version of this this
+feature was presented in \cite{NappiY03}, but showed no improvement.
+\[
+MGC(p) = \frac{1}{1+e^{g GC(p)-t)} \; ,}
+\]
+for scalars $g$ (the gain) and $t$ (the transfer). Values for these
+constants are not given.
+
+\chapter{Methods}
+
+
+\chapter{Results}
+
+
+% ---------------------------------------------------------------------- %
+% REFERENCES
+%
+\clearpage
+\bibliographystyle{plain}
+\bibliography{CTC}
+\addcontentsline{toc}{Chapter}{References}
+
+\end{document}
