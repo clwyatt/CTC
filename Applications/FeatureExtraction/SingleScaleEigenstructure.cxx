@@ -173,6 +173,7 @@ void SingleScaleEigenstructureFeature(ofstream & out, const EntryType & e)
   for(it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
       // is there is a better way to do this in ITK?
+      // yes use neigborhood iterators, this way is SLOOOOOW
       ctc::CTCImageType::IndexType center = it.GetIndex();
       ctc::CTCImageType::IndexType right = center;
       right[0] += 1;
