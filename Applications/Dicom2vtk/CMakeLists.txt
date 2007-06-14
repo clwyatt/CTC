@@ -1,0 +1,3 @@
+ADD_EXECUTABLE(dicom2vtk Dicom2vtk.cxx ) 
+
+TARGET_LINK_LIBRARIES(dicom2vtk CTCIO ITKCommon ITKIO)
