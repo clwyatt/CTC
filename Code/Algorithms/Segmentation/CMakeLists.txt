@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES(${CTC_SOURCE_DIR}/Code/Common)
 
 SET(CTCSegmentation_SRCS
   ctcSegmentColonFilter.cxx
+  ctcSegmentColonWithContrastFilter.cxx
 )
 
 # Add CTCSegmentation library

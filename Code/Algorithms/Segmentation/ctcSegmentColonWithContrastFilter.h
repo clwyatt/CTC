@@ -4,31 +4,32 @@ Id:        $Id$
 Language:  C++
 *******************************************************************************/
 
-#ifndef __ctcSegmentColonFilter_h
-#define __ctcSegmentColonFilter_h
+#ifndef __ctcSegmentColonWithContrastFilter_h
+#define __ctcSegmentColonWithContrastFilter_h
 
 #include "itkSmartPointer.h"
 #include "itkImageToImageFilter.h"
-
 #include "itkChangeLabelImageFilter.h"
-#include "itkBinaryThresholdImageFilter.h"
+#include "itkScalarImageKmeansImageFilter.h"
+#include "itkSliceBySliceImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
 #include "itkDanielssonDistanceMapImageFilter.h"
 #include "itkResampleImageFilter.h"
 #include "itkIdentityTransform.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkMinMaxCurvatureFlowImageFilter.h"
 
 #include "ctcCTCImage.h"
 
 namespace ctc
 {
   
-class ITK_EXPORT SegmentColonFilter :
+class ITK_EXPORT SegmentColonWithContrastFilter :
     public itk::ImageToImageFilter<CTCImageType, BinaryImageType>
 {
  public:
  
-  typedef SegmentColonFilter                        Self;
+  typedef SegmentColonWithContrastFilter                        Self;
   typedef itk::ImageToImageFilter<CTCImageType,
                                   BinaryImageType>  Superclass;
   typedef itk::SmartPointer<Self>                   Pointer;
@@ -39,7 +40,7 @@ class ITK_EXPORT SegmentColonFilter :
 
   // standard ITK macros
   itkNewMacro(Self);
-  itkTypeMacro(SegmentColonFilter, itk::ImageToImageFilter);
+  itkTypeMacro(SegmentColonWithContrastFilter, itk::ImageToImageFilter);
 
   void PrintSelf( std::ostream& os, itk::Indent indent ) const;
   
@@ -48,18 +49,16 @@ class ITK_EXPORT SegmentColonFilter :
   itkGetMacro(Threshold, CTCPixelType);
   itkSetMacro(Threshold, CTCPixelType);
 
-  itkGetMacro(MaxIterations, unsigned int);
-  itkSetMacro(MaxIterations, unsigned int);
-  itkGetMacro(MinDistanceThreshold, DistancePixelType);
-  itkSetMacro(MinDistanceThreshold, DistancePixelType);
-
 protected:
 
-  SegmentColonFilter();
-  typedef itk::BinaryThresholdImageFilter
-    <CTCImageType, BinaryImageType> 
-    ThresholdFilterType;
-  
+  SegmentColonWithContrastFilter();
+
+  typedef itk::ScalarImageKmeansImageFilter
+    <  itk::Image<double, 3> > KMeansFilterType;
+
+  typedef itk::MinMaxCurvatureFlowImageFilter<
+    itk::Image<double, 3>, itk::Image<double,3> > SmootherType;
+
   typedef itk::ConnectedThresholdImageFilter
     <BinaryImageType, BinaryImageType> 
     RegionGrowFilterType;
@@ -71,28 +70,23 @@ protected:
   typedef itk::ResampleImageFilter
     <BinaryImageType, BinaryImageType, double>
     DownsampleFilterType;
-
+  
   void GenerateData();
 
 private:
 
-  SegmentColonFilter(Self&);            // intentionally not implemented
+  SegmentColonWithContrastFilter(Self&);            // intentionally not implemented
   void operator=(const Self&);          // intentionally not implemented
 
-  ThresholdFilterType::Pointer       m_ThresholdFilter;
   RegionGrowFilterType::Pointer      m_BGRegionGrowFilter;
   DistanceFilterType::Pointer        m_DistanceFilter;
   DownsampleFilterType::Pointer      m_DownsampleFilter;
 
   long int          m_DownsampleFactor;
   CTCPixelType      m_Threshold;
-  CTCPixelType      m_MinPixelValue;
-  CTCPixelType      m_MaxPixelValue;
-  unsigned int      m_MaxIterations;
-  DistancePixelType m_MinDistanceThreshold;
 
 };
 
 } // end namespace ctc
 
-#endif // __ctcSegmentColonFilter_h
+#endif // __ctcSegmentColonWithContrastFilter_h

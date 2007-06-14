@@ -7,7 +7,7 @@ Language:  C++
 // revision 52 is version that writes VTK point sets
 // later versions use ITK Spatial Objects for IO
 
-// test for ctcSegmentColonFilter
+// test for ctcSegmentColonWithContrastFilter
  
 #include <iostream>
 #include <cstdlib>
@@ -30,7 +30,7 @@ Language:  C++
 #include "ctcConfigure.h"
 #include "ctcCTCImage.h"
 #include "ctcCTCImageReader.h"
-#include "ctcSegmentColonFilter.h"
+#include "ctcSegmentColonWithContrastFilter.h"
 #include "vul_arg.h"
 
 using namespace std;
@@ -57,8 +57,6 @@ int main(int argc, char ** argv)
 
   vul_arg<char const*> infile(0, "Dicom directory");
   vul_arg<char const*> outfilebase(0, "Output base for filenames (no extension)");
-  vul_arg<int> maxiter("-i", "Maximum number of iterations", 5);
-  vul_arg<int> mindist("-d", "Minimum distance considered", 10);
   vul_arg<int> thresh("-t", "Air/Tissue threshold", -800);
   vul_arg_parse(argc, argv);
 
@@ -83,11 +81,10 @@ int main(int argc, char ** argv)
     }
 
   // segment
-  ctc::SegmentColonFilter::Pointer filter = ctc::SegmentColonFilter::New();
+  ctc::SegmentColonWithContrastFilter::Pointer filter = 
+    ctc::SegmentColonWithContrastFilter::New();
   filter->SetInput( reader->GetOutput() );
-//   filter->SetThreshold(thresh());
-//   filter->SetMaxIterations(maxiter());
-//   filter->SetMinDistanceThreshold(mindist());
+  filter->SetThreshold(thresh());
   
   // write out binary image
   WriterType::Pointer writer = WriterType::New();
