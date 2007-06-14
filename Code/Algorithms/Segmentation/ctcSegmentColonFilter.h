@@ -77,7 +77,7 @@ protected:
     DistanceFilterType;
 
   typedef itk::ResampleImageFilter
-    <CTCImageType, CTCImageType, double>
+    <BinaryImageType, BinaryImageType, double>
     DownsampleFilterType;
 
   typedef itk::ResampleImageFilter
@@ -91,7 +91,8 @@ private:
   SegmentColonFilter(Self&);            // intentionally not implemented
   void operator=(const Self&);          // intentionally not implemented
 
-  KMeansFilterType::Pointer          m_KMeansFilter;
+  KMeansFilterType::Pointer          m_KMeansFilter1;
+  KMeansFilterType::Pointer          m_KMeansFilter2;
   RegionGrowFilterType::Pointer      m_BGRegionGrowFilter;
   DistanceFilterType::Pointer        m_DistanceFilter;
   DownsampleFilterType::Pointer      m_DownsampleFilter;
