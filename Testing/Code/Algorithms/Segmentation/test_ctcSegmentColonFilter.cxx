@@ -85,9 +85,9 @@ int main(int argc, char ** argv)
   // segment
   ctc::SegmentColonFilter::Pointer filter = ctc::SegmentColonFilter::New();
   filter->SetInput( reader->GetOutput() );
-//   filter->SetThreshold(thresh());
-//   filter->SetMaxIterations(maxiter());
-//   filter->SetMinDistanceThreshold(mindist());
+  filter->SetThreshold(thresh());
+  filter->SetMaxIterations(maxiter());
+  filter->SetMinDistanceThreshold(mindist());
   
   // write out binary image
   WriterType::Pointer writer = WriterType::New();
