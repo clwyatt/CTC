@@ -222,6 +222,20 @@ namespace ctc
 	pass++;
       }
 
+    // mask out non-colon regions and reverse constrast
+    std::clog << "Final Masking ... ";
+    itk::ImageRegionIterator<BinaryImageType>
+      it4(m_ThresholdFilter->GetOutput(), 
+	  m_ThresholdFilter->GetOutput()->GetRequestedRegion());
+    for( it4.GoToBegin(); !it4.IsAtEnd(); ++it4)
+      {
+	if(it4.Get() != 128)
+	  it4.Set(0);
+	else
+	  it4.Set(255);
+      }
+    std::clog << " Done." << std::endl;
+
     this->GraftOutput( m_ThresholdFilter->GetOutput() );
 
   }
