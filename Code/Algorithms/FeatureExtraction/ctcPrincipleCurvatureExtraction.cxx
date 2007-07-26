@@ -63,6 +63,7 @@ namespace ctc
 
     FeatureType f;
     BinaryImageType::IndexType idx;
+    itk::Point<double, 3> dcmCoordinate;
     typedef itk::Image<float, 3> FloatImageType;
     typedef itk::CropImageFilter<CTCImageType, FloatImageType> CropFilterType;
     CropFilterType::Pointer crop = CropFilterType::New();
@@ -123,9 +124,10 @@ namespace ctc
 	    }
  
 	    idx = bit.GetIndex();
-	    f[0] = idx[0];
-	    f[1] = idx[1];
-	    f[2] = idx[2];
+	    m_Image->TransformIndexToPhysicalPoint(idx, dcmCoordinate);
+	    f[0] = dcmCoordinate[0];
+	    f[1] = dcmCoordinate[1];
+	    f[2] = dcmCoordinate[2];
 
 	    // crop the region
 	    start[0] = idx[0]-4;
