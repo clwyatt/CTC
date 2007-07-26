@@ -5,5 +5,6 @@ RVFInfo
 FeatureExtraction 
 Legacy 
 PolypCorrection
-PolypCoordinateToIndex)
+PolypCoordinateToIndex
+SegmentColon)
 
