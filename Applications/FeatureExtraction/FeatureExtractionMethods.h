@@ -13,19 +13,9 @@ Language:  C++
 
 struct EntryType
 {
-  std::string mrn;
-  std::string study;
-  std::string series;
+  int id;
   double x, y, z;
-  double size;
-  char true_false;
 };
 typedef std::list<EntryType> DBType;
-
-void ExtractHistogramFeature(std::ofstream & out, const EntryType & e);
-
-void ExtractOrientedVolumeFeature(std::ofstream & out, const EntryType & e);
-
-void SingleScaleEigenstructureFeature(std::ofstream & out, const EntryType & e);
 
 #endif
