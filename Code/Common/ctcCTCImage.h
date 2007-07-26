@@ -24,6 +24,10 @@ namespace ctc
   typedef unsigned char                             BinaryPixelType;
   typedef itk::Image<BinaryPixelType, 3>            BinaryImageType;
 
+  // the common projection image type
+  typedef unsigned char                             ProjectionPixelType;
+  typedef itk::Image<ProjectionPixelType, 2>        ProjectionImageType;
+
 } // end namespace ctc
 
 #endif // __ctcCTCImage_h
