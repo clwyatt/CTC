@@ -35,3 +35,19 @@ DICOM_short_supine
 output_ctcSegmentColonWithContrast)
 
 set_tests_properties (test_ctcSegmentColonWithContrastFilter PROPERTIES TIMEOUT 3600)
+
+##########################################################################
+ADD_EXECUTABLE(test_ctcSegmentProjectionFilter test_ctcSegmentProjectionFilter.cxx ) 
+
+TARGET_LINK_LIBRARIES(test_ctcSegmentProjectionFilter 
+ctcvul 
+CTCIO 
+CTCSegmentation 
+ITKBasicFilters 
+ITKCommon 
+ITKIO)
+
+ADD_TEST(test_ctcSegmentProjectionFilter 
+${EXECUTABLE_OUTPUT_PATH}/test_ctcSegmentProjectionFilter
+supine.vtk
+output_ctcSegmentProjection.vtk)
