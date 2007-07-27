@@ -190,7 +190,7 @@ int main( int argc, char* argv[] )
 	 }
        mindist = sqrt(mindist);
 
-       float si = 0.5 - 0.3183*atan2(f[3] + f[4], f[3] - f[4]);
+       float si = 0.5 + 0.1592*atan2(f[3] + f[4], f[3] - f[4]);
        float cv = sqrt((f[3]*f[3] + f[4]*f[4])/2);
        float K = f[3]*f[4];
        float H = 0.5*(f[3] + f[4]);
