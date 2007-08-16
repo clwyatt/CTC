@@ -94,6 +94,8 @@ namespace ctc
     iit.SetFirstDirection(0);
     iit.SetSecondDirection(2);
 
+    clog << "hi" << endl;
+
     oit.SetDirection(0);
 
     iit.GoToBegin();
