@@ -19,12 +19,14 @@ Language:  C++
 #include "ctcCTCImageReader.h"
 #include "ctcSegmentColonFilter.h"
 #include "ctcSegmentColonWithContrastFilter.h"
+#include "ctcSegmentProjectionFilter.h"
 #include "vul_arg.h"
 
 using namespace std;
 
 // global typedefs
 typedef itk::ImageFileWriter< ctc::BinaryImageType >  WriterType; 
+typedef itk::ImageFileWriter< ctc::ProjectionImageType >  ProjectionWriterType;
 
 int main(int argc, char ** argv)
 {
@@ -73,6 +75,27 @@ int main(int argc, char ** argv)
 	  cerr << err << endl; 
 	  return EXIT_FAILURE; 
 	} 
+
+      // project
+      ctc::SegmentProjectionFilter::Pointer pfilter = ctc::SegmentProjectionFilter::New();
+      pfilter->SetInput( filter->GetOutput() );
+      pfilter->Update();
+
+      ProjectionWriterType::Pointer pwriter = ProjectionWriterType::New();
+      string outfilename2 = string(outfilebase()) + "_projection.png";
+      pwriter->SetFileName(outfilename2.c_str()); 
+      pwriter->SetInput( pfilter->GetOutput() );
+      try 
+	{ 
+	  pwriter->Update(); 
+	} 
+      catch( itk::ExceptionObject & err ) 
+	{ 
+	  cerr << "ExceptionObject caught !" << endl; 
+	  cerr << err << endl; 
+	  return EXIT_FAILURE; 
+	} 
+
     }
   else
     {
@@ -95,6 +118,27 @@ int main(int argc, char ** argv)
 	  cerr << err << endl; 
 	  return EXIT_FAILURE; 
 	} 
+
+      // project
+      ctc::SegmentProjectionFilter::Pointer pfilter = ctc::SegmentProjectionFilter::New();
+      pfilter->SetInput( filter->GetOutput() );
+      pfilter->Update();
+      
+      ProjectionWriterType::Pointer pwriter = ProjectionWriterType::New();
+      string outfilename2 = string(outfilebase()) + "_projection.png";
+      pwriter->SetFileName(outfilename2.c_str()); 
+      pwriter->SetInput( pfilter->GetOutput() );
+      try 
+	{ 
+	  pwriter->Update(); 
+	} 
+      catch( itk::ExceptionObject & err ) 
+	{ 
+	  cerr << "ExceptionObject caught !" << endl; 
+	  cerr << err << endl; 
+	  return EXIT_FAILURE; 
+	} 
+
     }
   
   return(EXIT_SUCCESS);
