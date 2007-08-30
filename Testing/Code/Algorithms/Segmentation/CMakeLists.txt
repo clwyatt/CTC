@@ -51,3 +51,20 @@ ADD_TEST(test_ctcSegmentProjectionFilter
 ${EXECUTABLE_OUTPUT_PATH}/test_ctcSegmentProjectionFilter
 supine.vtk
 output_ctcSegmentProjection.vtk)
+
+##########################################################################
+ADD_EXECUTABLE(test_ctcDetectAndSegmentPolypsNappi02Filter 
+               test_ctcDetectAndSegmentPolypsNappi02Filter.cxx ) 
+
+TARGET_LINK_LIBRARIES(test_ctcDetectAndSegmentPolypsNappi02Filter	 
+ctcvul 
+CTCIO 
+CTCSegmentation 
+ITKBasicFilters 
+ITKCommon 
+ITKIO)
+
+ADD_TEST(test_ctcDetectAndSegmentPolypsNappi02Filter
+${EXECUTABLE_OUTPUT_PATH}/ctcDetectAndSegmentPolypsNappi02Filter
+supine.vtk
+output_ctcDetectAndSegmentPolypsNappi02Filter.vtk)
