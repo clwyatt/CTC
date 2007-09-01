@@ -7,6 +7,8 @@ Language:  C++
 #ifndef __ctcByteSwap_h
 #define __ctcByteSwap_h
 
+#include <cassert>
+
 namespace ctc
 {
 

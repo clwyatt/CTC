@@ -4,9 +4,10 @@
 // Created: 07/21/98 by: Chris L. Wyatt
 //
 //                
-#include "read_rvf.h"
+#include <ctcConfigure.h>
+#include <cassert>
 
-#include "ctcConfigure.h"
+#include "read_rvf.h"
 
 using namespace std;
 
