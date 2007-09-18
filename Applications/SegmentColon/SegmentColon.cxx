@@ -10,8 +10,13 @@ Language:  C++
 #include <cstdlib>
 #include <string>
 
-// ITK IO includes
+// ITK includes
 #include "itkImageFileWriter.h"
+#include "itkBinaryMask3DMeshSource.h"
+#include "itkMesh.h"
+#include "itkDefaultDynamicMeshTraits.h"
+#include <itkMeshSpatialObject.h>
+#include <itkSpatialObjectWriter.h>
 
 // CTC includes
 #include "ctcConfigure.h"
@@ -27,6 +32,9 @@ using namespace std;
 // global typedefs
 typedef itk::ImageFileWriter< ctc::BinaryImageType >  WriterType; 
 typedef itk::ImageFileWriter< ctc::ProjectionImageType >  ProjectionWriterType;
+typedef itk::DefaultDynamicMeshTraits< float , 3, 3 > MeshTrait;
+typedef itk::Mesh<float, 3, MeshTrait > MeshType;
+typedef itk::BinaryMask3DMeshSource< ctc::BinaryImageType, MeshType > MeshSourceType;
 
 int main(int argc, char ** argv)
 {
@@ -51,6 +59,7 @@ int main(int argc, char ** argv)
       return EXIT_FAILURE;
     }
 
+  // this if/else needs to be refactored badly, alot of repetative code
   if( !segcontrast() )
     {
       // segment air only
@@ -76,7 +85,7 @@ int main(int argc, char ** argv)
 	  return EXIT_FAILURE; 
 	} 
 
-      // project
+      // compute and write projection image
       ctc::SegmentProjectionFilter::Pointer pfilter = ctc::SegmentProjectionFilter::New();
       pfilter->SetInput( filter->GetOutput() );
       pfilter->Update();
@@ -96,6 +105,49 @@ int main(int argc, char ** argv)
 	  return EXIT_FAILURE; 
 	} 
 
+      // create mesh spatial object
+      MeshSourceType::Pointer meshSource = MeshSourceType::New();
+      const ctc::BinaryPixelType objectValue = 255;
+      meshSource->SetObjectValue( objectValue );
+      
+      meshSource->SetInput( filter->GetOutput() );
+      try
+	{
+	  meshSource->Update();
+	}
+      catch( itk::ExceptionObject & err )
+	{
+	  cerr << "ExceptionObject caught !" << endl;
+	  cerr << err << endl;
+	  return EXIT_FAILURE;
+	}
+      
+      typedef itk::MeshSpatialObject<MeshType> MeshSpatialObjectType;
+      MeshSpatialObjectType::Pointer myMeshSpatialObject =
+	MeshSpatialObjectType::New();
+      
+      
+      myMeshSpatialObject->SetMesh(meshSource->GetOutput());
+      clog << "Mesh bounds : " <<
+	myMeshSpatialObject->GetBoundingBox()->GetBounds() << endl;
+      
+      // write the mesh object
+      typedef itk::SpatialObjectWriter<3,float,MeshTrait> WriterType;
+      WriterType::Pointer mwriter = WriterType::New();
+      
+      mwriter->SetInput(myMeshSpatialObject);
+      string outfilename3 = string(outfilebase()) + ".meta";
+      mwriter->SetFileName(outfilename3.c_str());
+      try
+	{
+	  mwriter->Update();
+	}
+      catch( itk::ExceptionObject & err )
+	{
+	  cerr << "ExceptionObject caught !" << endl;
+	  cerr << err << endl;
+	  return EXIT_FAILURE;
+	}
     }
   else
     {
@@ -119,7 +171,7 @@ int main(int argc, char ** argv)
 	  return EXIT_FAILURE; 
 	} 
 
-      // project
+      // compute and write projection image
       ctc::SegmentProjectionFilter::Pointer pfilter = ctc::SegmentProjectionFilter::New();
       pfilter->SetInput( filter->GetOutput() );
       pfilter->Update();
@@ -138,6 +190,50 @@ int main(int argc, char ** argv)
 	  cerr << err << endl; 
 	  return EXIT_FAILURE; 
 	} 
+
+      // create mesh spatial object
+      MeshSourceType::Pointer meshSource = MeshSourceType::New();
+      const ctc::BinaryPixelType objectValue = 255;
+      meshSource->SetObjectValue( objectValue );
+      
+      meshSource->SetInput( filter->GetOutput() );
+      try
+	{
+	  meshSource->Update();
+	}
+      catch( itk::ExceptionObject & err )
+	{
+	  cerr << "ExceptionObject caught !" << endl;
+	  cerr << err << endl;
+	  return EXIT_FAILURE;
+	}
+      
+      typedef itk::MeshSpatialObject<MeshType> MeshSpatialObjectType;
+      MeshSpatialObjectType::Pointer myMeshSpatialObject =
+	MeshSpatialObjectType::New();
+      
+      
+      myMeshSpatialObject->SetMesh(meshSource->GetOutput());
+      clog << "Mesh bounds : " <<
+	myMeshSpatialObject->GetBoundingBox()->GetBounds() << endl;
+      
+      // write the mesh object
+      typedef itk::SpatialObjectWriter<3,float,MeshTrait> WriterType;
+      WriterType::Pointer mwriter = WriterType::New();
+      
+      mwriter->SetInput(myMeshSpatialObject);
+      string outfilename3 = string(outfilebase()) + ".meta";
+      mwriter->SetFileName(outfilename3.c_str());
+      try
+	{
+	  mwriter->Update();
+	}
+      catch( itk::ExceptionObject & err )
+	{
+	  cerr << "ExceptionObject caught !" << endl;
+	  cerr << err << endl;
+	  return EXIT_FAILURE;
+	}
 
     }
   
