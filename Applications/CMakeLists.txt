@@ -6,5 +6,6 @@ FeatureExtraction
 Legacy 
 PolypCorrection
 PolypCoordinateToIndex
-SegmentColon)
+SegmentColon
+ManualSegmentCorrection)
 
