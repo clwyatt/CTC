@@ -1,5 +1,5 @@
 SET(ManualCorrect_GUI_SRCS
- fltkimageViewerGUI.fl
+ fltkImageViewerGUI.fl
 )
 
 FLTK_WRAP_UI(ManualCorrect ${ManualCorrect_GUI_SRCS} )
