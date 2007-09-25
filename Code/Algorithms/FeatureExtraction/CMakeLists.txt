@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES(${CTC_SOURCE_DIR}/Code/Common)
 SET(CTCFeatureExtraction_SRCS
   ctcRawVolumeExtraction.cxx
   ctcPrincipleCurvatureExtraction.cxx
+  ctcFeatureExtraction.cxx
 )
 
 # Add CTCFeatureExtraction library
