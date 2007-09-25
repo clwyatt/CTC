@@ -15,10 +15,6 @@ Language:  C++
 #include <vnl/algo/vnl_real_eigensystem.h>
 #include <iterator>
 
-//#include "itkRecursiveGaussianImageFilter.h"
-//#include "itkImageDuplicator.h"
-//#include "itkCastImageFilter.h"
-
 
 namespace ctc
 {
@@ -35,34 +31,21 @@ namespace ctc
         m_FeatureVector = FeatureVector;
    }
 
-   FeatureListType FeatureExtraction::GetSeedRegionVector()
-   { 
-        return Seed_Region;     
-   }
-
-   FeatureListType FeatureExtraction::GetGrowableRegionVector()
-   { 
-        return Growable_Region;     
-   }
-
    void FeatureExtraction::Analyze()
    {
+        using namespace std;
         ctc::PrincipleCurvatureExtraction::FeatureType fp;
         dcmCoordinate pdcm;
         BinaryImageType::IndexType idx, idx2;
 
         AssociatedFeatureList afl; 
-        int i,j,k,l;
+        int i,j,k,l,m,n;
 
-        //FeatureListType::Pointer FeatureContainerRaw = FeatureListType::New();
-        //FeatureListType::Pointer FeatureContainerSeedRegion = FeatureListType::New();
-        //FeatureListType::Pointer FeatureContainerAfterMerging = FeatureListType::New();
-
-        for(i = 0; i < m_FeatureVector->size(); i++)
+        for(i = 0; i < m_FeatureVector->Size(); i++)
         {
               fp = m_FeatureVector->GetMeasurementVector(i);
 
-              out << fp[0] << "," << fp[1]  << "," << fp[2] << "," << fp[3] << "," << fp[4] << endl;
+              cout << fp[0] << "," << fp[1]  << "," << fp[2] << "," << fp[3] << "," << fp[4] << endl;
 
               pdcm[0] = fp[0];
               pdcm[1] = fp[1];
@@ -83,6 +66,10 @@ namespace ctc
 
 
         /* Step 2: Setup Growable Region by threshold values */
+         
+        typedef itk::ConstNeighborhoodIterator< BinaryImageType >   BinaryIteratorType;
+        typedef itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< BinaryImageType >   FaceCalculatorType;   
+        typedef itk::ConstNeighborhoodIterator< BinaryImageType > NeighborhoodIteratorType; 
 
         BinaryIteratorType::RadiusType radius;
         radius.Fill(2);
@@ -106,9 +93,9 @@ namespace ctc
              }
         } 
 
-       
-
-        GrowableRegionType growableregion_vector;
+               
+        /* Vector of Vector --- Manipulating all the regions in dataset */
+        RegionCollectorType growableregion_vector;
 
         /* Do I need to add FaceCalculatorType here? */
         BinaryIteratorType it(radius, m_ColonImage, m_ColonImage->GetRequestedRegion());
@@ -122,18 +109,21 @@ namespace ctc
             for(i = 0; i < Seed_Region.size(); i++)
             { 
                 dcmCoordinate tracker;
+                //fl = *(Seed_Region.begin()+i);
                 fl = Seed_Region[i];
-                tracker = fl_tmp.GetDCMCoordinate();
-                if( pdcm[0] == tracker[0] && pdcm[1] == tracker[1] && pdcm[2] == tracker[2] ){
+                tracker = fl.GetDCMCoordinate();
+                if( pdcm[0] == tracker[0] && pdcm[1] == tracker[1] && pdcm[2] == tracker[2] )
+                {
                      goto begincalculation;
-                }else{
-                     goto continueloop;
                 }
-
             }
+
+        ++it;
+        continue;
+
 begincalculation: 
             
-            AssociatedGrowableRegion agr;
+            GrowableRegionType agr;
             agr.push_back(fl);
 
             for(i = 0; i < 125; i++)
@@ -148,12 +138,12 @@ begincalculation:
 
                       /* Double confirm here */
                       AssociatedFeatureList fl_tmp = Raw_Region[i];
-                      tracker2 = tmp_fl.GetDCMCoordinate();                      
+                      tracker2 = fl_tmp.GetDCMCoordinate();                      
 
                       if( neighborpdcm[0] == tracker2[0] && neighborpdcm[1] == tracker2[1] && neighborpdcm[2] == tracker2[2] )
                       {
-                          float SI_val = tmp_fl.GetSI();
-                          float CV_val = tmp_fl.GetCV();
+                          float SI_val = fl_tmp.GetSI();
+                          float CV_val = fl_tmp.GetCV();
                           if( SI_val > 0.8 && SI_val < 1.0 && CV_val > 0.05 && CV_val < 0.25 )
                           {
                                agr.push_back(fl_tmp);  
@@ -166,7 +156,7 @@ begincalculation:
 
             growableregion_vector.push_back(agr);
 
-continueloop: ++it;      
+            ++it;      
         }
 
       
@@ -174,7 +164,7 @@ continueloop: ++it;
 
         int merger = -1;
         int mergee = -1;
-        FeatureListType tmp;
+        GrowableRegionType tmp;
 
 starttomerge:             
         for(i = 0; i < growableregion_vector.size(); i++)
@@ -182,8 +172,8 @@ starttomerge:
               for( j = (i+1); j < growableregion_vector.size(); j++)
               {
                     
-                    FeatureListType::iterator iter1 = growableregion_vector[i].begin();
-                    FeatureListType::iterator iter2 = growableregion_vector[j].begin();
+                    GrowableRegionType::iterator iter1 = growableregion_vector[i].begin();
+                    GrowableRegionType::iterator iter2 = growableregion_vector[j].begin();
 
                     for (; iter1 != growableregion_vector[i].end(); ++iter1)
                     {
@@ -206,7 +196,7 @@ starttomerge:
         }
         goto finishmerging;
       
-merging:   for(int m=0; m < tmp.size(); m++)
+merging:   for(m = 0; m < tmp.size(); m++)
            {
                growableregion_vector[merger].push_back(tmp[m]);
            }     
@@ -221,7 +211,7 @@ finishmerging:
           
        int num_regions = growableregion_vector.size();
        int num_points = 0;  
-       FeatureListType::iterator iter;
+       GrowableRegionType::iterator iter;
 
               /* Subpart 1 --- Normalize the feature vector */
 
@@ -244,7 +234,7 @@ finishmerging:
 
              /* Subpart 2 --- Initialize the membership matrix */ 
        
-       int membershipmatrix[num_points][num_regions];
+       float membershipmatrix[num_points][num_regions];
        AssociatedFeatureList clustermatrix[num_regions];
 
        for(i = 0; i < num_points; i++)
@@ -298,8 +288,8 @@ finishmerging:
 
                       for (k = 0; k < num_regions; k++)
                       {
-                            p2[0] = clustermatrix[k]->GetnSI();
-                            p2[1] = clustermatrix[k]->GetnCV();
+                            p2[0] = clustermatrix[k].GetnSI();
+                            p2[1] = clustermatrix[k].GetnCV();
                             J2 = J2 + sqrt( (p1[0]-p2[0])*(p1[0]-p2[0]) + (p1[1]-p2[1])*(p1[1]-p2[1]) ) * membershipmatrix[m][k] * membershipmatrix[m][k]; 
                       }
                       ++iter; 
@@ -342,16 +332,8 @@ finishmerging:
 
                  clustermatrix[j].SetDCMCoordinate(updatedcoordinate);
             }
-
-
-            for(i = 0; i < num_points; i++)
-            {
-                  for(j = 0; j < num_regions; j++)
-                  {
-                        membershipmatrix[i][j] =    
-                  }
-            }
-
+            
+            
             /* Update memberfunction matrix */ 
             m = 0;
             for(i = 0; i < num_regions; i++)
@@ -368,15 +350,15 @@ finishmerging:
 
                        for(j = 0; j < num_regions; j++)
                        {
-                             p2[0] = clustermatrix[j]->GetnSI();
-                             p2[1] = clustermatrix[j]->GetnCV();
+                             p2[0] = clustermatrix[j].GetnSI();
+                             p2[1] = clustermatrix[j].GetnCV();
                              distance2 += sqrt( (p1[0]-p2[0])*(p1[0]-p2[0]) + (p1[1]-p2[1])*(p1[1]-p2[1]) );
                        }
 
                        for(j = 0; j < num_regions; j++)
                        {
-                             p2[0] = clustermatrix[j]->GetnSI();
-                             p2[1] = clustermatrix[j]->GetnCV();
+                             p2[0] = clustermatrix[j].GetnSI();
+                             p2[1] = clustermatrix[j].GetnCV();
                              distance1 = sqrt( (p1[0]-p2[0])*(p1[0]-p2[0]) + (p1[1]-p2[1])*(p1[1]-p2[1]) );
                              float unew = distance1/distance2;
                              membershipmatrix[m][j] = unew;
@@ -426,11 +408,18 @@ finishmerging:
              }
              if (counter < num_voxels)
              {
-                  growableregion_vector.erase(growableregion_vector.begin()+i);
-                  --iter; 
+                  growableregion_vector.erase(growableregion_vector.begin()+i); 
+                  i--;
              }
        } 
 
+
+       /* Step 6: Compute the gradient concentration to reduce false positives */
+        
+       num_regions = growableregion_vector.size();
+       cout << "Current size of GrowableRegion is " << num_regions << endl;
+      
+         
 
 
    }
