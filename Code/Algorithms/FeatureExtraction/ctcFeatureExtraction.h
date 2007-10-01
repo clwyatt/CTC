@@ -96,18 +96,30 @@ namespace ctc
     typedef std::vector<GrowableRegionType>            RegionCollectorType;
 
     typedef itk::Point<double, 3>                      dcmCoordinate;
+    typedef std::vector<dcmCoordinate>                 dcmVectorType;
 
     /* Standard ITK macros */
     itkNewMacro(Self);
     itkTypeMacro(FeatureExtraction, itk::Object);
 
-    void SetFeatureVector(const FeaturePointer);
+    void SetInitialFeatureVector(const FeaturePointer FeatureVector)
+                          { m_FeatureVector = FeatureVector; }
 
-    GrowableRegionType GetSeedRegion()
+    GrowableRegionType GetSeedRegion() const
                           { return Seed_Region; }
 
-    GrowableRegionType GetGrowableReg() 
+    GrowableRegionType GetGrowableReg() const
                           { return Growable_Region; }
+
+    RegionCollectorType GetRegionCollector() const
+                          { return RegionCollector; }
+
+    dcmVectorType GetPolyCenterCollector() const
+                          { return PolypCenterCollector; } 
+
+    void SetPolyCenterCollector(dcmVectorType collector)
+                          { PolypCenterCollector = collector; }
+
     void Analyze( void );
  
   protected:
@@ -124,7 +136,9 @@ namespace ctc
     GrowableRegionType   Raw_Region;
     GrowableRegionType   Seed_Region;
     GrowableRegionType   Growable_Region;
-
+    RegionCollectorType  RegionCollector;
+    dcmVectorType        PolypCenterCollector;
+    
   };
  
 }

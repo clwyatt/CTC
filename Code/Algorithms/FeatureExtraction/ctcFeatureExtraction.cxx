@@ -13,8 +13,9 @@ Language:  C++
 #include <itkNeighborhoodAlgorithm.h>
 #include <itkSymmetricEigenSystem.h>
 #include <vnl/algo/vnl_real_eigensystem.h>
+#include <vector>
 #include <iterator>
-
+#include <fstream>
 
 namespace ctc
 {
@@ -26,11 +27,6 @@ namespace ctc
    FeatureExtraction::~FeatureExtraction()
    { }
     
-   void FeatureExtraction::SetFeatureVector(const FeaturePointer FeatureVector)
-   {
-        m_FeatureVector = FeatureVector;
-   }
-
    void FeatureExtraction::Analyze()
    {
         using namespace std;
@@ -355,6 +351,7 @@ finishmerging:
                              distance2 += sqrt( (p1[0]-p2[0])*(p1[0]-p2[0]) + (p1[1]-p2[1])*(p1[1]-p2[1]) );
                        }
 
+                       
                        for(j = 0; j < num_regions; j++)
                        {
                              p2[0] = clustermatrix[j].GetnSI();
@@ -419,7 +416,193 @@ finishmerging:
        num_regions = growableregion_vector.size();
        cout << "Current size of GrowableRegion is " << num_regions << endl;
       
-         
+       std::vector<NeighborhoodIteratorType::OffsetType> surroundingoffsets(343);
+      
+       BinaryIteratorType::RadiusType radius2;
+       radius2.Fill(3);
+      
+       i = 0;
+       /* Improvement is needed here */
+       while(i < 343)  
+       { 
+            for(int a = -3; a < 4; a++)
+            {
+                 for(int b = -3; b < 4; b++)
+                 {
+                       for(int c = -3; c < 4; c++)
+                       {
+                             NeighborhoodIteratorType::OffsetType generatedoffset = {{a,b,c}};
+                             surroundingoffsets[i] = generatedoffset;
+                             i++;
+                       }
+                 }
+            }
+       }
+
+       /*
+        * x-y  --------- 0.939mm
+        * x-z, y-z ----- 1.415mm
+        * x-y-z -------- 1.563mm 
+        */
+       float Rmin = 0;
+       float Rmax = 4;
+
+       /* Initially, I define 8*3 = 24 direction vectors. Actually, by not counting the duplicated ones, 
+        * there are only 8+6+4=18 direction vectors in 3D space. */
+
+             /* Subpart 1: Define line equations of direction vectors through point (a,b,c) */
+                 /* 
+                  *  Plane 1:
+                     (1) y = b, z = c, x > a
+                     (2) y = b, z = c, x < a
+                     (3) x = a, z = c, y > b/core/Testing/Code/Algorithms/FeatureExtraction/test_ctcMAT4Converter.cxx:5:21:
+                     (4) x = a, z = c, y < b
+                     (5) y-b = x-a, z = c, x > a
+                     (6) y-b = x-a, z = c, x < a
+                     (7) y-b = a-x, z = c, x > a
+                     (8) y-b = a-x, z = c, x < a
+
+                     Plane 2:   Duplicate (1) & (2)
+                     (9)  x = a, y = b, z > c
+                     (10) x = a, y = b, z < c
+                     (11) z-c = x-a, y = b, x > a 
+                     (12) z-c = x-a, y = b, x < a
+                     (13) z-c = a-x, y = b, x > a 
+                     (14) z-c = a-x, y = b, x < a
+
+                     Plane 3:   Duplicate (3),(4),(9) & (10)
+                     (15) z-c = y-b, x = a, z > c
+                     (16) z-c = y-b, x = a, z < c
+                     (17) z-c = b-y, x = a, z > c
+                     (18) z-c = b-y, x = a, z < c
+                 */
+
+
+        /* Step 7 --- Calculate center of polyp candidates */
+        /* Step 8 --- Generate Statistics */
+        /* The above two steps are implemented together */
+
+       ofstream outfile("FinalPolypStatistics.txt");
+       outfile << "****** Final polyp candidates feature value statistics ******\n\n";
+
+       dcmCoordinate center;
+       dcmCoordinate iter_point;
+
+       double sum_SI = 0;
+       double sum_CV = 0;
+       double max_SI = 0;
+       double min_SI = 0;
+       double max_CV = 0;
+       double min_CV = 0;
+       double mean_SI = 0;
+       double mean_CV = 0;
+       double var_SI = 0;
+       double var_CV = 0;
+       double std_SI = 0;
+       double std_CV = 0;
+       double skew_SI = 0;
+       double skew_CV = 0;
+       double kurt_SI = 0;
+       double kurt_CV = 0;
+       double contrast_SI = 0;
+       double contrast_CV = 0;
+      
+       for(i = 0; i < num_regions; i++)
+       {   
+             iter = growableregion_vector[i].begin();
+             
+             /* Initialize the following parameters according to each polyp candidate */
+             int counter = 0;
+             center[0] = 0;
+             center[1] = 0;
+             center[2] = 0;
+             sum_SI = 0;
+             sum_CV = 0;
+             max_SI = 0;
+             min_SI = 1;
+             max_CV = 0;
+             min_CV = 1;
+
+             for (; iter != growableregion_vector[i].end(); ++iter)
+             {
+                   /* Step 7 part */
+                   iter_point = iter->GetDCMCoordinate();
+                   center[0] += iter_point[0];
+                   center[1] += iter_point[1];
+                   center[2] += iter_point[2];
+                   counter++;
+
+                   /* Step 8 part */
+                   sum_SI += iter->GetSI();
+                   sum_CV += iter->GetCV();
+
+                   if( max_SI < iter->GetSI() )
+                       max_SI = iter->GetSI();
+                   if( min_SI > iter->GetSI() )
+                       min_SI = iter->GetSI();
+
+                   if( max_CV < iter->GetCV() )
+                       max_CV = iter->GetCV();                   
+                   if( min_CV > iter->GetCV() )
+                       min_CV = iter->GetCV();
+
+             }
+
+             /* Step 7 part */
+             center[0] = center[0]/counter;
+             center[1] = center[1]/counter;
+             center[2] = center[2]/counter;
+             PolypCenterCollector.push_back(center);
+
+             /* Step 8 part */
+             mean_SI = sum_SI/counter;
+             mean_CV = sum_CV/counter;
+
+             /* Calculate variance */
+             iter = growableregion_vector[i].begin();
+             double tmp_SI = 0;
+             double tmp_CV = 0;
+             for (; iter != growableregion_vector[i].end(); ++iter)
+             {
+                   tmp_SI += ( (iter->GetSI()-mean_SI) * (iter->GetSI()-mean_SI) );
+                   tmp_CV += ( (iter->GetCV()-mean_CV) * (iter->GetCV()-mean_CV) );
+             }
+             var_SI = tmp_SI/(counter-1);
+             var_CV = tmp_CV/(counter-1);
+             std_SI = sqrt(var_SI);
+             std_CV = sqrt(var_CV);
+             
+
+             /* Calculate skew */
+             double tmp_SI_kurt = 0;
+             double tmp_CV_kurt = 0;
+             iter = growableregion_vector[i].begin();
+             tmp_SI = 0;
+             tmp_CV = 0;
+             for (; iter != growableregion_vector[i].end(); ++iter)
+             {
+                   tmp_SI += ( ((iter->GetSI()-mean_SI)/std_SI) * ((iter->GetSI()-mean_SI)/std_SI) * ((iter->GetSI()-mean_SI)/std_SI) );
+                   tmp_CV += ( ((iter->GetCV()-mean_CV)/std_CV) * ((iter->GetCV()-mean_CV)/std_CV) * ((iter->GetCV()-mean_CV)/std_CV) );                                      
+                   tmp_SI_kurt += ( ((iter->GetSI()-mean_SI)/std_SI) * ((iter->GetSI()-mean_SI)/std_SI) * ((iter->GetSI()-mean_SI)/std_SI) * ((iter->GetSI()-mean_SI)/std_SI) );
+                   tmp_CV_kurt += ( ((iter->GetCV()-mean_CV)/std_CV) * ((iter->GetCV()-mean_CV)/std_CV) * ((iter->GetCV()-mean_CV)/std_CV) * ((iter->GetCV()-mean_CV)/std_CV) );
+             }
+             skew_SI = tmp_SI/counter;
+             skew_CV = tmp_CV/counter;
+             kurt_SI = tmp_SI_kurt/counter - 3;
+             kurt_CV = tmp_CV_kurt/counter - 3;
+
+             contrast_SI = min_SI/max_SI;
+             contrast_CV = min_CV/max_CV;
+
+             outfile << "Polyp candidate " << i << " --- " << "Mean of shape index: " << mean_SI << " Max of shape index: " << max_SI << " Min of shape index: " << min_SI;
+             outfile << " Variance of shape index: " << var_SI << " Skew of shape index: " << skew_SI << " Kurt of shape index: " << kurt_SI << " Contrast of shape index: " << contrast_SI << endl;
+             outfile << "                     Mean of curvedness: " << mean_CV << " Max of curvedness: " << max_CV << " Min of curvedness: " << min_CV;
+             outfile << " Variance of curvedness: " << var_CV << " Skew of curvedness: " << skew_CV << " Kurt of curvedness: " << kurt_CV << " Contrast of curvedness: " << contrast_CV << endl;
+
+       } 
+       
+       outfile.close();
+        
 
 
    }
