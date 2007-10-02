@@ -31,3 +31,21 @@ ADD_TEST(test_ctcPrincipleCurvatureExtraction
          ${EXECUTABLE_OUTPUT_PATH}/test_ctcPrincipleCurvatureExtraction
          DICOM_short_supine 
          output_ctcPrincipleCurvatureExtraction.vtk)
+
+
+
+ADD_EXECUTABLE(test_ctcMAT4Converter test_ctcMAT4Converter.cxx)             
+
+TARGET_LINK_LIBRARIES(test_ctcMAT4Converter 
+ctcvul 
+CTCIO
+CTCSegmentation
+CTCFeatureExtraction 
+ITKBasicFilters 
+ITKCommon 
+ITKIO)
+
+ADD_TEST(test_ctcMAT4Converter 
+         ${EXECUTABLE_OUTPUT_PATH}/test_ctcMAT4Converter
+         DICOM_short_supine 
+         output_ctcFeatureExtraction.vtk)  
