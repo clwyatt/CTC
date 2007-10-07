@@ -159,13 +159,21 @@ namespace ctc
 	    v1[0] = va[2][0];
 	    v1[1] = va[2][1];
 	    v1[2] = va[2][2];
-
+/*
      f1[0] = va[0][0];   //hxx
      f1[1] = va[0][1];   //hxy
      f1[2] = va[0][2];   //hxz
      f1[3] = va[1][1];   //hyy
      f1[4] = va[1][2];   //hyz
      f1[5] = va[2][2];   //hzz
+*/
+     f1[0] = H[0];   //hxx
+     f1[1] = H[1];   //hxy
+     f1[2] = H[2];   //hxz
+
+     f1[3] = H[3];   //hyy
+     f1[4] = H[4];   //hyz
+     f1[5] = H[5];   //hzz
 
     
 /* Yuan */
@@ -199,7 +207,7 @@ namespace ctc
 
 	    // rotate the Hessian to align the first eigenvector to the
 	    // gradient direction
-	    mag = sqrt(v1[0]*v1[0]+v1[1]*v1[1]+v1[2]*v1[2])*sqrt(g[0]*g[0]+g[1]*g[1]+g[2]*g[2]);
+	/*    mag = sqrt(v1[0]*v1[0]+v1[1]*v1[1]+v1[2]*v1[2])*sqrt(g[0]*g[0]+g[1]*g[1]+g[2]*g[2]);
 	    angle = acos((v1[0]*g[0]+v1[1]*g[1]+v1[2]*g[2])/mag);  
 	    cross[0] = v1[1]*g[2]-v1[2]*g[1];
 	    cross[1] = v1[2]*g[0]-v1[0]*g[2];
@@ -240,7 +248,7 @@ namespace ctc
 	    
 	    // compute the principle curvatures
 	    float kappa1 = -ev2d.D[0].real()/gmag;
-	    float kappa2 = -ev2d.D[1].real()/gmag;
+	    float kappa2 = -ev2d.D[1].real()/gmag;*/
 
 	    // f[3] = kappa1;
 	    // f[4] = kappa2;

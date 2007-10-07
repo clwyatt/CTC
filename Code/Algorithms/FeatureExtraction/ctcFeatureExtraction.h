@@ -105,6 +105,12 @@ namespace ctc
     void SetInitialFeatureVector(const FeaturePointer FeatureVector)
                           { m_FeatureVector = FeatureVector; }
 
+    void SetSegmentedImageInput( const BinaryImageType *image )
+                          { m_ColonImage = image; }
+
+    void SetRawImageInput( const CTCImageType *image )
+                          { m_Image = image; } 
+
     GrowableRegionType GetSeedRegion() const
                           { return Seed_Region; }
 

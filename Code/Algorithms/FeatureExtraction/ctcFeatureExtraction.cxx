@@ -16,6 +16,8 @@ Language:  C++
 #include <vector>
 #include <iterator>
 #include <fstream>
+#include "StringtoDouble.h"
+#include "itkImageFileReader.h"
 
 namespace ctc
 {
@@ -34,10 +36,13 @@ namespace ctc
         dcmCoordinate pdcm;
         BinaryImageType::IndexType idx, idx2;
 
+      //  ofstream out3("datasetDCMSICV.txt");
+      //  ofstream out4("numpoints.txt");
+        
         AssociatedFeatureList afl; 
         int i,j,k,l,m,n;
 
-        for(i = 0; i < m_FeatureVector->Size(); i++)
+    /*     for(i = 0; i < m_FeatureVector->Size(); i++)
         {
               fp = m_FeatureVector->GetMeasurementVector(i);
 
@@ -51,27 +56,93 @@ namespace ctc
               afl.SetSI(fp[3]);
               afl.SetCV(fp[4]);
 
-              /* Step 1: Selection of "Seed Region" by threshold values */
+              // Step 1: Selection of "Seed Region" by threshold values 
               if (fp[3] < 1 && fp[3] > 0.9 && fp[4] < 0.2 && fp[4] > 0.08)
               {
                    Seed_Region.push_back(afl); 
               }
  
               Raw_Region.push_back(afl); 
-        }
+        }*/
 
+        ifstream filereader( "datasetDCMSICV.txt" );
+        int num_parameters = 0;
+        int num_v = 1;
+
+        while (! filereader.eof() )
+        {
+             string dumper = "";
+             getline (filereader,dumper); 
+    
+             if( dumper.size() == 0 )
+                  break;
+
+             char buf[dumper.size()];
+
+             for(int i = 0; i < dumper.size(); i++)
+             {
+                  buf[i] = dumper[i];
+             }
+
+             double tmp =  string2double(buf);
+             
+             if( num_parameters == 0 )
+             {
+                  pdcm[0] = tmp;
+                  num_parameters++;
+             } else if( num_parameters == 1 )
+             {   
+                  pdcm[1] = tmp;
+                  num_parameters++;
+             } else if( num_parameters == 2 )
+             {
+                  pdcm[2] = tmp;
+                  num_parameters++;
+                  afl.SetDCMCoordinate(pdcm);
+             } else if( num_parameters == 3 )
+             {
+                  afl.SetSI(tmp);
+                  num_parameters++;
+             } else if( num_parameters == 4 )
+             {
+                  afl.SetCV(tmp);
+                  num_parameters = 0;
+                  Raw_Region.push_back(afl); 
+                 // cout << "Voxel: " << num_v << endl;
+                  num_v++;
+                  if (afl.GetSI() < 1 && afl.GetSI() > 0.8 && afl.GetCV() < 0.2 && afl.GetCV() > 0.05)
+                  {
+                       Seed_Region.push_back(afl); 
+                  }
+             } 
+        }   
+      
+        
 
         /* Step 2: Setup Growable Region by threshold values */
          
         typedef itk::ConstNeighborhoodIterator< BinaryImageType >   BinaryIteratorType;
         typedef itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< BinaryImageType >   FaceCalculatorType;   
-        typedef itk::ConstNeighborhoodIterator< BinaryImageType > NeighborhoodIteratorType; 
+        typedef itk::ConstNeighborhoodIterator< BinaryImageType > NeighborhoodIteratorType;
+
+        FaceCalculatorType faceCalculator;
+        FaceCalculatorType::FaceListType faceList;
+        BinaryIteratorType::RadiusType cropradius;
+        cropradius.Fill(4);
 
         BinaryIteratorType::RadiusType radius;
         radius.Fill(2);
+  
+
+        faceList = faceCalculator(m_ColonImage, m_ColonImage->GetRequestedRegion(),cropradius);    
+        BinaryIteratorType it(radius, m_ColonImage, *(faceList.begin()));
 
         std::vector<NeighborhoodIteratorType::OffsetType> offsets(125);
         i = 0;
+
+        cout << "Creating 125-element-cube" << endl;
+
+
         /* Improvement is needed here */
         while(i < 125)  
         { 
@@ -87,29 +158,57 @@ namespace ctc
                         }
                   }
              }
-        } 
+        }
 
-               
+        BinaryIteratorType::OffsetType center = {{0,0,0}};
+        BinaryIteratorType::OffsetType right = {{1,0,0}};
+        BinaryIteratorType::OffsetType left = {{-1,0,0}};
+        BinaryIteratorType::OffsetType bottom = {{0,1,0}};
+        BinaryIteratorType::OffsetType top = {{0,-1,0}};
+        BinaryIteratorType::OffsetType front = {{0,0,1}};
+        BinaryIteratorType::OffsetType back = {{0,0,-1}}; 
+
+              
         /* Vector of Vector --- Manipulating all the regions in dataset */
         RegionCollectorType growableregion_vector;
 
+
         /* Do I need to add FaceCalculatorType here? */
-        BinaryIteratorType it(radius, m_ColonImage, m_ColonImage->GetRequestedRegion());
+//        BinaryIteratorType it(radius, m_ColonImage, m_ColonImage->GetRequestedRegion());
+       
+        int flag = 1;
+
         it.GoToBegin();       
         while( !it.IsAtEnd() )
         {
             idx = it.GetIndex();
+
+            int count = 0;
+
+	           if(it.GetPixel(right) == 255) count += 1;
+	           if(it.GetPixel(left) == 255) count += 1;
+	           if(it.GetPixel(bottom) == 255) count += 1;
+	           if(it.GetPixel(top) == 255) count += 1;
+	           if(it.GetPixel(front) == 255) count += 1;
+	           if(it.GetPixel(back) == 255) count += 1;
+	           if(count == 0) // not on a boundary
+            {
+                  ++it;
+                  continue;
+            }
+
             m_ColonImage->TransformIndexToPhysicalPoint(idx,pdcm);
             AssociatedFeatureList fl;
 
+            flag++;
             for(i = 0; i < Seed_Region.size(); i++)
             { 
                 dcmCoordinate tracker;
-                //fl = *(Seed_Region.begin()+i);
                 fl = Seed_Region[i];
                 tracker = fl.GetDCMCoordinate();
-                if( pdcm[0] == tracker[0] && pdcm[1] == tracker[1] && pdcm[2] == tracker[2] )
-                {
+                   
+                if ( abs(pdcm[0]-tracker[0]) <= 0.01 && abs(pdcm[1]-tracker[1]) <= 0.01 && abs(pdcm[2]-tracker[2]) <= 0.01 )
+                {                     
                      goto begincalculation;
                 }
             }
@@ -126,17 +225,17 @@ begincalculation:
             {
                 idx2 = it.GetIndex(offsets[i]);
                 dcmCoordinate neighborpdcm;             
-                m_ColonImage->TransformIndexToPhysicalPoint(idx2,neighborpdcm);
+                m_Image->TransformIndexToPhysicalPoint(idx2,neighborpdcm);
                 
                 for(i = 0; i < Raw_Region.size(); i++)
                 {
                       dcmCoordinate tracker2;
-
+                    
                       /* Double confirm here */
                       AssociatedFeatureList fl_tmp = Raw_Region[i];
                       tracker2 = fl_tmp.GetDCMCoordinate();                      
 
-                      if( neighborpdcm[0] == tracker2[0] && neighborpdcm[1] == tracker2[1] && neighborpdcm[2] == tracker2[2] )
+                      if( abs(neighborpdcm[0]-tracker2[0]) <= 0.01 && abs(neighborpdcm[1]-tracker2[1]) <= 0.01 && abs(neighborpdcm[2]-tracker2[2]) <= 0.01 )
                       {
                           float SI_val = fl_tmp.GetSI();
                           float CV_val = fl_tmp.GetCV();
@@ -155,6 +254,7 @@ begincalculation:
             ++it;      
         }
 
+   
       
         /* Step 3: Merging different detections on the same polyp candidate */
 
@@ -485,7 +585,7 @@ finishmerging:
        ofstream outfile("FinalPolypStatistics.txt");
        outfile << "****** Final polyp candidates feature value statistics ******\n\n";
 
-       dcmCoordinate center;
+       dcmCoordinate center_polyp;
        dcmCoordinate iter_point;
 
        double sum_SI = 0;
@@ -513,9 +613,9 @@ finishmerging:
              
              /* Initialize the following parameters according to each polyp candidate */
              int counter = 0;
-             center[0] = 0;
-             center[1] = 0;
-             center[2] = 0;
+             center_polyp[0] = 0;
+             center_polyp[1] = 0;
+             center_polyp[2] = 0;
              sum_SI = 0;
              sum_CV = 0;
              max_SI = 0;
@@ -527,9 +627,9 @@ finishmerging:
              {
                    /* Step 7 part */
                    iter_point = iter->GetDCMCoordinate();
-                   center[0] += iter_point[0];
-                   center[1] += iter_point[1];
-                   center[2] += iter_point[2];
+                   center_polyp[0] += iter_point[0];
+                   center_polyp[1] += iter_point[1];
+                   center_polyp[2] += iter_point[2];
                    counter++;
 
                    /* Step 8 part */
@@ -549,10 +649,10 @@ finishmerging:
              }
 
              /* Step 7 part */
-             center[0] = center[0]/counter;
-             center[1] = center[1]/counter;
-             center[2] = center[2]/counter;
-             PolypCenterCollector.push_back(center);
+             center_polyp[0] = center_polyp[0]/counter;
+             center_polyp[1] = center_polyp[1]/counter;
+             center_polyp[2] = center_polyp[2]/counter;
+             PolypCenterCollector.push_back(center_polyp);
 
              /* Step 8 part */
              mean_SI = sum_SI/counter;
@@ -604,8 +704,7 @@ finishmerging:
        outfile.close();
         
 
-
-   }
+}
 
        
        

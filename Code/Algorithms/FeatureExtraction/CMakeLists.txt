@@ -6,6 +6,7 @@ SET(CTCFeatureExtraction_SRCS
   ctcPrincipleCurvatureExtraction.cxx
   ctcFeatureExtraction.cxx
   MAT4Converter.cpp
+  StringtoDouble.cpp
 )
 
 # Add CTCFeatureExtraction library
