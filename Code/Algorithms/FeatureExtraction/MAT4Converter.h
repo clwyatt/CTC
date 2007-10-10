@@ -13,6 +13,7 @@ using namespace ctc;
 
 typedef std::vector<AssociatedFeatureList>         GrowableRegionType;
 typedef std::vector<GrowableRegionType>            RegionCollectorType;
+typedef itk::Point<double,3> dcmCoordinate;
 
 void MAT4FeatureVector(RegionCollectorType a);
 

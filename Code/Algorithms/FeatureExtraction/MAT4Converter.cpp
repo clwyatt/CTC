@@ -47,7 +47,7 @@ void MAT4FeatureVector(RegionCollectorType input)
           }
     }
  
-    double FeatureVectorArray[2*num_points];
+    double FeatureVectorArray[5*num_points];
     int m = 0;
 
     /* Push each feature vector value to an array 
@@ -73,8 +73,12 @@ void MAT4FeatureVector(RegionCollectorType input)
           iter = input[i].begin();
           for (; iter != input[i].end(); ++iter)
           { 
-               FeatureVectorArray[m] = iter->GetSI();
-               FeatureVectorArray[num_points+m] = iter->GetCV(); 
+               dcmCoordinate pdcm = iter->GetDCMCoordinate();
+               FeatureVectorArray[m] = pdcm[0];
+               FeatureVectorArray[m + num_points] = pdcm[1];
+               FeatureVectorArray[m + num_points*2] = pdcm[2];
+               FeatureVectorArray[m + num_points*3] = iter->GetSI();
+               FeatureVectorArray[m + num_points*4] = iter->GetCV(); 
                m++;     
           }
     }
@@ -82,7 +86,7 @@ void MAT4FeatureVector(RegionCollectorType input)
     /* Define header parameters */
     matFileHeader.type = 0000;
     matFileHeader.rows = num_points;
-    matFileHeader.cols = 2;
+    matFileHeader.cols = 5;
     matFileHeader.imag = 0;
     matFileHeader.namelen = 14;
     
