@@ -7,5 +7,6 @@ Legacy
 PolypCorrection
 PolypCoordinateToIndex
 SegmentColon
-ManualSegmentCorrection)
+ManualSegmentCorrection
+TagSubtraction)
 
