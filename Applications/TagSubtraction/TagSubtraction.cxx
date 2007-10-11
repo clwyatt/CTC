@@ -11,9 +11,12 @@ Language:  C++
 using namespace std;
 
 // ITK includes
-#include "itkImageFileWriter.h"
-#include "itkImageRegionIterator.h"
-#include "itkImageRegionConstIterator.h"
+#include <itkImageSeriesWriter.h>
+#include <itkNumericSeriesFileNames.h>
+#include <itksys/SystemTools.hxx>
+#include <itkGDCMImageIO.h>
+#include <itkImageRegionIterator.h>
+#include <itkImageRegionConstIterator.h>
 
 // CTC includes
 #include "ctcConfigure.h"
@@ -26,11 +29,25 @@ int main(int argc, char ** argv)
 {
   // parse args
   vul_arg<char const*> infile(0, "Input DICOM directory");
-  vul_arg<char const*> outfile(0, "Output DICOM File");
+  vul_arg<char const*> outfile(0, "Output DICOM directory");
   vul_arg<int> replaceval("-r", 
 			  "Replacement HU value for tagged regions (default -900)", 
 			  -900);
   vul_arg_parse(argc, argv);
+
+  // test if outfile exists, if so bail out
+  if(itksys::SystemTools::FileExists(outfile()))
+    {
+      if(itksys::SystemTools::FileIsDirectory(outfile()))
+	{
+	  cerr << "Error: directory " << outfile() << " exists. Halting." << endl;
+	}
+      else
+	{
+	  cerr << "Error: file " << outfile() << " exists. Halting." << endl;
+	}
+      return EXIT_FAILURE;
+    }
 
   // read in the DICOM series
   ctc::CTCImageReader::Pointer reader = ctc::CTCImageReader::New();
@@ -73,10 +90,39 @@ int main(int argc, char ** argv)
 
 
   // write out modified image
-  typedef itk::ImageFileWriter< ctc::CTCImageType >  WriterType; 
-  WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName(outfile()); 
+  typedef itk::Image< short, 2 > Image2DType; 
+  typedef itk::ImageSeriesWriter< ctc::CTCImageType, Image2DType > WriterType; 
+  WriterType::Pointer writer = WriterType::New(); 
   writer->SetInput( reader->GetOutput() );
+  writer->SetMetaDataDictionaryArray( reader->GetMetaDataDictionaryArray() ); 
+
+  itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
+  writer->SetImageIO( dicomIO );
+
+  typedef itk::NumericSeriesFileNames NameGeneratorType; 
+  NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
+  if( !itksys::SystemTools::MakeDirectory(outfile()) )
+    {
+      cerr << "Error: could not create output directory" << endl;
+      return EXIT_FAILURE;
+    }
+
+  std::string format = outfile(); 
+  format += "/%03d.dcm"; 
+  nameGenerator->SetSeriesFormat( format.c_str() );
+
+  ctc::CTCImageType::ConstPointer inputImage = reader->GetOutput(); 
+  ctc::CTCImageType::RegionType region = inputImage->GetLargestPossibleRegion(); 
+  ctc::CTCImageType::IndexType start = region.GetIndex(); 
+  ctc::CTCImageType::SizeType size = region.GetSize(); 
+
+  const unsigned int firstSlice = start[2]; 
+  const unsigned int lastSlice = start[2] + size[2] - 1; 
+  nameGenerator->SetStartIndex( firstSlice ); 
+  nameGenerator->SetEndIndex( lastSlice ); 
+  nameGenerator->SetIncrementIndex( 1 ); 
+  writer->SetFileNames( nameGenerator->GetFileNames() );
+
   try 
     { 
       writer->Update(); 

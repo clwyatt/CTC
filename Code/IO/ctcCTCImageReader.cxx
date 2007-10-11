@@ -28,11 +28,18 @@ namespace ctc
   CTCImageReader::CTCImageReader()
   {
     m_UnsignedType = false;
+    m_DictArray = new DictionaryArrayType;
   }
  
   CTCImageReader::~CTCImageReader()
   {
-    
+    for(int slice = 0; 
+	slice < m_DictArray->size(); 
+	slice++)
+      {
+	delete ((*(m_DictArray))[slice]);
+      }
+    delete m_DictArray;
   }
   
   void CTCImageReader::GenerateData()
@@ -71,6 +78,16 @@ namespace ctc
     reader->ReleaseDataFlagOn();
 
     reader->Update();
+
+    // Deep copy the MetaDataDictionary into the array
+    for(int slice = 0; 
+	slice < reader->GetMetaDataDictionaryArray()->size(); 
+	slice++)
+      {
+	DictionaryRawPointer newDictionary = new DictionaryType;
+	*newDictionary = *((*(reader->GetMetaDataDictionaryArray()))[slice]);
+	m_DictArray->push_back( newDictionary );
+      }
 
     // check the modality
     // for some reason this fails sometimes
@@ -116,5 +133,12 @@ namespace ctc
       << std::endl;
   }
   
+
+  CTCImageReader::DictionaryArrayRawPointer 
+  CTCImageReader::GetMetaDataDictionaryArray() const
+  {
+
+    return m_DictArray;
+  }
 }
 

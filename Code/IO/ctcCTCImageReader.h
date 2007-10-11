@@ -24,6 +24,11 @@ namespace ctc
     typedef itk::SmartPointer<Self>               Pointer;
     typedef itk::SmartPointer<const Self>         ConstPointer;
 
+    typedef itk::MetaDataDictionary                   DictionaryType;
+    typedef itk::MetaDataDictionary *                 DictionaryRawPointer;
+    typedef std::vector< DictionaryRawPointer >  DictionaryArrayType;
+    typedef const DictionaryArrayType *          DictionaryArrayRawPointer;
+
     // standard ITK macros
     itkNewMacro(Self);
     itkTypeMacro(CTCImageReader, itk::ImageSource);
@@ -33,6 +38,8 @@ namespace ctc
     itkGetMacro(Directory, std::string);
     itkSetMacro(Directory, std::string);
 
+    /** Get access to the Array of MetaDataDictionaries */
+    DictionaryArrayRawPointer GetMetaDataDictionaryArray() const;
   
   protected:
 
@@ -51,6 +58,8 @@ namespace ctc
   std::string m_Directory;
 
   bool m_UnsignedType;
+
+  DictionaryArrayType * m_DictArray;
 
   };
 
