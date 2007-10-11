@@ -44,6 +44,7 @@ int main(int argc, char ** argv)
   vul_arg<int> maxiter("-i", "Maximum number of iterations (ignored if -s)", 5);
   vul_arg<int> mindist("-d", "Minimum distance considered (ignored if -s)", 10);
   vul_arg<int> thresh("-t", "Air/Tissue threshold (ignored if -s)", -800);
+  vul_arg<bool> analyze("-a", "Write binary output as analyze 7.5 rather than vtk (the default)", false);
   vul_arg_parse(argc, argv);
 
   // read in the DICOM series
@@ -71,7 +72,16 @@ int main(int argc, char ** argv)
   
       // write out binary image
       WriterType::Pointer writer = WriterType::New();
-      string outfilename1 = string(outfilebase()) + ".vtk";
+      string outfilename1;
+      if( analyze() )
+	{
+	   outfilename1 = string(outfilebase()) + ".img";
+	}
+      else
+	{
+	   outfilename1 = string(outfilebase()) + ".vtk";
+	}
+
       writer->SetFileName(outfilename1.c_str()); 
       writer->SetInput( filter->GetOutput() );
       try 
@@ -157,7 +167,15 @@ int main(int argc, char ** argv)
   
       // write out binary image
       WriterType::Pointer writer = WriterType::New();
-      string outfilename1 = string(outfilebase()) + ".vtk";
+      string outfilename1;
+      if( analyze() )
+	{
+	   outfilename1 = string(outfilebase()) + ".img";
+	}
+      else
+	{
+	   outfilename1 = string(outfilebase()) + ".vtk";
+	}
       writer->SetFileName(outfilename1.c_str()); 
       writer->SetInput( filter->GetOutput() );
       try 
