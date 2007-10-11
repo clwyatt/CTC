@@ -49,10 +49,12 @@ int main(int argc, char ** argv)
   clog << "Starting Segment";
   ctc::SegmentColonWithContrastFilter::Pointer filter = ctc::SegmentColonWithContrastFilter::New();
   filter->SetInput( reader->GetOutput() );
-  clog << "Done Segmenting." << endl;
+  filter->Update();
+  clog << " Done Segmenting." << endl;
 
   // loop through the voxels, testing for threshold and lumen test
   // replace image values with air
+  clog << "Starting Mask";
   int replace = replaceval();
   typedef itk::ImageRegionIterator<ctc::CTCImageType> InputIteratorType;
   typedef itk::ImageRegionConstIterator<ctc::BinaryImageType> BinaryIteratorType;
@@ -62,11 +64,12 @@ int main(int argc, char ** argv)
        !it1.IsAtEnd() || !it2.IsAtEnd(); 
        ++it1, ++it2)
     {
-      if( (it2.Get() == 255) && (it1.Get() > 0) )
+      if( (it2.Get() == 255) && (it1.Get() > -800) )
 	{
 	  it1.Set(replace);
 	}
     }
+  clog << " Done Masking" << endl;
 
 
   // write out modified image
