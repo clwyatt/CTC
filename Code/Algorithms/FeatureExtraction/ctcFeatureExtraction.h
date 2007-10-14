@@ -24,12 +24,16 @@ namespace ctc
   public:
 
     typedef itk::Point<double,3> PointdcmCoordinate;
+    typedef BinaryImageType::IndexType PointIndex;
    
-    AssociatedFeatureList() { SI = 0; CV = 0; nSI = 0; nCV = 0; u = 0; } 
+    AssociatedFeatureList() { SI = 0; CV = 0; Gmag = 0; nSI = 0; nCV = 0; nGmag = 0; u = 0; } 
     ~AssociatedFeatureList() {}
 
     PointdcmCoordinate GetDCMCoordinate() const
           { return DCMCoordinate; }
+
+    PointIndex GetIndex() const
+          { return voxel_index; }
 
     float GetSI() const
           { return SI; }
@@ -37,11 +41,17 @@ namespace ctc
     float GetCV() const
           { return CV; }
 
+    float GetGmag() const
+          { return Gmag; }
+
     float GetnSI() const
           { return nSI; }
 
     float GetnCV() const
           { return nCV; }
+
+    float GetnGmag() const
+          { return nGmag; }
 
     float GetMembership() const
           { return u; }
@@ -52,11 +62,17 @@ namespace ctc
     void SetCV( float CalculatedCV )
           { CV = CalculatedCV; }
 
+    void SetGmag( float CalculatedGmag )
+          { Gmag = CalculatedGmag; }
+
     void SetnSI( float CalculatednSI )
           { nSI = CalculatednSI; }
 
     void SetnCV( float CalculatednCV )
           { nCV = CalculatednCV; }
+
+    void SetnGmag( float CalculatednGmag )
+          { nGmag = CalculatednGmag; }
 
     void SetMembership( float Calculatedu )
           { u = Calculatedu; }
@@ -64,16 +80,20 @@ namespace ctc
     void SetDCMCoordinate( PointdcmCoordinate CalculatedDCM ) 
           { DCMCoordinate = CalculatedDCM; }
 
+    void SetIndex( PointIndex CalculatedIndex )
+          { voxel_index = CalculatedIndex; }
+
   private:
     
     PointdcmCoordinate DCMCoordinate;
+    PointIndex voxel_index;
     float SI;
     float CV;
+    float Gmag;
     float nSI;    // Normalized value
     float nCV;
+    float nGmag;
     float u;      // Membership function
-    //AssociatedFeatureList * BelongedClusterCenter;
-
   };
 
   /*  

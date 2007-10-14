@@ -36,6 +36,7 @@ namespace ctc
         using namespace std;
         ctc::PrincipleCurvatureExtraction::FeatureType fp;
         dcmCoordinate pdcm;
+        BinaryImageType::IndexType pindex;
         BinaryImageType::IndexType idx, idx2;
         AssociatedFeatureList afl; 
         int i,j,k,l,m,n;
@@ -113,15 +114,32 @@ namespace ctc
              } else if( num_parameters == 4 )
              {
                   afl.SetCV(tmp);
-                  num_parameters = 0;
-                  Raw_Region.push_back(afl); 
-                  // cout << "Voxel: " << num_v << endl;
-                  num_v++;
+                  num_parameters++; 
+             } else if( num_parameters == 5 )
+             {
+                  afl.SetGmag(tmp);
+                  num_parameters++; 
+             } else if( num_parameters == 6 )
+             {
+                  pindex[0] = (int) tmp;
+                  num_parameters++; 
+             } else if( num_parameters == 7 )
+             {
+                  pindex[1] = (int) tmp;
+                  num_parameters++; 
+             } else if( num_parameters == 8 )
+             {
+                  pindex[2] = (int) tmp;
+                  num_parameters = 0; 
+                  afl.SetIndex(pindex);
+                  Raw_Region.push_back(afl);
+                  num_v++; 
                   if (afl.GetSI() < 1 && afl.GetSI() > 0.9 && afl.GetCV() < 0.2 && afl.GetCV() > 0.08)
                   {
                        Seed_Region.push_back(afl); 
                   }
-             } 
+             }           
+          
         }   
         filereader.close();
 
@@ -191,7 +209,7 @@ namespace ctc
         float v1[3];
         float f1[6];
         itk::Size<3> start, end;
-        float E,F,G,L,M,N,R1,hmag,P1,P2,K,H1,K1,K2,SI,CV;
+        float E,F,G,L,M,N,R1,hmag,P1,P2,K,H1,K1,K2,SI,CV,gmag;
 
         int SeedRegionTracker = 0;
 
@@ -248,12 +266,12 @@ begincalculation:
 
                 m_ColonImage->TransformIndexToPhysicalPoint(idx2,neighborpdcm);
 
-	               start[0] = idx[0]-4;
-	               start[1] = idx[1]-4;
-	               start[2] = idx[2]-4;
-	               end[0] = fullsize[0] - (idx[0]+4) - 1;
-	               end[1] = fullsize[1] - (idx[1]+4) - 1;
-	               end[2] = fullsize[2] - (idx[2]+4) - 1;	    
+	               start[0] = idx2[0]-4;
+	               start[1] = idx2[1]-4;
+	               start[2] = idx2[2]-4;
+	               end[0] = fullsize[0] - (idx2[0]+4) - 1;
+	               end[1] = fullsize[1] - (idx2[1]+4) - 1;
+	               end[2] = fullsize[2] - (idx2[2]+4) - 1;	    
 	               crop->SetLowerBoundaryCropSize(start);      
 	               crop->SetUpperBoundaryCropSize(end);
 	               crop->UpdateLargestPossibleRegion();
@@ -273,6 +291,7 @@ begincalculation:
                 gradient->SetInput(crop->GetOutput());
 	               gradient->Update();
            	    g = gradient->GetOutput()->GetPixel(idx);
+                gmag = sqrt(g[0]*g[0]+g[1]*g[1]+g[2]*g[2]); 
 
                 E = 1 + (g[0]*g[0])/(g[2]*g[2]);
                 F = (g[0]*g[1])/(g[2]*g[2]);
@@ -293,6 +312,8 @@ begincalculation:
                       fl_tmp.SetDCMCoordinate(neighborpdcm);
                       fl_tmp.SetSI(SI);
                       fl_tmp.SetCV(CV);
+                      fl_tmp.SetGmag(gmag);
+                      fl_tmp.SetIndex(idx2);
                       agr.push_back(fl_tmp); 
                 }
             }
@@ -345,8 +366,9 @@ merging:   for(m = 0; m < tmp.size(); m++)
            goto starttomerge;
 
 finishmerging:       
-      
-/*
+     
+         GrowableRegionType::iterator iter; 
+
            // Output contents in growableregion_vector into a txt file for debugging 
         ofstream out("GrowableRegion.txt");
         int counter = 1;
@@ -357,14 +379,18 @@ finishmerging:
              iter = growableregion_vector[i].begin();
              for (; iter != growableregion_vector[i].end(); ++iter)
              {
-                   dcmCoordinate abc = iter->GetDCMCoordinate(); 
+                   dcmCoordinate pointdcm = iter->GetDCMCoordinate(); 
+                   BinaryImageType::IndexType pointindex = iter->GetIndex();
                    cout << "Region: " << counter << endl; 
-                   out << abc[0] << endl;
-                   out << abc[1] << endl;
-                   out << abc[2] << endl;
+                   out << pointdcm[0] << endl;
+                   out << pointdcm[1] << endl;
+                   out << pointdcm[2] << endl;
                    out << iter->GetSI() << endl;
                    out << iter->GetCV() << endl;
-
+                   out << iter->GetGmag() << endl;
+                   out << pointindex[0] << endl;
+                   out << pointindex[1] << endl;
+                   out << pointindex[2] << endl;                   
              }
              counter++;
              out << "******" << endl;
@@ -372,7 +398,7 @@ finishmerging:
         out.close();
 
              // Write the data into growableregion_vector for debugging  
-        ifstream filereader2( "GrowableRegion.txt" );
+       /* ifstream filereader2( "GrowableRegion.txt" );
         num_parameters = 0;
         GrowableRegionType miner;
 
@@ -432,7 +458,6 @@ finishmerging:
           
        int num_regions = growableregion_vector.size();
        int num_points = 0;  
-       GrowableRegionType::iterator iter;
 
               /* Subpart 1 --- Normalize the feature vector */
        for(i = 0; i < growableregion_vector.size(); i++)
@@ -668,23 +693,25 @@ finishmerging:
 
        GrowableRegionType::iterator iter3;
        ofstream out2 ( "FinalExtraction.txt" );
-       int k_region = 0;
-       cout << "Size of growableregion_vector is " << growableregion_vector.size() << endl;
+       int k_voxel= 0;
 
+       cout << "Size of growableregion_vector is " << growableregion_vector.size() << endl;
        for(int counter1=0; counter1 < growableregion_vector.size(); counter1++)     
        {
              iter3 = growableregion_vector[counter1].begin();
-             out2 << "Region: " << counter1 << endl;            
+             out2 << "Region: " << (counter1+1) << endl;    
+             int k_region = 0;      
              for (; iter3 != growableregion_vector[counter1].end(); ++iter3)
              {               
-                   out2 << iter3->GetDCMCoordinate();
-                   out2 << " " << iter3->GetSI() << " " << iter3->GetCV() << endl;
+                   out2 << iter3->GetDCMCoordinate() << " " << iter3->GetIndex();
+                   out2 << " " << iter3->GetSI() << " " << iter3->GetCV() << " " << iter3->GetGmag() << endl;
                    k_region++;
+                   k_voxel++;
              }
-             out2 << "**********************  " << (counter1+1) << " ************************" << endl;
+             out2 << "**********************  " << k_region << "voxels  ************************" << endl;
        } 
        out2.close();
-       cout << "Total number of voxels extracted: " << k_region << endl; 
+       cout << "Total number of voxels extracted: " << k_voxel << endl; 
 
 
              

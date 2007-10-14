@@ -47,7 +47,7 @@ void MAT4FeatureVector(RegionCollectorType input)
           }
     }
  
-    double FeatureVectorArray[5*num_points];
+    double FeatureVectorArray[9*num_points];
     int m = 0;
 
     /* Push each feature vector value to an array 
@@ -68,17 +68,24 @@ void MAT4FeatureVector(RegionCollectorType input)
      *      10 11 12]
      * */
 
+    int num_region = 0;
     for(i = 0; i < num_regions; i++)
     {
           iter = input[i].begin();
+          num_region++;
           for (; iter != input[i].end(); ++iter)
           { 
                dcmCoordinate pdcm = iter->GetDCMCoordinate();
-               FeatureVectorArray[m] = pdcm[0];
-               FeatureVectorArray[m + num_points] = pdcm[1];
-               FeatureVectorArray[m + num_points*2] = pdcm[2];
-               FeatureVectorArray[m + num_points*3] = iter->GetSI();
-               FeatureVectorArray[m + num_points*4] = iter->GetCV(); 
+               BinaryImageType::IndexType pindex = iter->GetIndex();
+               FeatureVectorArray[m] = num_region;
+               FeatureVectorArray[m + num_points] = pdcm[0];
+               FeatureVectorArray[m + num_points*2] = pdcm[1];
+               FeatureVectorArray[m + num_points*3] = pdcm[2];
+               FeatureVectorArray[m + num_points*4] = pindex[0];
+               FeatureVectorArray[m + num_points*5] = pindex[1];
+               FeatureVectorArray[m + num_points*6] = pindex[2];
+               FeatureVectorArray[m + num_points*7] = iter->GetSI();
+               FeatureVectorArray[m + num_points*8] = iter->GetCV(); 
                m++;     
           }
     }
@@ -86,7 +93,7 @@ void MAT4FeatureVector(RegionCollectorType input)
     /* Define header parameters */
     matFileHeader.type = 0000;
     matFileHeader.rows = num_points;
-    matFileHeader.cols = 5;
+    matFileHeader.cols = 9;
     matFileHeader.imag = 0;
     matFileHeader.namelen = 14;
     
