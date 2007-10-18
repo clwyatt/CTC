@@ -31,6 +31,9 @@ using std::string;
 // Feature extraction methods
 #include "FeatureExtractionMethods.h"
 #include "ctcPrincipleCurvatureExtraction.h"
+#include "ctcFeatureExtraction.h"
+#include "MAT4Converter.h" 
+#include "StringtoDouble.h"
 
 // this is ugly, should be refactored 
 DBType * parsedb(const char * dbname)
@@ -95,21 +98,41 @@ int main( int argc, char* argv[] )
 {
   // parse args
   vul_arg<char const*> imgdir(0, "DICOM image dir");
-  vul_arg<char const*> segfile("-s", "segmented image", "segment.vtk");
-  vul_arg<char const*> pfile("-p", "polyp coordinate file", "polyps");
-  vul_arg<char const*> outfilename("-o", 
-				   "output csv file name", 
-				   "features.csv");
+  vul_arg<char const*> datainfile(0, "input volume data file", "SupineData.vtk");
+  vul_arg<char const*> seginfile(0, "segmented image", "SupineSegmented.vtk");
+  vul_arg<char const*> outfilename(0, "Output feature filename", "PolypCandidatesExtractedInSegfile.vtk");
+  //vul_arg<char const*> pfile("-p", "polyp coordinate file", "polyps");
+  //vul_arg<char const*> outfilename("-o", 
+		//		   "output csv file name", 
+		//		   "features.csv");
   vul_arg_parse(argc, argv);
 
+
+  /* get paths to input/output files */
+  string rawinfilename = "";
+  rawinfilename.append(imgdir());
+  rawinfilename.append("/");
+  rawinfilename.append(datainfile());
+  string seginfilename = "";
+  seginfilename.append(imgdir());
+  seginfilename.append("/");
+  seginfilename.append(seginfile());
+  string outputVTKname = "";
+  outputVTKname.append(outfilename());
+
   // read data
-  ctc::CTCImageReader::Pointer rawreader = ctc::CTCImageReader::New();
-  rawreader->SetDirectory(string(imgdir()));
+  //ctc::CTCImageReader::Pointer rawreader = ctc::CTCImageReader::New();
+  //rawreader->SetDirectory(string(imgdir()));
+  //rawreader->SetFileName(rawinfilename);
+  typedef itk::ImageFileReader< ctc::CTCImageType > RawDataReaderType;
+  RawDataReaderType::Pointer rawreader = RawDataReaderType::New();
+  rawreader->SetFileName(rawinfilename);
+  
 
   // read segmented data
   typedef itk::ImageFileReader< ctc::BinaryImageType > SegDataReaderType;
   SegDataReaderType::Pointer segreader = SegDataReaderType::New();
-  segreader->SetFileName(string(segfile()));
+  segreader->SetFileName(string(seginfile()));
 
   // invoke readers
   try
@@ -141,6 +164,10 @@ int main( int argc, char* argv[] )
   std::clog << " Done." << std::endl;
 
   // read the polyps file
+ 
+  
+  /* Will uncomment soon */
+  /*
   DBType * db;
   try
     {
@@ -151,7 +178,10 @@ int main( int argc, char* argv[] )
       cerr << "Error reading file " << pfile() << endl;
       return EXIT_FAILURE;
     }
+  */
 
+  /* Previous Work */
+  /*
   // output
   ofstream out(outfilename());
 
@@ -209,9 +239,21 @@ int main( int argc, char* argv[] )
 	   << id
 	   << endl;
     }  
-  out.close();
-  
-  delete db;
+  out.close();*/
+ 
+    typedef ctc::FeatureExtraction FeatureExtractionFilterType;  
+    FeatureExtractionFilterType::Pointer FEfilter = FeatureExtractionFilterType::New();
+//  FEfilter->SetInitialFeatureVector(filter->GetOutput());
+
+    FEfilter->SetSegmentedImageInput(segreader->GetOutput());
+    FEfilter->SetRawImageInput(rawreader->GetOutput());
+    FEfilter->SetOutputVTK(outputVTKname);
+
+    /* Core of feature extraction */
+    FEfilter->Analyze();
+
+
+//  delete db;
 
   return EXIT_SUCCESS;
 
