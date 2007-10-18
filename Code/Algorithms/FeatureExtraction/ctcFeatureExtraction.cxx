@@ -131,7 +131,7 @@ namespace ctc
              {
                   pindex[2] = (int) tmp;
                   num_parameters = 0; 
-                  afl.SetIndex(pindex);
+                  afl.SetVoxelIndex(pindex);
                   Raw_Region.push_back(afl);
                   num_v++; 
                   if (afl.GetSI() < 1 && afl.GetSI() > 0.9 && afl.GetCV() < 0.2 && afl.GetCV() > 0.08)
@@ -313,7 +313,7 @@ begincalculation:
                       fl_tmp.SetSI(SI);
                       fl_tmp.SetCV(CV);
                       fl_tmp.SetGmag(gmag);
-                      fl_tmp.SetIndex(idx2);
+                      fl_tmp.SetVoxelIndex(idx2);
                       agr.push_back(fl_tmp); 
                 }
             }
@@ -370,7 +370,7 @@ finishmerging:
          GrowableRegionType::iterator iter; 
 
            // Output contents in growableregion_vector into a txt file for debugging 
-        ofstream out("GrowableRegion.txt");
+   /*     ofstream out("GrowableRegion.txt");
         int counter = 1;
 
         for(i = 0; i < growableregion_vector.size(); i++)     
@@ -380,7 +380,7 @@ finishmerging:
              for (; iter != growableregion_vector[i].end(); ++iter)
              {
                    dcmCoordinate pointdcm = iter->GetDCMCoordinate(); 
-                   BinaryImageType::IndexType pointindex = iter->GetIndex();
+                   BinaryImageType::IndexType pointindex = iter->GetVoxelIndex();
                    cout << "Region: " << counter << endl; 
                    out << pointdcm[0] << endl;
                    out << pointdcm[1] << endl;
@@ -395,7 +395,7 @@ finishmerging:
              counter++;
              out << "******" << endl;
         } 
-        out.close();
+        out.close();*/
 
              // Write the data into growableregion_vector for debugging  
        /* ifstream filereader2( "GrowableRegion.txt" );
@@ -703,7 +703,7 @@ finishmerging:
              int k_region = 0;      
              for (; iter3 != growableregion_vector[counter1].end(); ++iter3)
              {               
-                   out2 << iter3->GetDCMCoordinate() << " " << iter3->GetIndex();
+                   out2 << iter3->GetDCMCoordinate() << " " << iter3->GetVoxelIndex();
                    out2 << " " << iter3->GetSI() << " " << iter3->GetCV() << " " << iter3->GetGmag() << endl;
                    k_region++;
                    k_voxel++;
@@ -847,7 +847,74 @@ finishmerging:
        }
 
        outfile.close();
-       MAT4FeatureVector(growableregion_vector); 
+       MAT4FeatureVector(growableregion_vector);
+
+
+       /* Write new polyp candidates scheme to the output VTK file */
+
+       typedef itk::ImageFileWriter< BinaryImageType > SegDataWriterType; 
+       SegDataWriterType::Pointer segwriter = SegDataWriterType::New();
+       segwriter->SetFileName(UserNamedOutputVTK);
+     
+       typedef itk::ImageRegionIterator< BinaryImageType>  IteratorType;
+
+
+       BinaryIteratorType::RadiusType radius2;
+       radius2.Fill(1);
+       BinaryIteratorType input1(radius2, m_ColonImage,m_ColonImage->GetRequestedRegion() );
+    
+       BinaryImageType::Pointer output = BinaryImageType::New();
+       output->SetRegions(m_ColonImage->GetRequestedRegion());     
+       output->Allocate();
+       IteratorType outvtk(output, m_ColonImage->GetRequestedRegion());  
+    
+       int polypadder = 101;
+       BinaryImageType::IndexType idx_tmp2;
+       
+       for (input1.GoToBegin(), outvtk.GoToBegin(); !input1.IsAtEnd(); ++input1, ++outvtk)
+       {
+            dcmCoordinate dcm1;
+            int data = input1.GetPixel(center);
+            idx_tmp2 = input1.GetIndex();
+            m_ColonImage->TransformIndexToPhysicalPoint(idx_tmp2, dcm1);
+
+            if(input1.GetPixel(center) == 0)
+	           {	
+	                 int count_v = 0;
+
+	                 if(input1.GetPixel(right) == 255) count_v += 1;
+	                 if(input1.GetPixel(left) == 255) count_v += 1;
+	                 if(input1.GetPixel(bottom) == 255) count_v += 1;
+	                 if(input1.GetPixel(top) == 255) count_v += 1;
+	                 if(input1.GetPixel(front) == 255) count_v += 1;
+	                 if(input1.GetPixel(back) == 255) count_v += 1;
+	                
+                  if(count_v != 0) 
+	                 {
+                         int flag = 0;
+                         for(int counter1=0; counter1 < growableregion_vector.size(); counter1++)     
+                         {
+                                iter3 = growableregion_vector[counter1].begin();                               
+                                for (; iter3 != growableregion_vector[counter1].end(); ++iter3)
+                                {                
+                                      dcmCoordinate dcm2 = iter3->GetDCMCoordinate();
+                                      if( abs(dcm2[0]-dcm1[0]) <= 0.03 && abs(dcm2[1]-dcm1[1]) <= 0.03 && abs(dcm2[2]-dcm1[2]) <= 0.03 )
+                                      {
+                                          outvtk.Set(polypadder+counter1);
+                                          flag = 1;
+                                      }
+                                }
+                         }
+                         if(flag == 0)
+                             outvtk.Set(100);                   
+                  }else
+                       outvtk.Set(1);
+            }else 
+                 outvtk.Set(0);      
+       }
+
+
+
 }
 
        
