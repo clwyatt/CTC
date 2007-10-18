@@ -53,6 +53,8 @@ class ITK_EXPORT SegmentColonFilter :
   itkGetMacro(MinDistanceThreshold, DistancePixelType);
   itkSetMacro(MinDistanceThreshold, DistancePixelType);
 
+  itkGetMacro(NumberVoxelsInRegion, unsigned int);
+
 protected:
 
   SegmentColonFilter();
@@ -90,6 +92,7 @@ private:
   CTCPixelType      m_MaxPixelValue;
   unsigned int      m_MaxIterations;
   DistancePixelType m_MinDistanceThreshold;
+  unsigned int      m_NumberVoxelsInRegion;
 
 };
 

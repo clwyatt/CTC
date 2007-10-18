@@ -30,6 +30,7 @@ namespace ctc
     m_Threshold = -800;
     m_MaxIterations = 10;
     m_MinDistanceThreshold = 10;
+    m_NumberVoxelsInRegion = 0;
     
   }
   
@@ -194,6 +195,14 @@ namespace ctc
 	if(maxd < m_MinDistanceThreshold)
 	  break;
 
+	// if in upper 1/3 of z-axis, likely in lung
+	bool lungflag = bool( static_cast<float>(maxi[2]) > 
+			      (2.0/3.0)*static_cast<float>(downSize[2]) );
+	//std::clog << static_cast<float>(maxi[2]) << std::endl;
+	//std::clog << static_cast<float>(downSize[2]) << std::endl;
+	if(lungflag) std::clog << "in lung, ignoring." << std::endl;
+
+
 	DistanceFloodIteratorType dfit(m_DistanceFilter->GetOutput(),
 				       dfunction,
 				       maxi);
@@ -215,7 +224,11 @@ namespace ctc
 	bfit.GoToBegin();
 	while(!bfit.IsAtEnd())
 	  {
-	    bfit.Set(128);
+	    if(!lungflag)
+	      bfit.Set(128);
+	    else
+	      bfit.Set(0);
+
 	    ++bfit;
 	  }
 
@@ -224,6 +237,7 @@ namespace ctc
 
     // mask out non-colon regions and reverse constrast
     std::clog << "Final Masking ... ";
+    m_NumberVoxelsInRegion = 0;
     itk::ImageRegionIterator<BinaryImageType>
       it4(m_ThresholdFilter->GetOutput(), 
 	  m_ThresholdFilter->GetOutput()->GetRequestedRegion());
@@ -232,7 +246,10 @@ namespace ctc
 	if(it4.Get() != 128)
 	  it4.Set(0);
 	else
-	  it4.Set(255);
+	  {
+	    it4.Set(1);
+	    m_NumberVoxelsInRegion += 1;
+	  }
       }
     std::clog << " Done." << std::endl;
 

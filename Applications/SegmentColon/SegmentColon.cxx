@@ -115,48 +115,51 @@ int main(int argc, char ** argv)
 	  return EXIT_FAILURE; 
 	} 
 
-      // create mesh spatial object
-      MeshSourceType::Pointer meshSource = MeshSourceType::New();
-      const ctc::BinaryPixelType objectValue = 255;
-      meshSource->SetObjectValue( objectValue );
-      
-      meshSource->SetInput( filter->GetOutput() );
-      try
+      // create mesh spatial object if objects are present
+      if(filter->GetNumberVoxelsInRegion() != 0)
 	{
-	  meshSource->Update();
-	}
-      catch( itk::ExceptionObject & err )
-	{
-	  cerr << "ExceptionObject caught !" << endl;
-	  cerr << err << endl;
-	  return EXIT_FAILURE;
-	}
+	  MeshSourceType::Pointer meshSource = MeshSourceType::New();
+	  const ctc::BinaryPixelType objectValue = 1;
+	  meshSource->SetObjectValue( objectValue );
+	  
+	  meshSource->SetInput( filter->GetOutput() );
+	  try
+	    {
+	      meshSource->Update();
+	    }
+	  catch( itk::ExceptionObject & err )
+	    {
+	      cerr << "ExceptionObject caught !" << endl;
+	      cerr << err << endl;
+	      return EXIT_FAILURE;
+	    }
+	  
+	  typedef itk::MeshSpatialObject<MeshType> MeshSpatialObjectType;
+	  MeshSpatialObjectType::Pointer myMeshSpatialObject =
+	    MeshSpatialObjectType::New();
+	  
+	  
+	  myMeshSpatialObject->SetMesh(meshSource->GetOutput());
+	  clog << "Mesh bounds : " <<
+	    myMeshSpatialObject->GetBoundingBox()->GetBounds() << endl;
+	  
+	  // write the mesh object
+	  typedef itk::SpatialObjectWriter<3,float,MeshTrait> WriterType;
+	  WriterType::Pointer mwriter = WriterType::New();
       
-      typedef itk::MeshSpatialObject<MeshType> MeshSpatialObjectType;
-      MeshSpatialObjectType::Pointer myMeshSpatialObject =
-	MeshSpatialObjectType::New();
-      
-      
-      myMeshSpatialObject->SetMesh(meshSource->GetOutput());
-      clog << "Mesh bounds : " <<
-	myMeshSpatialObject->GetBoundingBox()->GetBounds() << endl;
-      
-      // write the mesh object
-      typedef itk::SpatialObjectWriter<3,float,MeshTrait> WriterType;
-      WriterType::Pointer mwriter = WriterType::New();
-      
-      mwriter->SetInput(myMeshSpatialObject);
-      string outfilename3 = string(outfilebase()) + ".meta";
-      mwriter->SetFileName(outfilename3.c_str());
-      try
-	{
-	  mwriter->Update();
-	}
-      catch( itk::ExceptionObject & err )
-	{
-	  cerr << "ExceptionObject caught !" << endl;
-	  cerr << err << endl;
-	  return EXIT_FAILURE;
+	  mwriter->SetInput(myMeshSpatialObject);
+	  string outfilename3 = string(outfilebase()) + ".meta";
+	  mwriter->SetFileName(outfilename3.c_str());
+	  try
+	    {
+	      mwriter->Update();
+	    }
+	  catch( itk::ExceptionObject & err )
+	    {
+	      cerr << "ExceptionObject caught !" << endl;
+	      cerr << err << endl;
+	      return EXIT_FAILURE;
+	    }
 	}
     }
   else
@@ -252,7 +255,6 @@ int main(int argc, char ** argv)
 	  cerr << err << endl;
 	  return EXIT_FAILURE;
 	}
-
     }
   
   return(EXIT_SUCCESS);
