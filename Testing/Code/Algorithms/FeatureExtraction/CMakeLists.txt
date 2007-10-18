@@ -46,6 +46,24 @@ ITKCommon
 ITKIO)
 
 ADD_TEST(test_ctcMAT4Converter 
-         ${EXECUTABLE_OUTPUT_PATH}/test_ctcMAT4Converter
-         DICOM_short_supine 
-         output_ctcFeatureExtraction.vtk)  
+         SupineData.vtk
+         SupineSegmented.vtk 
+         output_ctcFeatureExtraction.vtk) 
+
+
+
+ADD_EXECUTABLE(test_ctcFeatureExtraction test_ctcFeatureExtraction.cxx)             
+
+TARGET_LINK_LIBRARIES(test_ctcFeatureExtraction 
+ctcvul 
+CTCIO
+CTCSegmentation
+CTCFeatureExtraction 
+ITKBasicFilters 
+ITKCommon 
+ITKIO)
+
+ADD_TEST(test_ctcFeatureExtraction
+         SupineData.vtk
+         SupineSegmented.vtk 
+         output_ctcFeatureExtraction.vtk)        
