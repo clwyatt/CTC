@@ -5,7 +5,6 @@ SET(CTCSegmentation_SRCS
   ctcSegmentColonFilter.cxx
   ctcSegmentColonWithContrastFilter.cxx
   ctcSegmentProjectionFilter.cxx
-  ctcDetectAndSegmentPolypsNappi02Filter.cxx
 )
 
 # Add CTCSegmentation library
