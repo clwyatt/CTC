@@ -17,6 +17,8 @@ using namespace std;
 #include <itkGDCMImageIO.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
+#include <itkMetaDataObject.h>
+#include <itkMetaDataDictionary.h>
 
 // CTC includes
 #include "ctcConfigure.h"
@@ -64,7 +66,8 @@ int main(int argc, char ** argv)
 
   // segment air + constrast
   clog << "Starting Segment";
-  ctc::SegmentColonWithContrastFilter::Pointer filter = ctc::SegmentColonWithContrastFilter::New();
+  ctc::SegmentColonWithContrastFilter::Pointer filter = 
+    ctc::SegmentColonWithContrastFilter::New();
   filter->SetInput( reader->GetOutput() );
   filter->Update();
   clog << " Done Segmenting." << endl;
@@ -75,8 +78,11 @@ int main(int argc, char ** argv)
   int replace = replaceval();
   typedef itk::ImageRegionIterator<ctc::CTCImageType> InputIteratorType;
   typedef itk::ImageRegionConstIterator<ctc::BinaryImageType> BinaryIteratorType;
-  InputIteratorType it1(reader->GetOutput(), reader->GetOutput()->GetRequestedRegion());
-  BinaryIteratorType it2(filter->GetOutput(), filter->GetOutput()->GetRequestedRegion());
+  InputIteratorType it1(reader->GetOutput(), 
+			reader->GetOutput()->GetRequestedRegion());
+  BinaryIteratorType it2(filter->GetOutput(), 
+			 filter->GetOutput()->GetRequestedRegion());
+
   for( it1.GoToBegin(), it2.GoToBegin(); 
        !it1.IsAtEnd() || !it2.IsAtEnd(); 
        ++it1, ++it2)
@@ -88,15 +94,38 @@ int main(int argc, char ** argv)
     }
   clog << " Done Masking" << endl;
 
-
   // write out modified image
   typedef itk::Image< short, 2 > Image2DType; 
   typedef itk::ImageSeriesWriter< ctc::CTCImageType, Image2DType > WriterType; 
   WriterType::Pointer writer = WriterType::New(); 
   writer->SetInput( reader->GetOutput() );
-  writer->SetMetaDataDictionaryArray( reader->GetMetaDataDictionaryArray() ); 
+
+  // modify series number
+  ctc::CTCImageReader::DictionaryArrayRawPointer dictarray = 
+    reader->GetMetaDataDictionaryArray();
+
+  std::string SeriesNumberTag = "0020|0011";
+  std::string SeriesNumberValue;
+  for(int slice = 0; 
+      slice < dictarray->size(); 
+      slice++)
+    {
+      ctc::CTCImageReader::DictionaryRawPointer dict = 
+	(*(reader->GetMetaDataDictionaryArray()))[slice];
+
+      itk::ExposeMetaData<std::string>(*dict, 
+					SeriesNumberTag, 
+					SeriesNumberValue);
+      SeriesNumberValue = "90";
+      itk::EncapsulateMetaData<std::string>(*dict, 
+					    SeriesNumberTag, 
+					    SeriesNumberValue);
+    }
+
+  writer->SetMetaDataDictionaryArray( dictarray ); 
 
   itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
+
   writer->SetImageIO( dicomIO );
 
   typedef itk::NumericSeriesFileNames NameGeneratorType; 
