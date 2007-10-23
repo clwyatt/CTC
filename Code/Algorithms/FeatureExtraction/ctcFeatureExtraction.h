@@ -10,7 +10,9 @@ Language:  C++
 #include "itkObject.h"
 #include "ctcCTCImage.h"
 #include "itkListSample.h"
+#include <string>
 
+using namespace std;
 namespace ctc
 {
 
@@ -32,7 +34,7 @@ namespace ctc
     PointdcmCoordinate GetDCMCoordinate() const
           { return DCMCoordinate; }
 
-    PointIndex GetIndex() const
+    PointIndex GetVoxelIndex() const
           { return voxel_index; }
 
     float GetSI() const
@@ -80,7 +82,7 @@ namespace ctc
     void SetDCMCoordinate( PointdcmCoordinate CalculatedDCM ) 
           { DCMCoordinate = CalculatedDCM; }
 
-    void SetIndex( PointIndex CalculatedIndex )
+    void SetVoxelIndex( PointIndex CalculatedIndex )
           { voxel_index = CalculatedIndex; }
 
   private:
@@ -108,7 +110,7 @@ namespace ctc
     typedef itk::SmartPointer<Self>                    Pointer;
     typedef itk::SmartPointer<const Self>              ConstPointer;
     
-    typedef itk::Vector< float, 5>                     FeatureType;
+    typedef itk::Vector< float, 9>                     FeatureType;
     typedef itk::Statistics::ListSample<FeatureType>   FeatureSampleType;
     typedef FeatureSampleType::Pointer                 FeaturePointer;
 
@@ -147,6 +149,9 @@ namespace ctc
                           { PolypCenterCollector = collector; }
 
     void Analyze( void );
+
+    void SetOutputVTK(string name)
+                          { UserNamedOutputVTK = name; }
  
   protected:
 
@@ -164,6 +169,7 @@ namespace ctc
     GrowableRegionType   Growable_Region;
     RegionCollectorType  RegionCollector;
     dcmVectorType        PolypCenterCollector;
+    string               UserNamedOutputVTK;
     
   };
  
