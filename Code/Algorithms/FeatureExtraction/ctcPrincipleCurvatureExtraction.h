@@ -29,7 +29,7 @@ namespace ctc
     typedef itk::SmartPointer<const Self>             ConstPointer;
 
     typedef BinaryImageType                           InputImageType;
-    typedef itk::Vector< float, 5>                    FeatureType;
+    typedef itk::Vector< float, 9>                    FeatureType;
     typedef itk::Statistics::ListSample<FeatureType>  FeatureSampleType;
         
     // standard ITK macros

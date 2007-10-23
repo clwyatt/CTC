@@ -76,7 +76,7 @@ void MAT4FeatureVector(RegionCollectorType input)
           for (; iter != input[i].end(); ++iter)
           { 
                dcmCoordinate pdcm = iter->GetDCMCoordinate();
-               BinaryImageType::IndexType pindex = iter->GetIndex();
+               BinaryImageType::IndexType pindex = iter->GetVoxelIndex();
                FeatureVectorArray[m] = num_region;
                FeatureVectorArray[m + num_points] = pdcm[0];
                FeatureVectorArray[m + num_points*2] = pdcm[1];
