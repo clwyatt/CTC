@@ -132,7 +132,7 @@ int main( int argc, char* argv[] )
   // read segmented data
   typedef itk::ImageFileReader< ctc::BinaryImageType > SegDataReaderType;
   SegDataReaderType::Pointer segreader = SegDataReaderType::New();
-  segreader->SetFileName(string(seginfile()));
+  segreader->SetFileName(seginfilename);
 
   // invoke readers
   try
