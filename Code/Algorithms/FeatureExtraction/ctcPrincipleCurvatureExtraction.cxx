@@ -12,6 +12,7 @@ Language:  C++
 #include <itkNeighborhoodAlgorithm.h>
 #include <itkSymmetricEigenSystem.h>
 #include <vnl/algo/vnl_real_eigensystem.h>
+#include <fstream>
 
 //#include "itkRecursiveGaussianImageFilter.h"
 //#include "itkImageDuplicator.h"
@@ -80,6 +81,16 @@ namespace ctc
     HessianPixelType::EigenVectorsMatrixType va;
     HessianPixelType H;
     float v1[3];
+    float f1[6];
+
+    std::ofstream out3("datasetDCMSICV.txt");
+
+
+/* Yuan  */
+    float E,F,G,L,M,N,R1,hmag,P1,P2,K,H1,K1,K2,SI,CV;
+    //typedef ctc::AssociatedFeatureList AssociatedFeatureVector;
+    
+    
     typedef itk::GradientRecursiveGaussianImageFilter<FloatImageType> GradientFilterType;
     typedef GradientFilterType::OutputImageType GradientImageType;
     typedef GradientFilterType::OutputPixelType GradientPixelType;
@@ -109,6 +120,7 @@ namespace ctc
 	if(bit.GetPixel(center) == 0)
 	  {	
 	    int count = 0;
+
 	    if(bit.GetPixel(right) == 255) count += 1;
 	    if(bit.GetPixel(left) == 255) count += 1;
 	    if(bit.GetPixel(bottom) == 255) count += 1;
@@ -118,13 +130,13 @@ namespace ctc
 	    if(count == 0) // not on a boundary
 	      continue;
 	   
-	    if( (m_FeatureVector->Size() % 100) == 0 && (m_FeatureVector->Size() > 0)){
+	    if( (m_FeatureVector->Size() % 10000) == 0 && (m_FeatureVector->Size() > 0)){
 		std::clog << m_FeatureVector->Size() << std::endl;
 		std::clog << m_FeatureVector->GetMeasurementVector(m_FeatureVector->Size()-1) << std::endl;
 	    }
  
 	    idx = bit.GetIndex();
-	    m_Image->TransformIndexToPhysicalPoint(idx, dcmCoordinate);
+	    m_ColonImage->TransformIndexToPhysicalPoint(idx, dcmCoordinate);
 	    f[0] = dcmCoordinate[0];
 	    f[1] = dcmCoordinate[1];
 	    f[2] = dcmCoordinate[2];
@@ -150,22 +162,88 @@ namespace ctc
 	    v1[0] = va[2][0];
 	    v1[1] = va[2][1];
 	    v1[2] = va[2][2];
+/*
+     f1[0] = va[0][0];   //hxx
+     f1[1] = va[0][1];   //hxy
+     f1[2] = va[0][2];   //hxz
+     f1[3] = va[1][1];   //hyy
+     f1[4] = va[1][2];   //hyz
+     f1[5] = va[2][2];   //hzz
+*/
 
+     f1[0] = H[0];   //hxx
+     f1[1] = H[1];   //hxy
+     f1[2] = H[2];   //hxz
+
+     f1[3] = H[3];   //hyy
+     f1[4] = H[4];   //hyz
+     f1[5] = H[5];   //hzz
+
+ /*    
+     std::cout << "H[0][0] " << H[0][0] << " H[0][1] " << H[0][1] << " H[0][2] " << H[0][2] << std::endl;
+     std::cout << "H[1][0] " << H[1][0] << " H[1][1] " << H[1][1] << " H[1][2] " << H[1][2] << std::endl;
+     std::cout << "H[2][0] " << H[2][0] << " H[2][1] " << H[2][1] << " H[2][2] " << H[2][2] << std::endl;
+*/
+/*
+     std::cout << "va[0][0] " << va[0][0] << " va[0][1] " << va[0][1] << " va[0][2] " << va[0][2] << va[0][3] << std::endl;
+     std::cout << "va[1][1] " << va[1][1] << " va[1][2] " << va[0][1] << " va[2][2] " << va[2][2] << va[3][2] << std::endl;
+*/
+
+
+    
 	    // compute the gradient, same scale
 	    gradient->SetInput(crop->GetOutput());
 	    gradient->Update();
 	    g = gradient->GetOutput()->GetPixel(idx);
 	    gmag = sqrt(g[0]*g[0]+g[1]*g[1]+g[2]*g[2]);
 
+     E = 1 + (g[0]*g[0])/(g[2]*g[2]);
+     F = (g[0]*g[1])/(g[2]*g[2]);
+     G = 1 + (g[1]*g[1])/(g[2]*g[2]); 
+     hmag = g[0]*g[0] + g[1]*g[1] + g[2]*g[2];
+     R1 = g[2]*g[2]*sqrt(hmag);
+     L = (2*g[0]*g[1]*f1[2] - g[0]*g[0]*f1[5] - g[2]*g[2]*f1[0]) / R1;
+     M = (g[0]*g[2]*f1[4] + g[1]*g[2]*f1[2] - g[0]*g[1]*f1[5] - g[2]*g[2]*f1[1]) / R1;
+     N = (2*g[1]*g[2]*f1[4] - g[1]*g[1]*f1[5] - g[2]*g[2]*f1[3]) / R1;
+
+     //P1 =   g[0]*g[0]*(f1[3]*f1[5] - f1[4]*f1[4]) + 2*g[1]*g[2]*(f1[2]*f1[1] - f1[0]*f1[0]*f1[4])
+     //     + g[1]*g[1]*(f1[5]*f1[0] - f1[2]*f1[2]) + 2*g[0]*g[2]*(f1[1]*f1[4] - f1[3]*f1[3]*f1[2])
+     //     + g[2]*g[2]*(f1[0]*f1[3] - f1[1]*f1[1]) + 2*g[0]*g[1]*(f1[4]*f1[2] - f1[5]*f1[5]*f1[1]);
+
+     //P2 =   2*g[1]*g[2]*f1[4] - g[0]*g[0]*(f1[3]+f1[5])
+     //     + 2*g[0]*g[2]*f1[2] - g[1]*g[1]*(f1[0]+f1[5])
+     //     + 2*g[0]*g[1]*f1[1] - g[2]*g[2]*(f1[0]+f1[3]);
+
+     /* Gaussian Curvature & Mean Curvature */
+     K = (L*N-M*M) / (E*G-F*F);
+     H1 = (E*N-2*F*M+G*L) / (2*(E*G-F*F));
+
+
 	    // rotate the Hessian to align the first eigenvector to the
 	    // gradient direction
-	    mag = sqrt(v1[0]*v1[0]+v1[1]*v1[1]+v1[2]*v1[2])*sqrt(g[0]*g[0]+g[1]*g[1]+g[2]*g[2]);
+	 /* 
+     mag = sqrt(v1[0]*v1[0]+v1[1]*v1[1]+v1[2]*v1[2])*sqrt(g[0]*g[0]+g[1]*g[1]+g[2]*g[2]);
 	    angle = acos((v1[0]*g[0]+v1[1]*g[1]+v1[2]*g[2])/mag);  
 	    cross[0] = v1[1]*g[2]-v1[2]*g[1];
 	    cross[1] = v1[2]*g[0]-v1[0]*g[2];
 	    cross[2] = v1[0]*g[1]-v1[1]*g[0];
 	    mag = sqrt(cross[0]*cross[0]+cross[1]*cross[1]+cross[2]*cross[2]);
-	    cross[0] = cross[0]/mag;
+	    cross[0] = cross[0]/mag;for(int counter=0;counter < Seed_Region.size(); counter++)
+{
+    cout << "Voxel: " << counter << endl; 
+    AssociatedFeatureList tmp = Seed_Region[counter];
+    out << tmp.GetDCMCoordinate() << "   ";       
+    out << tmp.GetSI() << "   " << tmp.GetCV() << endl;
+}
+
+for(int counter=0;counter < Raw_Region.size(); counter++)
+{
+    cout << "Voxel: " << counter << endl; 
+    AssociatedFeatureList tmp = Raw_Region[counter];
+    out2 << tmp.GetDCMCoordinate() << "   ";       
+    out2 << tmp.GetSI() << "   " << tmp.GetCV() << endl;
+}
+
 	    cross[1] = cross[1]/mag;
 	    cross[2] = cross[2]/mag;
 	    R[0][0] = 1 + (1-cos(angle))*(cross[0]*cross[0]-1);
@@ -187,9 +265,9 @@ namespace ctc
 	    S[2][1] = H(2,1);
 	    S[2][2] = H(2,2);
 	    RS = R*S;
-
+*/
 	    // extract submatrix
-	    vnl_matrix<double> Hs(2,2);
+/*	    vnl_matrix<double> Hs(2,2);
 	    Hs[0][0] = RS[1][1];
 	    Hs[0][1] = RS[1][2];
 	    Hs[1][0] = RS[2][1];
@@ -199,11 +277,40 @@ namespace ctc
 	    vnl_real_eigensystem ev2d(Hs);
 	    
 	    // compute the principle curvatures
-	    float kappa1 = -ev2d.D[0].real()/gmag;
+	     ofstream out3("datasetDCMSICV.txt");float kappa1 = -ev2d.D[0].real()/gmag;
 	    float kappa2 = -ev2d.D[1].real()/gmag;
 
-	    f[3] = kappa1;
-	    f[4] = kappa2;
+	    // f[3] = kappa1;
+	    // f[4] = kappa2;
+*/
+
+     K1 = H1 + sqrt(H1*H1-K);
+     K2 = H1 - sqrt(H1*H1-K);  
+
+     SI = 0.5 - 0.31831*atan((K1+K2)/(K1-K2));
+     CV = sqrt(K1*K1/2 + K2*K2/2);
+
+     f[3] = SI;
+     f[4] = CV; 
+     f[5] = gmag;
+     f[6] = idx[0];
+     f[7] = idx[1];
+     f[8] = idx[2];     
+
+     //FeaturesList->SetDCMCoordinate(dcmCoordinate);
+     //FeaturesList->SetSI(f[3]);
+     //FeaturesList->SetCV(f[4]);
+
+     out3 << f[0] << std::endl;
+     out3 << f[1] << std::endl;
+     out3 << f[2] << std::endl;
+     out3 << f[3] << std::endl;
+     out3 << f[4] << std::endl;
+     out3 << f[5] << std::endl;
+     out3 << idx[0] << std::endl;
+     out3 << idx[1] << std::endl;
+     out3 << idx[2] << std::endl;
+
 
 // 	    if(oneshot)
 // 	      {
@@ -239,6 +346,7 @@ namespace ctc
 // 	  break;
       }
     std::clog << "Number of samples: " << m_FeatureVector->Size() << std::endl;
+    out3.close();
 
   }
 

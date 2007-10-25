@@ -321,6 +321,34 @@ begincalculation:
             ++it;      
         }
 
+
+        GrowableRegionType::iterator iter; 
+
+        for(i = 0; i < growableregion_vector.size(); i++)     
+        {
+             
+             iter = growableregion_vector[i].begin();
+             for (; iter != growableregion_vector[i].end(); ++iter)
+             {
+                   BinaryImageType::IndexType pointindex = iter->GetVoxelIndex();
+                 
+                   if( pointindex[0] >= 512 || pointindex[1] >= 512 || pointindex[2] >= 462 )
+                   {                      
+                           if( pointindex[0] >= 512 )
+                               pointindex[0] = (int) (pointindex[0]/10);
+                           if( pointindex[1] >= 512 )
+                               pointindex[1] = (int) (pointindex[1]/10);
+                           if( pointindex[2] >= 462 )
+                               pointindex[2] = (int) (pointindex[2]/10);
+                           iter->SetVoxelIndex(pointindex);                           
+                   }
+             }
+             
+        } 
+
+
+
+
            /* Step 3: Merging different detections on the same polyp candidate */
 
         cout << "Merging multiple detections on the same polyp candidate ......" << endl;      
@@ -367,7 +395,7 @@ merging:   for(m = 0; m < tmp.size(); m++)
 
 finishmerging:       
      
-         GrowableRegionType::iterator iter; 
+        
 
            // Output contents in growableregion_vector into a txt file for debugging 
    /*     ofstream out("GrowableRegion.txt");
