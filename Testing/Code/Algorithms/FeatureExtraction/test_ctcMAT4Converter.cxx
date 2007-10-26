@@ -92,7 +92,7 @@ int main( int argc, char* argv[] )
     FeatureExtractionFilterType::RegionCollectorType PolypRegionCollector = FEfilter->GetRegionCollector();
 
     /* Generate a MAT4 file according to feature vectors */
-    MAT4FeatureVector(PolypRegionCollector);    
+  //  MAT4FeatureVector(PolypRegionCollector);    
 
     out.close();
         
