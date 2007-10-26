@@ -10,6 +10,7 @@ Language:  C++
 #include "itkObject.h"
 #include "ctcCTCImage.h"
 #include "itkListSample.h"
+#include "ctcFeatureExtraction.h"
 
 namespace ctc
 {
@@ -31,6 +32,7 @@ namespace ctc
     typedef BinaryImageType                           InputImageType;
     typedef itk::Vector< float, 9>                    FeatureType;
     typedef itk::Statistics::ListSample<FeatureType>  FeatureSampleType;
+    typedef std::vector<AssociatedFeatureList>        GrowableRegionType;
         
     // standard ITK macros
     itkNewMacro(Self);
@@ -45,6 +47,8 @@ namespace ctc
     void Compute( void );
 
     FeatureSampleType::Pointer GetOutput( void );
+    GrowableRegionType GetSeedRegion() const
+                       { return Seed_Region; }
 
   protected:
 
@@ -56,10 +60,10 @@ namespace ctc
 
     PrincipleCurvatureExtraction(Self&);            // intentionally not implemented
     void operator=(const Self&);                    // intentionally not implemented
-
     const CTCImageType *       m_Image;
     const BinaryImageType *    m_ColonImage;
     FeatureSampleType::Pointer m_FeatureVector;
+    GrowableRegionType         Seed_Region;
   };
 
 

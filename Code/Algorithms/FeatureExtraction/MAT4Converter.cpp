@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <string>
 #include "MAT4Converter.h"
 
 using namespace std;
@@ -17,14 +18,14 @@ typedef struct {
 /* File Converter Function */
 /* RegionCollectorType input --- Vector of Vector */
 
-void MAT4FeatureVector(RegionCollectorType input)
+void MAT4FeatureVector(RegionCollectorType input, char* filename)
 {
  
     MAT4HEADER matFileHeader;
-    char *pname = "FeatureVector";
+    char *pname = "FeatureVectorVoxels";
 
     FILE *matFile; 
-	   matFile = fopen("FeatureVector.mat", "wb");
+	   matFile = fopen(filename, "wb");
 
     if (matFile == 0)
     {
@@ -95,16 +96,77 @@ void MAT4FeatureVector(RegionCollectorType input)
     matFileHeader.rows = num_points;
     matFileHeader.cols = 9;
     matFileHeader.imag = 0;
-    matFileHeader.namelen = 14;
+    matFileHeader.namelen = 20;
     
     fwrite( &matFileHeader, sizeof(MAT4HEADER), 1, matFile ); // write the header
     fwrite( pname, sizeof(char), matFileHeader.namelen, matFile ); // write out name of variable
     fwrite( FeatureVectorArray, sizeof(double), matFileHeader.rows*matFileHeader.cols, matFile );
        
     fclose(matFile);
-    printf("MAT4 File is generated as FeatureVector.mat!\n"); 
+    printf("MAT4 File for extracted voxels is generated!\n"); 
 
 }
 
 
+void MAT4FeatureVectorPolyps(float input[][18], int num_regions, char* filename)
+{
+ 
+    MAT4HEADER matFileHeader;
+    char *pname = "FeatureVectorPolyps";
 
+    FILE *matFile; 
+	   matFile = fopen(filename, "wb");
+
+    if (matFile == 0)
+    {
+         std::cerr << "couldn't open file" << "\n;";
+         exit(0);
+    }
+    
+    int i = 0;
+
+ 
+    double FeatureVectorArray[18*num_regions];
+
+    /* Push each feature vector value to an array 
+     *
+     * E.X FeatureVectorArray[POINTS*FEATURES] = {1,4,7,10,2,5,8,11,3,6,9,12};
+     * 
+     * Actually the above array is acquired from following feature vectors
+     *      
+     * V1 (1,2,3)
+     * V2 (4,5,6)
+     * V3 (7,8,9)
+     * V4 (10,11,12)
+     *
+     * The generated 2D matrix in .mat file is like this:
+     * x = [1 2 3
+     *      4 5 6
+     *      7 8 9
+     *      10 11 12]
+     * */
+
+     for (int m = 0; m < num_regions; m++)
+     {
+          for (int j = 0; j < 18; j++)
+          {
+                FeatureVectorArray[m+num_regions*j] = input[m][j];
+          }
+     }
+
+
+    /* Define header parameters */
+    matFileHeader.type = 0000;
+    matFileHeader.rows = num_regions;
+    matFileHeader.cols = 18;
+    matFileHeader.imag = 0;
+    matFileHeader.namelen = 20;
+    
+    fwrite( &matFileHeader, sizeof(MAT4HEADER), 1, matFile ); // write the header
+    fwrite( pname, sizeof(char), matFileHeader.namelen, matFile ); // write out name of variable
+    fwrite( FeatureVectorArray, sizeof(double), matFileHeader.rows*matFileHeader.cols, matFile );
+       
+    fclose(matFile);
+    printf("MAT4 File for candidate polyps is generated!\n"); 
+
+}

@@ -151,7 +151,10 @@ namespace ctc
     void Analyze( void );
 
     void SetOutputVTK(string name)
-                          { UserNamedOutputVTK = name; }
+                          { UserNamedOutput = name; }
+
+    void SetSeedRegion( GrowableRegionType InputSeedRegion )
+                          { Seed_Region = InputSeedRegion; }
  
   protected:
 
@@ -169,7 +172,7 @@ namespace ctc
     GrowableRegionType   Growable_Region;
     RegionCollectorType  RegionCollector;
     dcmVectorType        PolypCenterCollector;
-    string               UserNamedOutputVTK;
+    string               UserNamedOutput;
     
   };
  

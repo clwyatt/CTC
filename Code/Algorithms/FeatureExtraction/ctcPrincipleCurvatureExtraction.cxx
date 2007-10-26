@@ -82,6 +82,7 @@ namespace ctc
     HessianPixelType H;
     float v1[3];
     float f1[6];
+    int seedpoint = 0;
 
     std::ofstream out3("datasetDCMSICV.txt");
 
@@ -105,6 +106,7 @@ namespace ctc
     SystemType3D::MatrixType R;
     SystemType3D::MatrixType S;
     SystemType3D::MatrixType RS;
+    AssociatedFeatureList afl;
 
     FaceCalculatorType faceCalculator;
     FaceCalculatorType::FaceListType faceList;
@@ -130,16 +132,16 @@ namespace ctc
 	    if(count == 0) // not on a boundary
 	      continue;
 	   
-	    if( (m_FeatureVector->Size() % 10000) == 0 && (m_FeatureVector->Size() > 0)){
-		std::clog << m_FeatureVector->Size() << std::endl;
-		std::clog << m_FeatureVector->GetMeasurementVector(m_FeatureVector->Size()-1) << std::endl;
+	    if( (m_FeatureVector->Size() % 20000) == 0 && (m_FeatureVector->Size() > 0)){
+      		 std::clog << m_FeatureVector->Size() << std::endl;
+		       std::clog << m_FeatureVector->GetMeasurementVector(m_FeatureVector->Size()-1) << std::endl;
 	    }
  
 	    idx = bit.GetIndex();
 	    m_ColonImage->TransformIndexToPhysicalPoint(idx, dcmCoordinate);
 	    f[0] = dcmCoordinate[0];
 	    f[1] = dcmCoordinate[1];
-	    f[2] = dcmCoordinate[2];
+	    f[2] = dcmCoordinate[2];     
 
 	    // crop the region
 	    start[0] = idx[0]-4;
@@ -297,10 +299,17 @@ for(int counter=0;counter < Raw_Region.size(); counter++)
      f[7] = idx[1];
      f[8] = idx[2];     
 
-     //FeaturesList->SetDCMCoordinate(dcmCoordinate);
-     //FeaturesList->SetSI(f[3]);
-     //FeaturesList->SetCV(f[4]);
-
+/*     if (f[3] < 1 && f[3] > 0.9 && f[4] < 0.2 && f[4] > 0.08)
+     {
+          afl.SetDCMCoordinate(dcmCoordinate);   
+          afl.SetSI(SI);
+          afl.SetCV(CV);
+          afl.SetGmag(gmag);
+          afl.SetVoxelIndex(idx);
+          Seed_Region.push_back(afl);
+          seedpoint++;
+     }
+*/
      out3 << f[0] << std::endl;
      out3 << f[1] << std::endl;
      out3 << f[2] << std::endl;
@@ -310,7 +319,6 @@ for(int counter=0;counter < Raw_Region.size(); counter++)
      out3 << idx[0] << std::endl;
      out3 << idx[1] << std::endl;
      out3 << idx[2] << std::endl;
-
 
 // 	    if(oneshot)
 // 	      {
@@ -345,7 +353,9 @@ for(int counter=0;counter < Raw_Region.size(); counter++)
 // 	if(m_FeatureVector->Size() > 200)
 // 	  break;
       }
-    std::clog << "Number of samples: " << m_FeatureVector->Size() << std::endl;
+ //   std::clog << "Number of voxels on the colon wall: " << m_FeatureVector->Size() << std::endl;
+ //   std::cout << "Number of seeds: " << seedpoint << std::endl;
+
     out3.close();
 
   }

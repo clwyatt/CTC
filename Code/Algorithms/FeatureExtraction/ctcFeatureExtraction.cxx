@@ -16,10 +16,12 @@ Language:  C++
 #include <vector>
 #include <iterator>
 #include <fstream>
+#include <string>
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "MAT4Converter.h" 
 #include "StringtoDouble.h"
+
 
 namespace ctc
 {
@@ -44,8 +46,8 @@ namespace ctc
         /* Stacked vector --- Manipulating all the regions in dataset */
         RegionCollectorType growableregion_vector;
 
-
-    /*     for(i = 0; i < m_FeatureVector->Size(); i++)
+/*
+        for(i = 0; i < m_FeatureVector->Size(); i++)
         {
               fp = m_FeatureVector->GetMeasurementVector(i);
 
@@ -58,6 +60,11 @@ namespace ctc
               afl.SetDCMCoordinate(pdcm);
               afl.SetSI(fp[3]);
               afl.SetCV(fp[4]);
+              afl.SetGmag(fp[5]);
+              pindex[0] = (int) fp[6];
+              pindex[1] = (int) fp[7];
+              pindex[2] = (int) fp[8];
+              afl.SetVoxelIndex(pindex);
 
               // Step 1: Selection of "Seed Region" by threshold values 
               if (fp[3] < 1 && fp[3] > 0.9 && fp[4] < 0.2 && fp[4] > 0.08)
@@ -66,16 +73,17 @@ namespace ctc
               }
  
               Raw_Region.push_back(afl); 
-        }*/
+        }
 
-
+*/
            /* Step 1 Read the SI,CV & coordinate data from dataset */
 
-        cout << "Polyp seed region generating ......" << endl;
+        cout << "\nPolyp seed region generating ......" << endl;
 
         ifstream filereader( "datasetDCMSICV.txt" );
         int num_parameters = 0;
         int num_v = 1;
+        int num_seeds = 0;
 
         while (! filereader.eof() )
         {
@@ -87,9 +95,9 @@ namespace ctc
 
              char buf[dumper.size()];
 
-             for(int i = 0; i < dumper.size(); i++)
+             for(int ii = 0; ii < dumper.size(); ii++)
              {
-                  buf[i] = dumper[i];
+                  buf[ii] = dumper[ii];
              }
 
              double tmp =  string2double(buf);
@@ -137,11 +145,15 @@ namespace ctc
                   if (afl.GetSI() < 1 && afl.GetSI() > 0.9 && afl.GetCV() < 0.2 && afl.GetCV() > 0.08)
                   {
                        Seed_Region.push_back(afl); 
+                       num_seeds++;
                   }
              }           
           
         }   
         filereader.close();
+
+        if ( remove("datasetDCMSICV.txt") != 0)
+            cout << "Could not remove file" << endl;
 
            /* Step 2: Setup Growable Region by threshold values */   
 
@@ -322,34 +334,22 @@ begincalculation:
         }
 
 
-        GrowableRegionType::iterator iter; 
-
-        for(i = 0; i < growableregion_vector.size(); i++)     
-        {
-             
-             iter = growableregion_vector[i].begin();
-             for (; iter != growableregion_vector[i].end(); ++iter)
-             {
-                   BinaryImageType::IndexType pointindex = iter->GetVoxelIndex();
-                 
-                   if( pointindex[0] >= 512 || pointindex[1] >= 512 || pointindex[2] >= 462 )
-                   {                      
-                           if( pointindex[0] >= 512 )
-                               pointindex[0] = (int) (pointindex[0]/10);
-                           if( pointindex[1] >= 512 )
-                               pointindex[1] = (int) (pointindex[1]/10);
-                           if( pointindex[2] >= 462 )
-                               pointindex[2] = (int) (pointindex[2]/10);
-                           iter->SetVoxelIndex(pointindex);                           
-                   }
-             }
-             
-        } 
+       GrowableRegionType::iterator iter; 
+       /* Re-acquire voxel index data */ 
+       for(i = 0; i < growableregion_vector.size(); i++)
+       {
+            iter = growableregion_vector[i].begin();
+            for (; iter != growableregion_vector[i].end(); ++iter)
+            { 
+                   BinaryImageType::IndexType voxel_index;
+                   m_ColonImage->TransformPhysicalPointToIndex(iter->GetDCMCoordinate(), voxel_index);  
+                   iter->SetVoxelIndex(voxel_index);
+            }
+       }
 
 
 
-
-           /* Step 3: Merging different detections on the same polyp candidate */
+        /* Step 3: Merging different detections on the same polyp candidate */
 
         cout << "Merging multiple detections on the same polyp candidate ......" << endl;      
         int merger = -1;
@@ -395,10 +395,10 @@ merging:   for(m = 0; m < tmp.size(); m++)
 
 finishmerging:       
      
-        
+    /*    
 
            // Output contents in growableregion_vector into a txt file for debugging 
-   /*     ofstream out("GrowableRegion.txt");
+        ofstream out("GrowableRegion.txt");
         int counter = 1;
 
         for(i = 0; i < growableregion_vector.size(); i++)     
@@ -425,7 +425,7 @@ finishmerging:
         } 
         out.close();*/
 
-             // Write the data into growableregion_vector for debugging  
+       // Write the data into growableregion_vector for debugging  
        /* ifstream filereader2( "GrowableRegion.txt" );
         num_parameters = 0;
         GrowableRegionType miner;
@@ -549,8 +549,8 @@ finishmerging:
             if(trick > 1)
               break;
          
-            cout << "J2: " << J2 << endl;
-            cout << "J1: " << J1 << endl;
+            //cout << "J2: " << J2 << endl;
+            //cout << "J1: " << J1 << endl;
             J1 = J2;
             J2 = 0;
 
@@ -627,7 +627,7 @@ finishmerging:
                              dcmCoordinate nd = iter_tracker->GetDCMCoordinate();
                              if( sqrt((nd[0]-ad[0])*(nd[0]-ad[0]) + (nd[1]-ad[1])*(nd[1]-ad[1]) + (nd[2]-ad[2])*(nd[2]-ad[2])) < min_distance )
                              {
-                                   cout << "Yes " << endl;
+                                   // cout << "Yes " << endl;
                                    clustermatrix[j].SetnSI( iter_tracker->GetnSI() );
                                    clustermatrix[j].SetnCV( iter_tracker->GetnSI() );
                                    min_distance = sqrt((nd[0]-ad[0])*(nd[0]-ad[0]) + (nd[1]-ad[1])*(nd[1]-ad[1]) + (nd[2]-ad[2])*(nd[2]-ad[2]));
@@ -685,9 +685,9 @@ finishmerging:
        
        } // end of WHILE
 
-       cout << "Final M is " << m << endl;       
-       cout << "J2: " << J2 << endl;
-       cout << "J1: " << J1 << endl;
+       //cout << "Final M is " << m << endl;       
+       //cout << "J2: " << J2 << endl;
+       //cout << "J1: " << J1 << endl;
 
    
            /* Step 5: Remove the cluster with volume less than 35mm^3 */
@@ -718,12 +718,16 @@ finishmerging:
              }
        } 
 
+       cout << "Number of candidate polyps is " << growableregion_vector.size() << endl;
+       GrowableRegionType::iterator iter3;
 
+       /*
        GrowableRegionType::iterator iter3;
        ofstream out2 ( "FinalExtraction.txt" );
        int k_voxel= 0;
 
-       cout << "Size of growableregion_vector is " << growableregion_vector.size() << endl;
+       //cout << "Size of growableregion_vector is " << growableregion_vector.size() << endl;
+       
        for(int counter1=0; counter1 < growableregion_vector.size(); counter1++)     
        {
              iter3 = growableregion_vector[counter1].begin();
@@ -740,12 +744,10 @@ finishmerging:
        } 
        out2.close();
        cout << "Total number of voxels extracted: " << k_voxel << endl; 
-
-
-             
+       */
           
-       ofstream outfile("FinalPolypStatistics.txt");
-       outfile << "****** Final polyp candidates feature value statistics ******\n\n";
+    //   ofstream outfile("FinalPolypStatistics.txt");
+    //   outfile << "****** Final polyp candidates feature value statistics ******\n\n";
 
        dcmCoordinate center_polyp;
        dcmCoordinate iter_point;
@@ -770,6 +772,9 @@ finishmerging:
        double contrast_CV = 0;
       
        num_regions = growableregion_vector.size();
+       float polypsdata[num_regions][18];
+       m = 0;
+
        for(i = 0; i < num_regions; i++)
        {   
              iter = growableregion_vector[i].begin();
@@ -857,7 +862,26 @@ finishmerging:
              contrast_SI = min_SI/max_SI;
              contrast_CV = min_CV/max_CV;
 
-             outfile << "Polyp candidate " << (i+1) << " " << center << " --- " << endl; 
+             polypsdata[m][0]  = (i+1);
+             polypsdata[m][1]  = center_polyp[0];
+             polypsdata[m][2]  = center_polyp[1];
+             polypsdata[m][3]  = center_polyp[2];
+             polypsdata[m][4]  = mean_SI;
+             polypsdata[m][5]  = max_SI;
+             polypsdata[m][6]  = min_SI;
+             polypsdata[m][7]  = var_SI;
+             polypsdata[m][8]  = skew_SI;
+             polypsdata[m][9]  = kurt_SI;
+             polypsdata[m][10] = contrast_SI;
+             polypsdata[m][11] = mean_CV;
+             polypsdata[m][12] = max_CV;
+             polypsdata[m][13] = min_CV;
+             polypsdata[m][14] = var_CV;
+             polypsdata[m][15] = skew_CV;
+             polypsdata[m][16] = kurt_CV;
+             polypsdata[m][17] = contrast_CV;            
+/*
+             outfile << "Polyp candidate " << (i+1) << " " << center_polyp << " --- " << endl; 
              outfile << "   Mean of shape index: " << mean_SI << endl;
              outfile << "   Max of shape index: " << max_SI << endl;
              outfile << "   Min of shape index: " << min_SI << endl;
@@ -872,17 +896,42 @@ finishmerging:
              outfile << "   Skew of curvedness: " << skew_CV << endl;
              outfile << "   Kurt of curvedness: " << kurt_CV << endl;
              outfile << "   Contrast of curvedness: " << contrast_CV << endl << endl << endl;
+*/
+             m++;
        }
 
-       outfile.close();
-       MAT4FeatureVector(growableregion_vector);
+//       outfile.close();
 
+       string mat4voxels = "";
+       mat4voxels.append(UserNamedOutput);
+       mat4voxels.append("_extractedvoxels.mat");             
+       char buf_name1[mat4voxels.size()];
+       for(int iii = 0; iii < mat4voxels.size(); iii++)
+       {
+                  buf_name1[iii] = mat4voxels[iii];
+       }
+       MAT4FeatureVector(growableregion_vector, buf_name1);
+
+
+       string mat4polyps = "";
+       mat4polyps.append(UserNamedOutput);
+       mat4polyps.append("_extractedpolyps.mat");
+       char buf_name2[mat4polyps.size()];
+       for(int iii = 0; iii < mat4polyps.size(); iii++)
+       {
+                  buf_name2[iii] = mat4polyps[iii];
+       }
+       MAT4FeatureVectorPolyps(polypsdata, num_regions, buf_name2);
 
        /* Write new polyp candidates scheme to the output VTK file */
 
        typedef itk::ImageFileWriter< BinaryImageType > SegDataWriterType; 
        SegDataWriterType::Pointer segwriter = SegDataWriterType::New();
-       segwriter->SetFileName(UserNamedOutputVTK);
+
+       string vtkoutput = "";
+       vtkoutput.append(UserNamedOutput);
+       vtkoutput.append("_output.vtk");
+       segwriter->SetFileName(vtkoutput);
      
        typedef itk::ImageRegionIterator< BinaryImageType>  IteratorType;
 
@@ -941,13 +990,9 @@ finishmerging:
                  outvtk.Set(0);      
        }
 
+       cout << vtkoutput << " is generated!\n" << endl; 
 
-
-}
-
-       
-       
-
+   }
        
 }
 
