@@ -151,10 +151,10 @@ namespace ctc
           
         }   
         filereader.close();
-
+/*
         if ( remove("datasetDCMSICV.txt") != 0)
             cout << "Could not remove file" << endl;
-
+*/
            /* Step 2: Setup Growable Region by threshold values */   
 
         typedef itk::ConstNeighborhoodIterator< BinaryImageType >   BinaryIteratorType;
@@ -990,6 +990,8 @@ finishmerging:
                  outvtk.Set(0);      
        }
 
+       segwriter->SetInput(output);
+       segwriter->Update();
        cout << vtkoutput << " is generated!\n" << endl; 
 
    }
