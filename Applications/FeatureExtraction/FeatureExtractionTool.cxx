@@ -20,6 +20,8 @@ using std::ofstream;
 using std::string;
 #include <cctype>
 
+using namespace std;
+
 // ITK includes
 
 // CTC includes
@@ -139,6 +141,8 @@ int main( int argc, char* argv[] )
   filter->SetBinaryInput(segreader->GetOutput());
   filter->SetImageInput(reader->GetOutput());
   std::clog << "Computing Features ...";
+  cout << endl;
+
   try
     {
       filter->Compute();
