@@ -395,7 +395,7 @@ merging:   for(m = 0; m < tmp.size(); m++)
 
 finishmerging:       
      
-    /*    
+        
 
            // Output contents in growableregion_vector into a txt file for debugging 
         ofstream out("GrowableRegion.txt");
@@ -423,7 +423,7 @@ finishmerging:
              counter++;
              out << "******" << endl;
         } 
-        out.close();*/
+        out.close();
 
        // Write the data into growableregion_vector for debugging  
        /* ifstream filereader2( "GrowableRegion.txt" );
@@ -721,8 +721,8 @@ finishmerging:
        cout << "Number of candidate polyps is " << growableregion_vector.size() << endl;
        GrowableRegionType::iterator iter3;
 
-       /*
-       GrowableRegionType::iterator iter3;
+       
+     //  GrowableRegionType::iterator iter3;
        ofstream out2 ( "FinalExtraction.txt" );
        int k_voxel= 0;
 
@@ -744,7 +744,7 @@ finishmerging:
        } 
        out2.close();
        cout << "Total number of voxels extracted: " << k_voxel << endl; 
-       */
+       
           
     //   ofstream outfile("FinalPolypStatistics.txt");
     //   outfile << "****** Final polyp candidates feature value statistics ******\n\n";
@@ -902,26 +902,31 @@ finishmerging:
 
 //       outfile.close();
 
-       string mat4voxels = "";
-       mat4voxels.append(UserNamedOutput);
-       mat4voxels.append("_extractedvoxels.mat");             
-       char buf_name1[mat4voxels.size()];
-       for(int iii = 0; iii < mat4voxels.size(); iii++)
+       if( growableregion_vector.size() != 0 )
        {
-                  buf_name1[iii] = mat4voxels[iii];
+            string mat4voxels = "";
+            mat4voxels.append(UserNamedOutput);
+            mat4voxels.append("ExtractedVoxels.mat");             
+            char buf_name1[mat4voxels.size()];
+            for(int iii = 0; iii < mat4voxels.size(); iii++)
+            {
+                 buf_name1[iii] = mat4voxels[iii];
+            }
+            MAT4FeatureVector(growableregion_vector, buf_name1);
+            //MAT4FeatureVector(growableregion_vector, "forced.mat");
+
+            string mat4polyps = "";
+            mat4polyps.append(UserNamedOutput);
+            mat4polyps.append("ExtractedPolyps.mat");
+            char buf_name2[mat4polyps.size()];
+            for(int iii = 0; iii < mat4polyps.size(); iii++)
+            {
+                 buf_name2[iii] = mat4polyps[iii];
+            }
+            MAT4FeatureVectorPolyps(polypsdata, num_regions, buf_name2); 
        }
-       MAT4FeatureVector(growableregion_vector, buf_name1);
 
 
-       string mat4polyps = "";
-       mat4polyps.append(UserNamedOutput);
-       mat4polyps.append("_extractedpolyps.mat");
-       char buf_name2[mat4polyps.size()];
-       for(int iii = 0; iii < mat4polyps.size(); iii++)
-       {
-                  buf_name2[iii] = mat4polyps[iii];
-       }
-       MAT4FeatureVectorPolyps(polypsdata, num_regions, buf_name2);
 
        /* Write new polyp candidates scheme to the output VTK file */
 

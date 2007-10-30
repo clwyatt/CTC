@@ -132,9 +132,9 @@ namespace ctc
 	    if(count == 0) // not on a boundary
 	      continue;
 	   
-	    if( (m_FeatureVector->Size() % 20000) == 0 && (m_FeatureVector->Size() > 0)){
+	    if( (m_FeatureVector->Size() % 10000) == 0 && (m_FeatureVector->Size() > 0)){
       		 std::clog << m_FeatureVector->Size() << std::endl;
-		       std::clog << m_FeatureVector->GetMeasurementVector(m_FeatureVector->Size()-1) << std::endl;
+//		     std::clog << m_FeatureVector->GetMeasurementVector(m_FeatureVector->Size()-1) << std::endl;
 	    }
  
 	    idx = bit.GetIndex();
@@ -277,7 +277,7 @@ for(int counter=0;counter < Raw_Region.size(); counter++)
 	    
  	    // compute the eienvalues of submatrix
 	    vnl_real_eigensystem ev2d(Hs);
-	    
+	    /gpfs0/santagoGrp/data/WFU_prior_CTC_data/CTC-0018/104_110637
 	    // compute the principle curvatures
 	     ofstream out3("datasetDCMSICV.txt");float kappa1 = -ev2d.D[0].real()/gmag;
 	    float kappa2 = -ev2d.D[1].real()/gmag;
