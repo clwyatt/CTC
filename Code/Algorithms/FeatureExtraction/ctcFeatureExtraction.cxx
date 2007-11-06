@@ -422,8 +422,8 @@ begincalculation:
        
        GrowableRegionType::iterator iter; 
        /* Re-acquire voxel index data */ 
-       for(i = 0; i < growableregion_vector.size(); i++)
-       /*{
+       /*for(i = 0; i < growableregion_vector.size(); i++)
+       {
             iter = growableregion_vector[i].begin();
             for (; iter != growableregion_vector[i].end(); ++iter)
             { 
