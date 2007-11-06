@@ -77,7 +77,7 @@ namespace ctc
 
 */
            /* Step 1 Read the SI,CV & coordinate data from dataset */
-
+/*
         cout << "\nPolyp seed region generating ......" << endl;
 
         ifstream filereader( "datasetDCMSICV.txt" );
@@ -150,7 +150,7 @@ namespace ctc
              }           
           
         }   
-        filereader.close();
+        filereader.close();*/
 /*
         if ( remove("datasetDCMSICV.txt") != 0)
             cout << "Could not remove file" << endl;
@@ -345,7 +345,8 @@ begincalculation:
                    m_ColonImage->TransformPhysicalPointToIndex(iter->GetDCMCoordinate(), voxel_index);  
                    iter->SetVoxelIndex(voxel_index);
             }
-       }
+       }/raid/home/yuan/fltk_Binary
+
 
 
 
