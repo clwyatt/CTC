@@ -142,10 +142,11 @@ namespace ctc
                   afl.SetVoxelIndex(pindex);
                   Raw_Region.push_back(afl);
                   num_v++; 
-                  if (afl.GetSI() < 1 && afl.GetSI() > 0.9 && afl.GetCV() < 0.2 && afl.GetCV() > 0.08)
+                  if (afl.GetSI() < 1 && afl.GetSI() > 0.8 && afl.GetCV() < 0.25 && afl.GetCV() > 0.05)
                   {
                        Seed_Region.push_back(afl); 
                        num_seeds++;
+                       cout << "Seed # " << num_seeds;
                   }
              }           
           
@@ -171,16 +172,16 @@ namespace ctc
         faceList = faceCalculator(m_ColonImage, m_ColonImage->GetRequestedRegion(),cropradius);    
         BinaryIteratorType it(radius, m_ColonImage, *(faceList.begin()));
         
-        std::vector<NeighborhoodIteratorType::OffsetType> offsets(125);
+        std::vector<NeighborhoodIteratorType::OffsetType> offsets(27);
         i = 0;
-        //cout << "Creating 125-element-cube" << endl;     
-        while(i < 125)  
+       
+        while(i < 27)  
         { 
-             for(int a = -2; a < 3; a++)
+             for(int a = -1; a < 2; a++)
              {
-                  for(int b = -2; b < 3; b++)
+                  for(int b = -1; b < 2; b++)
                   {
-                        for(int c = -2; c < 3; c++)
+                        for(int c = -1; c < 2; c++)
                         {
                               NeighborhoodIteratorType::OffsetType generatedoffset = {{a,b,c}};
                               offsets[i] = generatedoffset;
@@ -229,10 +230,16 @@ namespace ctc
   
         cout << "Entering growableregion formation ......" << endl;    
 
-        it.GoToBegin();       
-        while( !it.IsAtEnd() )
+        //it.GoToBegin();       
+        //while( !it.IsAtEnd() )
+        
+        //std::ofstream out3("Anypoint.txt");
+        //std::ofstream out4("Seedpoint.txt");
+        int voxel_tracker = 0;
+        for(it.GoToBegin(); !it.IsAtEnd(); ++it)
         {
-            idx = it.GetIndex();
+            if(it.GetPixel(center) == 0)
+            {        
             int count = 0;
 
 	           if(it.GetPixel(right) == 255) count += 1;
@@ -241,50 +248,44 @@ namespace ctc
 	           if(it.GetPixel(top) == 255) count += 1;
 	           if(it.GetPixel(front) == 255) count += 1;
 	           if(it.GetPixel(back) == 255) count += 1;
+
 	           if(count == 0) // not on a boundary
             {
-                  ++it;
+                  //++it;
                   continue;
             }
 
+            voxel_tracker++;
+            if((voxel_tracker % 10000) == 0)
+                cout << voxel_tracker << " voxels checked" << endl;
+
+            idx = it.GetIndex();
+
+
+            /*
             m_ColonImage->TransformIndexToPhysicalPoint(idx,pdcm);
             AssociatedFeatureList fl;
             dcmCoordinate tracker;
 
             fl = Seed_Region[SeedRegionTracker];
             tracker = fl.GetDCMCoordinate();
+            BinaryImageType::IndexType idx_d = fl.GetVoxelIndex();
 
-            if ( abs(pdcm[0]-tracker[0]) <= 0.01 && abs(pdcm[1]-tracker[1]) <= 0.01 && abs(pdcm[2]-tracker[2]) <= 0.01 )
+            if ( abs(pdcm[0]-tracker[0]) <= 0.001 && abs(pdcm[1]-tracker[1]) <= 0.001 && abs(pdcm[2]-tracker[2]) <= 0.001 )
+              //if( idx[0] == idx_d[0] && idx[1] == idx_d[1] && idx[1] == idx_d[1]  )
             {                     
                   SeedRegionTracker++;
                   goto begincalculation;
-            }
-           
+            }*/
 
-        ++it;
-        continue;
-
-begincalculation: 
-            
-            GrowableRegionType agr;
-            agr.push_back(fl);
-
-            for(i = 0; i < 125; i++)
-            {
-                idx2 = it.GetIndex(offsets[i]);
-                dcmCoordinate neighborpdcm;   
-                if(it.GetPixel(offsets[i]) != 0)
-                     continue;
-
-                m_ColonImage->TransformIndexToPhysicalPoint(idx2,neighborpdcm);
-
-	               start[0] = idx2[0]-4;
-	               start[1] = idx2[1]-4;
-	               start[2] = idx2[2]-4;
-	               end[0] = fullsize[0] - (idx2[0]+4) - 1;
-	               end[1] = fullsize[1] - (idx2[1]+4) - 1;
-	               end[2] = fullsize[2] - (idx2[2]+4) - 1;	    
-	               crop->SetLowerBoundaryCropSize(start);      
+                start[0] = idx[0]-4;
+	               start[1] = idx[1]-4;
+	               start[2] = idx[2]-4;
+	               end[0] = fullsize[0] - (idx[0]+4) - 1;
+	               end[1] = fullsize[1] - (idx[1]+4) - 1;
+	               end[2] = fullsize[2] - (idx[2]+4) - 1;	  
+	          
+                crop->SetLowerBoundaryCropSize(start);      
 	               crop->SetUpperBoundaryCropSize(end);
 	               crop->UpdateLargestPossibleRegion();
                 
@@ -315,29 +316,114 @@ begincalculation:
                 N = (2*g[1]*g[2]*f1[4] - g[1]*g[1]*f1[5] - g[2]*g[2]*f1[3]) / R1;
                 K = (L*N-M*M) / (E*G-F*F);
                 H1 = (E*N-2*F*M+G*L) / (2*(E*G-F*F));
+                K1 = H1 + sqrt(H1*H1-K);
+                K2 = H1 - sqrt(H1*H1-K);  
+                SI = 0.5 - 0.31831*atan((K1+K2)/(K1-K2));
+                CV = sqrt(K1*K1/2 + K2*K2/2);
+
+                //out3 << SI << "   " << CV << endl;
+
+            AssociatedFeatureList fl;
+            if( SI > 0.9 && SI < 1.0 && CV > 0.08 && CV < 0.2 )
+            {
+                 dcmCoordinate seeddcm;
+                 m_ColonImage->TransformIndexToPhysicalPoint(idx,seeddcm);
+                 fl.SetSI(SI);
+                 fl.SetCV(CV);
+                 fl.SetDCMCoordinate(seeddcm);
+                 fl.SetGmag(gmag);
+                 fl.SetVoxelIndex(idx);
+                 //cout << "Get one" << endl;
+                 //cout << seeddcm << "  " << idx << "  " <<  SI << "   " << CV << endl;
+                 goto begincalculation;
+            }
+           
+
+        //++it;
+        continue;
+
+begincalculation: 
+            
+            GrowableRegionType agr;
+            agr.push_back(fl);
+
+            for(i = 0; i < 27; i++)
+            {
+                idx2 = it.GetIndex(offsets[i]);
+                dcmCoordinate neighborpdcm;   
+                if(it.GetPixel(offsets[i]) != 0)
+                     continue;
+            
+                start[0] = idx2[0]-4;
+	               start[1] = idx2[1]-4;
+	               start[2] = idx2[2]-4;
+	               end[0] = fullsize[0] - (idx2[0]+4) - 1;
+	               end[1] = fullsize[1] - (idx2[1]+4) - 1;
+	               end[2] = fullsize[2] - (idx2[2]+4) - 1;	  
+	          
+                crop->SetLowerBoundaryCropSize(start);      
+	               crop->SetUpperBoundaryCropSize(end);
+	               crop->UpdateLargestPossibleRegion();
+                
+          	     // compute the Hessian, scale = 1.0;
+	               hessian->SetInput(crop->GetOutput());
+	               hessian->Update();
+	               H = hessian->GetOutput()->GetPixel(idx2);
+
+                f1[0] = H[0];   //hxx
+                f1[1] = H[1];   //hxy
+                f1[2] = H[2];   //hxz
+                f1[3] = H[3];   //hyy
+                f1[4] = H[4];   //hyz
+                f1[5] = H[5];   //hzz
+
+                gradient->SetInput(crop->GetOutput());
+	               gradient->Update();
+           	    g = gradient->GetOutput()->GetPixel(idx2);
+                gmag = sqrt(g[0]*g[0]+g[1]*g[1]+g[2]*g[2]); 
+
+                E = 1 + (g[0]*g[0])/(g[2]*g[2]);
+                F = (g[0]*g[1])/(g[2]*g[2]);
+                G = 1 + (g[1]*g[1])/(g[2]*g[2]); 
+                hmag = g[0]*g[0] + g[1]*g[1] + g[2]*g[2];
+                R1 = g[2]*g[2]*sqrt(hmag);
+                L = (2*g[0]*g[1]*f1[2] - g[0]*g[0]*f1[5] - g[2]*g[2]*f1[0]) / R1;
+                M = (g[0]*g[2]*f1[4] + g[1]*g[2]*f1[2] - g[0]*g[1]*f1[5] - g[2]*g[2]*f1[1]) / R1;
+                N = (2*g[1]*g[2]*f1[4] - g[1]*g[1]*f1[5] - g[2]*g[2]*f1[3]) / R1;
+                K = (L*N-M*M) / (E*G-F*F);
+                H1 = (E*N-2*F*M+G*L) / (2*(E*G-F*F));
+                K1 = H1 + sqrt(H1*H1-K);
+                K2 = H1 - sqrt(H1*H1-K);  
                 SI = 0.5 - 0.31831*atan((K1+K2)/(K1-K2));
                 CV = sqrt(K1*K1/2 + K2*K2/2);
 
                 if( SI > 0.8 && SI < 1.0 && CV > 0.05 && CV < 0.25 )
                 {
                       AssociatedFeatureList fl_tmp;
+                      m_ColonImage->TransformIndexToPhysicalPoint(idx2,neighborpdcm);
                       fl_tmp.SetDCMCoordinate(neighborpdcm);
                       fl_tmp.SetSI(SI);
                       fl_tmp.SetCV(CV);
                       fl_tmp.SetGmag(gmag);
                       fl_tmp.SetVoxelIndex(idx2);
-                      agr.push_back(fl_tmp); 
+                      agr.push_back(fl_tmp);
+                      //cout << "Get one neighbour" << endl; 
                 }
             }
-            growableregion_vector.push_back(agr);
-            ++it;      
+            growableregion_vector.push_back(agr);             
+            }   
+            //++it;  
         }
 
+       
+      // cout << "SeedRegionTracker is " << SeedRegionTracker << endl;
+       cout << "Size of Region Vector: " << growableregion_vector.size() << endl;
 
+       
        GrowableRegionType::iterator iter; 
        /* Re-acquire voxel index data */ 
        for(i = 0; i < growableregion_vector.size(); i++)
-       {
+       /*{
             iter = growableregion_vector[i].begin();
             for (; iter != growableregion_vector[i].end(); ++iter)
             { 
@@ -345,19 +431,110 @@ begincalculation:
                    m_ColonImage->TransformPhysicalPointToIndex(iter->GetDCMCoordinate(), voxel_index);  
                    iter->SetVoxelIndex(voxel_index);
             }
-       }/raid/home/yuan/fltk_Binary
+       }*/
 
+ 
+
+
+        cout << "Merging multiple detections on the same polyp candidate ......" << endl;      
+        int merger = -1;
+        int mergee = -1;
+        GrowableRegionType tmp;   
+        int bigsize;    
+
+starttomerge:            
+        if(1)
+        {
+
+        RegionCollectorType merging_vector;
+        int merging_bank[growableregion_vector.size()];
+        for(i = 0; i < growableregion_vector.size(); i++)
+            merging_bank[i] = 0;
+
+        int merging_flag = 0;
+        int num_merged = 0;
+
+        cout << "Size is: " << growableregion_vector.size() << endl; 
+        for(i = 0; i < growableregion_vector.size(); i++)
+        {
+              for( j = (i+1); j < growableregion_vector.size(); j++)
+              {
+                    
+                    GrowableRegionType::iterator iter1 = growableregion_vector[i].begin();
+                    GrowableRegionType::iterator iter2 = growableregion_vector[j].begin();
+
+                    for (; iter1 != growableregion_vector[i].end(); ++iter1)
+                    {
+                          iter2 = growableregion_vector[j].begin();
+                          for (; iter2 != growableregion_vector[j].end(); ++iter2)
+                          {
+                              dcmCoordinate c1 = iter1->GetDCMCoordinate(); 
+                              dcmCoordinate c2 = iter2->GetDCMCoordinate();
+                              //float distance = sqrt( (c1[0]-c2[0])*(c1[0]-c2[0]) + (c1[1]-c2[1])*(c1[1]-c2[1]) + (c1[2]-c2[2])*(c1[2]-c2[2]) ); 
+                              float distance2 = (c1[0]-c2[0])*(c1[0]-c2[0]) + (c1[1]-c2[1])*(c1[1]-c2[1]) + (c1[2]-c2[2])*(c1[2]-c2[2]); 
+                              //if( abs(c1[0]-c2[0]) < 7 && abs(c1[1]-c2[1]) < 7 && abs(c1[2]-c2[2]) < 7 )                              
+                              if(distance2 < 100)
+                              {
+                                   //tmp = growableregion_vector[j];
+                                   merging_vector.push_back(growableregion_vector[j]);
+                                   merger = i;
+                                   //mergee = j;
+                                   merging_bank[j] = 1;
+                                   merging_flag = 1;
+                                   goto jnext;
+                                   //goto merging;
+                              }
+                          }                        
+                    }
+jnext:              cout << "";                  
+              }
+              if(merging_flag == 1)
+              {
+                   merging_flag = 0;
+                   goto merging;
+              }
+        }
+        goto finishmerging;
+      
+merging:   for(m = 0; m < merging_vector.size(); m++)
+           {
+                tmp = merging_vector[m];
+                for(n = 0; n < tmp.size(); n++)
+                {
+                     growableregion_vector[merger].push_back(tmp[n]); 
+                }                
+           }
+
+           bigsize = growableregion_vector.size();
+           
+           for(m = 0; m < bigsize; m++)
+           {
+                 if(merging_bank[m] == 1)
+                 {
+                       growableregion_vector.erase(growableregion_vector.begin() + (m-num_merged)); 
+                       merging_bank[m] = 0;
+                       num_merged++;
+                 }
+           } 
+                  
+           goto starttomerge;
+
+finishmerging:
+           cout << "Merging is done!" << endl;
+        }       
 
 
 
         /* Step 3: Merging different detections on the same polyp candidate */
 
-        cout << "Merging multiple detections on the same polyp candidate ......" << endl;      
+    /*    cout << "Merging multiple detections on the same polyp candidate ......" << endl;      
         int merger = -1;
         int mergee = -1;
-        GrowableRegionType tmp;
+        GrowableRegionType tmp;       
 
-starttomerge:             
+starttomerge:            
+
+        cout << "Size is: " << growableregion_vector.size() << endl; 
         for(i = 0; i < growableregion_vector.size(); i++)
         {
               for( j = (i+1); j < growableregion_vector.size(); j++)
@@ -372,8 +549,10 @@ starttomerge:
                           {
                               dcmCoordinate c1 = iter1->GetDCMCoordinate(); 
                               dcmCoordinate c2 = iter2->GetDCMCoordinate();
-                              float distance = sqrt( (c1[0]-c2[0])*(c1[0]-c2[0]) + (c1[1]-c2[1])*(c1[1]-c2[1]) + (c1[2]-c2[2])*(c1[2]-c2[2]) ); 
-                              if(distance < 12.5)
+                              //float distance = sqrt( (c1[0]-c2[0])*(c1[0]-c2[0]) + (c1[1]-c2[1])*(c1[1]-c2[1]) + (c1[2]-c2[2])*(c1[2]-c2[2]) ); 
+                              //float distance2 = (c1[0]-c2[0])*(c1[0]-c2[0]) + (c1[1]-c2[1])*(c1[1]-c2[1]) + (c1[2]-c2[2])*(c1[2]-c2[2]); 
+                              if( abs(c1[0]-c2[0]) < 7 && abs(c1[1]-c2[1]) < 7 && abs(c1[2]-c2[2]) < 7 )                              
+                              //if(distance2 < 100)
                               {
                                    tmp = growableregion_vector[j];
                                    merger = i;
@@ -395,11 +574,13 @@ merging:   for(m = 0; m < tmp.size(); m++)
            goto starttomerge;
 
 finishmerging:       
-     
+*/     
         
 
            // Output contents in growableregion_vector into a txt file for debugging 
-        ofstream out("GrowableRegion.txt");
+        
+        
+        //ofstream out("GrowableRegion.txt");
         int counter = 1;
 
         for(i = 0; i < growableregion_vector.size(); i++)     
@@ -410,21 +591,21 @@ finishmerging:
              {
                    dcmCoordinate pointdcm = iter->GetDCMCoordinate(); 
                    BinaryImageType::IndexType pointindex = iter->GetVoxelIndex();
-                   cout << "Region: " << counter << endl; 
-                   out << pointdcm[0] << endl;
-                   out << pointdcm[1] << endl;
-                   out << pointdcm[2] << endl;
-                   out << iter->GetSI() << endl;
-                   out << iter->GetCV() << endl;
-                   out << iter->GetGmag() << endl;
-                   out << pointindex[0] << endl;
-                   out << pointindex[1] << endl;
-                   out << pointindex[2] << endl;                   
+                   cout << "Region: " << counter << "  " << endl; 
+                   cout << pointdcm[0] << "  ";
+                   cout << pointdcm[1] << "  ";
+                   cout << pointdcm[2] << "  ";
+                   cout << iter->GetSI() << "  ";
+                   cout << iter->GetCV() << "  ";
+                   cout << iter->GetGmag() << "  ";
+                   cout << pointindex[0] << "  ";
+                   cout << pointindex[1] << "  ";
+                   cout << pointindex[2] << endl;                   
              }
              counter++;
-             out << "******" << endl;
+             cout << "******" << endl;
         } 
-        out.close();
+        //out.close();
 
        // Write the data into growableregion_vector for debugging  
        /* ifstream filereader2( "GrowableRegion.txt" );
@@ -544,7 +725,7 @@ finishmerging:
        // We need to decide this value later. 
        float objectivefunctionthreshold = 100;
        
-       while ( 1 )
+       while ( 0 )
        {
             trick++;
             if(trick > 1)
@@ -696,11 +877,14 @@ finishmerging:
             * x = 0.664062023162842mm
             * y = 0.664062023162842mm
             * z = 1mm */
-       double x = 0.6640620231;
-       double y = 0.6640620231;
+       //double x = 0.6640620231;
+       //double y = 0.6640620231;
+       
+       double x = 0.765625;
+       double y = 0.765625; 
        double z = 1;
        double volume = x * y * z;
-       int num_voxels = int (35/volume);
+       int num_voxels = int (6/volume);
        num_regions = growableregion_vector.size();
 
        for(i = 0; i < num_regions; i++)
@@ -724,7 +908,7 @@ finishmerging:
 
        
      //  GrowableRegionType::iterator iter3;
-       ofstream out2 ( "FinalExtraction.txt" );
+     //  ofstream out2 ( "FinalExtraction.txt" );
        int k_voxel= 0;
 
        //cout << "Size of growableregion_vector is " << growableregion_vector.size() << endl;
@@ -732,18 +916,18 @@ finishmerging:
        for(int counter1=0; counter1 < growableregion_vector.size(); counter1++)     
        {
              iter3 = growableregion_vector[counter1].begin();
-             out2 << "Region: " << (counter1+1) << endl;    
+             cout << "Region: " << (counter1+1) << endl;    
              int k_region = 0;      
              for (; iter3 != growableregion_vector[counter1].end(); ++iter3)
              {               
-                   out2 << iter3->GetDCMCoordinate() << " " << iter3->GetVoxelIndex();
-                   out2 << " " << iter3->GetSI() << " " << iter3->GetCV() << " " << iter3->GetGmag() << endl;
+                   cout << iter3->GetDCMCoordinate() << " " << iter3->GetVoxelIndex();
+                   cout << " " << iter3->GetSI() << " " << iter3->GetCV() << endl;
                    k_region++;
                    k_voxel++;
              }
-             out2 << "**********************  " << k_region << "voxels  ************************" << endl;
+             cout << "**********************  " << k_region << "voxels  ************************" << endl;
        } 
-       out2.close();
+    //   out2.close();
        cout << "Total number of voxels extracted: " << k_voxel << endl; 
        
           
@@ -965,12 +1149,12 @@ finishmerging:
 	           {	
 	                 int count_v = 0;
 
-	                 if(input1.GetPixel(right) == 255) count_v += 1;
-	                 if(input1.GetPixel(left) == 255) count_v += 1;
-	                 if(input1.GetPixel(bottom) == 255) count_v += 1;
-	                 if(input1.GetPixel(top) == 255) count_v += 1;
-	                 if(input1.GetPixel(front) == 255) count_v += 1;
-	                 if(input1.GetPixel(back) == 255) count_v += 1;
+	                 if(input1.GetPixel(right) == 1) count_v += 1;
+	                 if(input1.GetPixel(left) == 1) count_v += 1;
+	                 if(input1.GetPixel(bottom) == 1) count_v += 1;
+	                 if(input1.GetPixel(top) == 1) count_v += 1;
+	                 if(input1.GetPixel(front) == 1) count_v += 1;
+	                 if(input1.GetPixel(back) == 1) count_v += 1;
 	                
                   if(count_v != 0) 
 	                 {
