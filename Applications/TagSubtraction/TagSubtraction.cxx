@@ -64,6 +64,20 @@ int main(int argc, char ** argv)
       return EXIT_FAILURE;
     }
 
+  // store the orginal DICOM meta-data from first slice  
+  std::string StudyInstanceUIDTag = "0020|000D";
+  std::string StudyInstanceUIDValue;
+  std::string SeriesInstanceUIDTag = "0020|000E";
+  std::string SeriesInstanceUIDValue;
+  ctc::CTCImageReader::DictionaryRawPointer dict0 = 
+    (*(reader->GetMetaDataDictionaryArray()))[0];
+  itk::ExposeMetaData<std::string>(*dict0, 
+				   StudyInstanceUIDTag, 
+				   StudyInstanceUIDValue);
+  itk::ExposeMetaData<std::string>(*dict0, 
+				   SeriesInstanceUIDTag, 
+				   SeriesInstanceUIDValue);
+
   // segment air + constrast
   clog << "Starting Segment";
   ctc::SegmentColonWithContrastFilter::Pointer filter = 
@@ -100,26 +114,42 @@ int main(int argc, char ** argv)
   WriterType::Pointer writer = WriterType::New(); 
   writer->SetInput( reader->GetOutput() );
 
-  // modify series number
+  // modify series number, use old StudyInstanceUID,
+  // alter old SeriesInstanceUId, and add Series description
   ctc::CTCImageReader::DictionaryArrayRawPointer dictarray = 
     reader->GetMetaDataDictionaryArray();
 
   std::string SeriesNumberTag = "0020|0011";
-  std::string SeriesNumberValue;
+  std::string SeriesNumberValue = "90";
+  std::string SeriesDescriptionTag = "0008|103E";
+  std::string SeriesDescriptionValue = "Derived from SeriesInstance UID " + SeriesInstanceUIDValue;
   for(int slice = 0; 
       slice < dictarray->size(); 
       slice++)
     {
       ctc::CTCImageReader::DictionaryRawPointer dict = 
-	(*(reader->GetMetaDataDictionaryArray()))[slice];
+	(*dictarray)[slice];
 
       itk::ExposeMetaData<std::string>(*dict, 
 					SeriesNumberTag, 
 					SeriesNumberValue);
-      SeriesNumberValue = "90";
+
       itk::EncapsulateMetaData<std::string>(*dict, 
 					    SeriesNumberTag, 
 					    SeriesNumberValue);
+
+      itk::EncapsulateMetaData<std::string>(*dict, 
+					    StudyInstanceUIDTag, 
+					    StudyInstanceUIDValue);
+
+      itk::EncapsulateMetaData<std::string>(*dict, 
+					    SeriesInstanceUIDTag, 
+					    SeriesInstanceUIDValue+"1");
+
+      itk::EncapsulateMetaData<std::string>(*dict, 
+					    StudyInstanceUIDTag, 
+					    StudyInstanceUIDValue);
+
     }
 
   writer->SetMetaDataDictionaryArray( dictarray ); 
