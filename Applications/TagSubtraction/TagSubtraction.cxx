@@ -19,6 +19,7 @@ using namespace std;
 #include <itkImageRegionConstIterator.h>
 #include <itkMetaDataObject.h>
 #include <itkMetaDataDictionary.h>
+#include "gdcmUtil.h"
 
 // CTC includes
 #include "ctcConfigure.h"
@@ -63,21 +64,7 @@ int main(int argc, char ** argv)
       std::cout << ex << std::endl;
       return EXIT_FAILURE;
     }
-
-  // store the orginal DICOM meta-data from first slice  
-  std::string StudyInstanceUIDTag = "0020|000D";
-  std::string StudyInstanceUIDValue;
-  std::string SeriesInstanceUIDTag = "0020|000E";
-  std::string SeriesInstanceUIDValue;
-  ctc::CTCImageReader::DictionaryRawPointer dict0 = 
-    (*(reader->GetMetaDataDictionaryArray()))[0];
-  itk::ExposeMetaData<std::string>(*dict0, 
-				   StudyInstanceUIDTag, 
-				   StudyInstanceUIDValue);
-  itk::ExposeMetaData<std::string>(*dict0, 
-				   SeriesInstanceUIDTag, 
-				   SeriesInstanceUIDValue);
-
+  
   // segment air + constrast
   clog << "Starting Segment";
   ctc::SegmentColonWithContrastFilter::Pointer filter = 
@@ -119,42 +106,47 @@ int main(int argc, char ** argv)
   ctc::CTCImageReader::DictionaryArrayRawPointer dictarray = 
     reader->GetMetaDataDictionaryArray();
 
-  std::string SeriesNumberTag = "0020|0011";
-  std::string SeriesNumberValue = "90";
-  std::string SeriesDescriptionTag = "0008|103E";
-  std::string SeriesDescriptionValue = "Derived from SeriesInstance UID " + SeriesInstanceUIDValue;
   for(int slice = 0; 
       slice < dictarray->size(); 
       slice++)
     {
-      ctc::CTCImageReader::DictionaryRawPointer dict = 
-	(*dictarray)[slice];
 
-      itk::ExposeMetaData<std::string>(*dict, 
-					SeriesNumberTag, 
-					SeriesNumberValue);
+      std::string SeriesNumberTag = "0020|0011";
+      std::string SeriesNumberValue = "90";
+      std::string SeriesDescriptionTag = "0008|103e";
+      std::string SeriesInstanceUIDTag = "0020|000e";
+      std::string SeriesInstanceUIDValue;
+
+      ctc::CTCImageReader::DictionaryRawPointer dict = 
+	(*(reader->GetMetaDataDictionaryArray()))[slice];
+
+       itk::ExposeMetaData<std::string>(*dict, 
+ 					SeriesInstanceUIDTag, 
+ 					SeriesInstanceUIDValue);
 
       itk::EncapsulateMetaData<std::string>(*dict, 
 					    SeriesNumberTag, 
 					    SeriesNumberValue);
+      
+      std::string SeriesDescriptionValue = "Derived from SeriesInstance UID " + SeriesInstanceUIDValue;
+      itk::EncapsulateMetaData<std::string>(*dict, 
+					    SeriesDescriptionTag, 
+					    SeriesDescriptionValue);
+
+      // taken from ITK code
+      std::string UIDPrefix = "1.2.826.0.1.3680043.2.1125." "1";
+      SeriesInstanceUIDValue = gdcm::Util::CreateUniqueUID( UIDPrefix );
 
       itk::EncapsulateMetaData<std::string>(*dict, 
-					    StudyInstanceUIDTag, 
-					    StudyInstanceUIDValue);
-
-      itk::EncapsulateMetaData<std::string>(*dict, 
-					    SeriesInstanceUIDTag, 
-					    SeriesInstanceUIDValue+"1");
-
-      itk::EncapsulateMetaData<std::string>(*dict, 
-					    StudyInstanceUIDTag, 
-					    StudyInstanceUIDValue);
+ 					    SeriesInstanceUIDTag, 
+ 					    SeriesInstanceUIDValue);
 
     }
 
   writer->SetMetaDataDictionaryArray( dictarray ); 
 
   itk::GDCMImageIO::Pointer dicomIO = itk::GDCMImageIO::New();
+  dicomIO->SetKeepOriginalUID(true);
 
   writer->SetImageIO( dicomIO );
 
