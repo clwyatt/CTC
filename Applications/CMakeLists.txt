@@ -8,5 +8,6 @@ PolypCorrection
 PolypCoordinateToIndex
 SegmentColon
 ManualSegmentCorrection
-TagSubtraction)
+TagSubtraction
+MatchCandidatePolyp)
 
