@@ -28,8 +28,55 @@ namespace ctc
     typedef itk::Point<double,3> PointdcmCoordinate;
     typedef BinaryImageType::IndexType PointIndex;
    
-    AssociatedFeatureList() { SI = 0; CV = 0; Gmag = 0; nSI = 0; nCV = 0; nGmag = 0; u = 0; } 
+    AssociatedFeatureList() { SI = 0; CV = 0; Gmag = 0; nSI = 0; nCV = 0; nGmag = 0; u = 0; groupid = 0; }
+  
+    /* Copy Constructor */
+    AssociatedFeatureList(const AssociatedFeatureList & another)
+          { 
+               DCMCoordinate = another.GetDCMCoordinate();
+               voxel_index = another.GetVoxelIndex();
+               SI = another.GetSI();
+               CV = another.GetCV();
+               Gmag = another.GetGmag();
+               nSI = another.GetnSI();
+               nCV = another.GetnCV();
+               nGmag = another.GetnGmag();
+               u = another.GetMembership();
+               groupid = another.GetGroupID();
+               x = another.GetX();
+               y = another.GetY();
+               z = another.GetZ();
+               ix = another.GetIX(); 
+               iy = another.GetIY();                
+               iz = another.GetIZ();                 
+          }
+
     ~AssociatedFeatureList() {}
+
+    /* Assignment */
+    AssociatedFeatureList & operator=(const AssociatedFeatureList & copyer)
+          { 
+               if(this == &copyer)
+                  return *this;
+               DCMCoordinate = copyer.GetDCMCoordinate();
+               voxel_index = copyer.GetVoxelIndex();
+               SI = copyer.GetSI();
+               CV = copyer.GetCV();
+               Gmag = copyer.GetGmag();
+               nSI = copyer.GetnSI();
+               nCV = copyer.GetnCV();
+               nGmag = copyer.GetnGmag();
+               u = copyer.GetMembership();
+               groupid = copyer.GetGroupID();
+               x = copyer.GetX();
+               y = copyer.GetY();
+               z = copyer.GetZ();
+               ix = copyer.GetIX(); 
+               iy = copyer.GetIY();                
+               iz = copyer.GetIZ();    
+               return *this;
+          }
+
 
     PointdcmCoordinate GetDCMCoordinate() const
           { return DCMCoordinate; }
@@ -58,6 +105,9 @@ namespace ctc
     float GetMembership() const
           { return u; }
 
+    int GetGroupID() const
+          { return groupid; }
+
     void SetSI( float CalculatedSI )
           { SI = CalculatedSI; }
 
@@ -85,10 +135,55 @@ namespace ctc
     void SetVoxelIndex( PointIndex CalculatedIndex )
           { voxel_index = CalculatedIndex; }
 
+    void SetGroupID( int newgroupid )
+          { groupid = newgroupid; }
+
+    float GetX() const
+          { return x; }
+
+    float GetY() const
+          { return y; }
+
+    float GetZ() const
+          { return z; }
+
+    void SetX( float xx )
+          { x == xx; }    
+
+    void SetY( float yy )
+          { y == yy; }  
+
+    void SetZ( float zz )
+          { z == zz; }  
+
+    int GetIX() const
+          { return ix; }
+
+    int GetIY() const
+          { return iy; }
+
+    int GetIZ() const
+          { return iz; }
+
+    void SetIX( int xx )
+          { ix == xx; }    
+
+    void SetIY( int yy )
+          { iy == yy; }  
+
+    void SetIZ( int zz )
+          { iz == zz; }  
+
   private:
     
     PointdcmCoordinate DCMCoordinate;
     PointIndex voxel_index;
+    float x;
+    float y;
+    float z;
+    int ix;
+    int iy;
+    int iz;
     float SI;
     float CV;
     float Gmag;
@@ -96,6 +191,7 @@ namespace ctc
     float nCV;
     float nGmag;
     float u;      // Membership function
+    int groupid;
   };
 
   /*  

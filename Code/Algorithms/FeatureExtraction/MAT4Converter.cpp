@@ -32,7 +32,8 @@ void MAT4FeatureVector(RegionCollectorType input, char* filename)
          std::cerr << "couldn't open file" << "\n;";
          exit(0);
     }
-    
+   
+    cout << "1" << endl; 
     int num_points = 0;
     int i = 0;
     int num_regions = input.size();
@@ -47,8 +48,11 @@ void MAT4FeatureVector(RegionCollectorType input, char* filename)
                 num_points++;       
           }
     }
- 
+    cout << "2" << endl; 
+
     double FeatureVectorArray[9*num_points];
+
+    cout << "3" << endl; 
     int m = 0;
 
     /* Push each feature vector value to an array 
@@ -90,6 +94,7 @@ void MAT4FeatureVector(RegionCollectorType input, char* filename)
                m++;     
           }
     }
+    cout << "4" << endl; 
 
     /* Define header parameters */
     matFileHeader.type = 0000;
@@ -99,9 +104,12 @@ void MAT4FeatureVector(RegionCollectorType input, char* filename)
     matFileHeader.namelen = 20;
     
     fwrite( &matFileHeader, sizeof(MAT4HEADER), 1, matFile ); // write the header
+    cout << "5" << endl; 
     fwrite( pname, sizeof(char), matFileHeader.namelen, matFile ); // write out name of variable
+    cout << "6" << endl; 
     fwrite( FeatureVectorArray, sizeof(double), matFileHeader.rows*matFileHeader.cols, matFile );
-       
+    cout << "7" << endl;        
+
     fclose(matFile);
     printf("MAT4 File for extracted voxels is generated!\n"); 
 
