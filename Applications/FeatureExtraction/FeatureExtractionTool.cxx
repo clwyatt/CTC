@@ -19,6 +19,7 @@ using std::ofstream;
 #include <string>
 using std::string;
 #include <cctype>
+#include <time.h>
 
 using namespace std;
 
@@ -109,7 +110,7 @@ int main( int argc, char* argv[] )
   string rawinfilename = "";
   rawinfilename.append(imgdir());
   string seginfilename = "";
-  seginfilename.append(imgdir());
+  //seginfilename.append(imgdir());
   seginfilename.append(seginfile());
   string outputVTKname = "";
   outputVTKname.append(outfilename());
@@ -135,6 +136,8 @@ int main( int argc, char* argv[] )
     }
 
 
+  clock_t start, end;
+  start = clock();
   // extract the features
   typedef ctc::PrincipleCurvatureExtraction FilterType;
   FilterType::Pointer filter = FilterType::New();
@@ -142,6 +145,7 @@ int main( int argc, char* argv[] )
   filter->SetImageInput(reader->GetOutput());
   std::clog << "Computing Features ...";
   cout << endl;
+/*
 
   try
     {
@@ -153,7 +157,7 @@ int main( int argc, char* argv[] )
       return EXIT_FAILURE;
     }
   std::clog << " Done." << std::endl;
-
+*/
  
     typedef ctc::FeatureExtraction FeatureExtractionFilterType;  
     FeatureExtractionFilterType::Pointer FEfilter = FeatureExtractionFilterType::New();
@@ -166,7 +170,15 @@ int main( int argc, char* argv[] )
 
     /* Core of feature extraction */
     FEfilter->Analyze();
-  
+    end = clock();
+    double elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
+    cout << "Total running time: " << elapsed << " secs" << endl;
+    cout << "Total running time(h): " << elapsed/3600 << " hours" << endl;
+    ofstream out("Time.txt");
+    out << "Total running time(s): " << elapsed << " secs" << endl;
+    out << "Total running time(h): " << elapsed/3600 << " hours" << endl;
+    out.close();
+
     return EXIT_SUCCESS;
 
 }
