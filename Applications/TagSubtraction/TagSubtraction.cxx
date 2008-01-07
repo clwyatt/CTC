@@ -106,10 +106,6 @@ int main(int argc, char ** argv)
   ctc::CTCImageReader::DictionaryArrayRawPointer dictarray = 
     reader->GetMetaDataDictionaryArray();
 
-  // taken from ITK code, generate a new series instance UID
-  std::string UIDPrefix = "1.2.826.0.1.3680043.2.1125." "1";
-  std::string NewSeriesInstanceUIDValue = gdcm::Util::CreateUniqueUID( UIDPrefix );
-
   for(int slice = 0; 
       slice < dictarray->size(); 
       slice++)
@@ -120,6 +116,7 @@ int main(int argc, char ** argv)
       std::string SeriesDescriptionTag = "0008|103e";
       std::string SeriesInstanceUIDTag = "0020|000e";
       std::string SeriesInstanceUIDValue;
+      std::string NewSeriesInstanceUIDValue;
 
       ctc::CTCImageReader::DictionaryRawPointer dict = 
 	(*(reader->GetMetaDataDictionaryArray()))[slice];
@@ -136,6 +133,9 @@ int main(int argc, char ** argv)
       itk::EncapsulateMetaData<std::string>(*dict, 
 					    SeriesDescriptionTag, 
 					    SeriesDescriptionValue);
+      //replace number after the last .
+      size_t dotloc = SeriesInstanceUIDValue.rfind(".", SeriesInstanceUIDValue.size()-1);
+      NewSeriesInstanceUIDValue = SeriesInstanceUIDValue.substr(0, dotloc) + ".90";
 
       itk::EncapsulateMetaData<std::string>(*dict, 
  					    SeriesInstanceUIDTag, 
