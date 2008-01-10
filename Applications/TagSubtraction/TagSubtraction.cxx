@@ -115,8 +115,11 @@ int main(int argc, char ** argv)
       std::string SeriesNumberValue = "90";
       std::string SeriesDescriptionTag = "0008|103e";
       std::string SeriesInstanceUIDTag = "0020|000e";
+      std::string SOPInstanceUIDTag = "0008|0018";
       std::string SeriesInstanceUIDValue;
       std::string NewSeriesInstanceUIDValue;
+      std::string SOPInstanceUIDValue;
+      std::string NewSOPInstanceUIDValue;
 
       ctc::CTCImageReader::DictionaryRawPointer dict = 
 	(*(reader->GetMetaDataDictionaryArray()))[slice];
@@ -124,6 +127,10 @@ int main(int argc, char ** argv)
       itk::ExposeMetaData<std::string>(*dict, 
 				       SeriesInstanceUIDTag, 
 				       SeriesInstanceUIDValue);
+
+      itk::ExposeMetaData<std::string>(*dict, 
+				       SOPInstanceUIDTag, 
+				       SOPInstanceUIDValue);
       
       itk::EncapsulateMetaData<std::string>(*dict, 
 					    SeriesNumberTag, 
@@ -140,6 +147,14 @@ int main(int argc, char ** argv)
       itk::EncapsulateMetaData<std::string>(*dict, 
  					    SeriesInstanceUIDTag, 
  					    NewSeriesInstanceUIDValue);
+
+      //append to make unique SOPInstanceUID 
+      NewSOPInstanceUIDValue = SOPInstanceUIDValue + ".1";
+
+      itk::EncapsulateMetaData<std::string>(*dict, 
+ 					    SOPInstanceUIDTag, 
+ 					    NewSOPInstanceUIDValue);
+
     }
 
   writer->SetMetaDataDictionaryArray( dictarray ); 
