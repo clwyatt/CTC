@@ -308,58 +308,86 @@ namespace ctc
 
 
     // extract connected largest region, should be the colon
-    typedef itk::ImageRegionIterator<DistanceImageType> 
-      DistanceIteratorType;
-    typedef itk::BinaryThresholdImageFunction<BinaryImageType> 
-      BinaryFunctionType;
-    BinaryFunctionType::Pointer bfunction = 
-      BinaryFunctionType::New();
-    bfunction->SetInputImage(m_BGRegionGrowFilter->GetOutput());
-    bfunction->ThresholdBetween(0, 1);
-    
-    typedef itk::FloodFilledImageFunctionConditionalIterator
-      <BinaryImageType, BinaryFunctionType> BinaryFloodIteratorType;
-
-    DistanceIteratorType 
-      dit(m_DistanceFilter->GetOutput(), 
-	  m_DistanceFilter->GetOutput()->GetRequestedRegion());
-    DistancePixelType maxd = 0;
-    dit.GoToBegin();
-    DistanceImageType::IndexType maxi = dit.GetIndex();
-    while(!dit.IsAtEnd())
+    bool lumenComplete = false;
+    while( !lumenComplete )
       {
-	if(dit.Get() > maxd)
+	typedef itk::ImageRegionIterator<DistanceImageType> 
+	  DistanceIteratorType;
+	typedef itk::BinaryThresholdImageFunction<BinaryImageType> 
+	  BinaryFunctionType;
+	BinaryFunctionType::Pointer bfunction = 
+	  BinaryFunctionType::New();
+	bfunction->SetInputImage(m_BGRegionGrowFilter->GetOutput());
+	bfunction->ThresholdBetween(0, 1);
+
+	typedef itk::BinaryThresholdImageFunction<DistanceImageType> 
+	  DistanceFunctionType;
+	DistanceFunctionType::Pointer dfunction = 
+	  DistanceFunctionType::New();
+	dfunction->SetInputImage(m_DistanceFilter->GetOutput());
+	dfunction->ThresholdBetween(1, 1000); //todo refactor 1000 into named constant
+	
+	typedef itk::FloodFilledImageFunctionConditionalIterator
+	  <BinaryImageType, BinaryFunctionType> BinaryFloodIteratorType;
+
+	typedef itk::FloodFilledImageFunctionConditionalIterator
+	  <DistanceImageType, DistanceFunctionType> DistanceFloodIteratorType;
+	
+	DistanceIteratorType 
+	  dit(m_DistanceFilter->GetOutput(), 
+	      m_DistanceFilter->GetOutput()->GetRequestedRegion());
+	DistancePixelType maxd = 0;
+	dit.GoToBegin();
+	DistanceImageType::IndexType maxi = dit.GetIndex();
+	while(!dit.IsAtEnd())
 	  {
-	    maxd = dit.Get();
-	    maxi = dit.GetIndex();
+	    if(dit.Get() > maxd)
+	      {
+		maxd = dit.Get();
+		maxi = dit.GetIndex();
+	      }
+	    ++dit;
 	  }
-	++dit;
-      }
     
-    std::clog << ": Seed Value " << maxd << " at " << maxi << std::endl;
+	std::clog << ": Seed Value " << maxd << " at " << maxi << std::endl;
 	    
-    BinaryImageType::IndexType seed;
-    seed[0] = 2*maxi[0];
-    seed[1] = 2*maxi[1];
-    seed[2] = 2*maxi[2];
+	BinaryImageType::IndexType seed;
+	seed[0] = 2*maxi[0];
+	seed[1] = 2*maxi[1];
+	seed[2] = 2*maxi[2];
 
+	std::clog << "Growing at seed " << seed << " value = " 
+		  << static_cast<float>(m_BGRegionGrowFilter->GetOutput()->GetPixel(seed));
 
+	BinaryFloodIteratorType bfit(m_BGRegionGrowFilter->GetOutput(),
+				     bfunction,
+				     seed);
+	bfit.GoToBegin();
+	while(!bfit.IsAtEnd())
+	  {
+	    bfit.Set(128);
+	    ++bfit;
+	  }
 
+	DistanceFloodIteratorType dfit(m_DistanceFilter->GetOutput(),
+				     dfunction,
+				     maxi);
+	dfit.GoToBegin();
+	while(!dfit.IsAtEnd())
+	  {
+	    dfit.Set(0);
+	    ++dfit;
+	  }
 
-    std::clog << "Growing at seed " << seed << " value = " 
-	      << static_cast<float>(m_BGRegionGrowFilter->GetOutput()->GetPixel(seed));
-
-    BinaryFloodIteratorType bfit(m_BGRegionGrowFilter->GetOutput(),
-				 bfunction,
-				 seed);
-    bfit.GoToBegin();
-    while(!bfit.IsAtEnd())
-      {
-	bfit.Set(128);
-	++bfit;
-      }
-    std::clog << " Done." << std::endl;
+	std::clog << " Done." << std::endl;
     
+	// method to determine if the lumen segmentation is complete
+	// this is simplest possible
+	lumenComplete = static_cast<bool>(maxd < 5); 
+
+
+      } // lumen complete
+
     // mask out non-colon regions and reverse constrast
     std::clog << "Final Masking ... ";
     itk::ImageRegionIterator<BinaryImageType>
