@@ -140,9 +140,9 @@ int main(int argc, char ** argv)
       itk::EncapsulateMetaData<std::string>(*dict, 
 					    SeriesDescriptionTag, 
 					    SeriesDescriptionValue);
-      //replace number after the last .
-      size_t dotloc = SeriesInstanceUIDValue.rfind(".", SeriesInstanceUIDValue.size()-1);
-      NewSeriesInstanceUIDValue = SeriesInstanceUIDValue.substr(0, dotloc) + ".90";
+
+      //append after the last . to make unique
+      NewSeriesInstanceUIDValue = SeriesInstanceUIDValue + ".90";
 
       itk::EncapsulateMetaData<std::string>(*dict, 
  					    SeriesInstanceUIDTag, 
