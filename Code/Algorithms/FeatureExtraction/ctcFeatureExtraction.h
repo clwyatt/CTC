@@ -28,7 +28,7 @@ namespace ctc
     typedef itk::Point<double,3> PointdcmCoordinate;
     typedef BinaryImageType::IndexType PointIndex;
    
-    AssociatedFeatureList() { SI = 0; CV = 0; Gmag = 0; nSI = 0; nCV = 0; nGmag = 0; u = 0; groupid = 0; }
+    AssociatedFeatureList() { SI = 0; CV = 0; Gmag = 0; nSI = 0; nCV = 0; nGmag = 0; u = 0; groupid = 0; tag = 0; }
   
     /* Copy Constructor */
     AssociatedFeatureList(const AssociatedFeatureList & another)
@@ -43,12 +43,7 @@ namespace ctc
                nGmag = another.GetnGmag();
                u = another.GetMembership();
                groupid = another.GetGroupID();
-               x = another.GetX();
-               y = another.GetY();
-               z = another.GetZ();
-               ix = another.GetIX(); 
-               iy = another.GetIY();                
-               iz = another.GetIZ();                 
+               tag = another.GetTag();               
           }
 
     ~AssociatedFeatureList() {}
@@ -68,18 +63,16 @@ namespace ctc
                nGmag = copyer.GetnGmag();
                u = copyer.GetMembership();
                groupid = copyer.GetGroupID();
-               x = copyer.GetX();
-               y = copyer.GetY();
-               z = copyer.GetZ();
-               ix = copyer.GetIX(); 
-               iy = copyer.GetIY();                
-               iz = copyer.GetIZ();    
+               tag = copyer.GetTag(); 
                return *this;
           }
 
 
     PointdcmCoordinate GetDCMCoordinate() const
           { return DCMCoordinate; }
+
+    PointdcmCoordinate Get_nDCMCoordinate() const
+          { return nDCMCoordinate; }
 
     PointIndex GetVoxelIndex() const
           { return voxel_index; }
@@ -108,6 +101,9 @@ namespace ctc
     int GetGroupID() const
           { return groupid; }
 
+    int GetTag() const
+          { return tag; }
+
     void SetSI( float CalculatedSI )
           { SI = CalculatedSI; }
 
@@ -132,58 +128,23 @@ namespace ctc
     void SetDCMCoordinate( PointdcmCoordinate CalculatedDCM ) 
           { DCMCoordinate = CalculatedDCM; }
 
+    void Set_nDCMCoordinate( PointdcmCoordinate CalculatedDCM ) 
+          { nDCMCoordinate = CalculatedDCM; }    
+
     void SetVoxelIndex( PointIndex CalculatedIndex )
           { voxel_index = CalculatedIndex; }
 
     void SetGroupID( int newgroupid )
           { groupid = newgroupid; }
 
-    float GetX() const
-          { return x; }
-
-    float GetY() const
-          { return y; }
-
-    float GetZ() const
-          { return z; }
-
-    void SetX( float xx )
-          { x == xx; }    
-
-    void SetY( float yy )
-          { y == yy; }  
-
-    void SetZ( float zz )
-          { z == zz; }  
-
-    int GetIX() const
-          { return ix; }
-
-    int GetIY() const
-          { return iy; }
-
-    int GetIZ() const
-          { return iz; }
-
-    void SetIX( int xx )
-          { ix == xx; }    
-
-    void SetIY( int yy )
-          { iy == yy; }  
-
-    void SetIZ( int zz )
-          { iz == zz; }  
+    void SetTag( int newtag )
+          { tag = newtag; }    
 
   private:
     
     PointdcmCoordinate DCMCoordinate;
+    PointdcmCoordinate nDCMCoordinate;    
     PointIndex voxel_index;
-    float x;
-    float y;
-    float z;
-    int ix;
-    int iy;
-    int iz;
     float SI;
     float CV;
     float Gmag;
@@ -192,6 +153,7 @@ namespace ctc
     float nGmag;
     float u;      // Membership function
     int groupid;
+    int tag;
   };
 
   /*  
@@ -210,23 +172,25 @@ namespace ctc
     typedef itk::Statistics::ListSample<FeatureType>   FeatureSampleType;
     typedef FeatureSampleType::Pointer                 FeaturePointer;
 
-    typedef std::vector<AssociatedFeatureList>         GrowableRegionType;
+    typedef std::list<AssociatedFeatureList>           GrowableRegionType;
     typedef std::vector<GrowableRegionType>            RegionCollectorType;
 
     typedef itk::Point<double, 3>                      dcmCoordinate;
-    typedef std::vector<dcmCoordinate>                 dcmVectorType;
+    typedef std::list<dcmCoordinate>                   dcmVectorType;
+
+    typedef ctc::CTCImageType::SizeType                VolumeSizeType;
 
     /* Standard ITK macros */
     itkNewMacro(Self);
     itkTypeMacro(FeatureExtraction, itk::Object);
 
-    void SetInitialFeatureVector(const FeaturePointer FeatureVector)
+    void SetInitialFeatureVector( const FeaturePointer FeatureVector )
                           { m_FeatureVector = FeatureVector; }
 
-    void SetSegmentedImageInput( const BinaryImageType *image )
+    void SetSegmentedImageInput( BinaryImageType *image )
                           { m_ColonImage = image; }
 
-    void SetRawImageInput( const CTCImageType *image )
+    void SetRawImageInput( CTCImageType *image )
                           { m_Image = image; } 
 
     GrowableRegionType GetSeedRegion() const
@@ -238,15 +202,24 @@ namespace ctc
     RegionCollectorType GetRegionCollector() const
                           { return RegionCollector; }
 
+    VolumeSizeType GetVolumeSize() 
+                          { return m_Image->GetLargestPossibleRegion().GetSize(); }
+
     dcmVectorType GetPolyCenterCollector() const
                           { return PolypCenterCollector; } 
 
-    void SetPolyCenterCollector(dcmVectorType collector)
+    void SetPolyCenterCollector( dcmVectorType collector )
                           { PolypCenterCollector = collector; }
 
     void Analyze( void );
 
-    void SetOutputVTK(string name)
+    int PrincipalCurvatures( BinaryImageType::IndexType idx, float &SI, float &CV, float &gmag );
+
+    void CalculateCentroid( RegionCollectorType &growableregion_vector, dcmCoordinate &centroid, int index ); 
+
+    void MergeRegions( RegionCollectorType &growableregion_vector, list<int> merge_list, int merger ); 
+
+    void SetOutputVTK( string name )
                           { UserNamedOutput = name; }
 
     void SetSeedRegion( GrowableRegionType InputSeedRegion )
@@ -259,8 +232,8 @@ namespace ctc
 
   private:
 
-    const CTCImageType *    m_Image;
-    const BinaryImageType * m_ColonImage;
+    CTCImageType *  m_Image;
+    BinaryImageType *     m_ColonImage;
 
     FeaturePointer       m_FeatureVector;
     GrowableRegionType   Raw_Region;
