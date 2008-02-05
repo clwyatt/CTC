@@ -9,6 +9,7 @@ PolypCoordinateToIndex
 SegmentColon
 ManualSegmentCorrection
 TagSubtraction
-MatchCandidatePolyp)
+MatchCandidatePolyp
+Registration)
 
 
