@@ -24,8 +24,6 @@ Language:  C++
 #include "itkImageFileWriter.h"
 #include "MAT4Converter.h" 
 #include "StringtoDouble.h"
-#include "/usr/src/yum-3.2.2/MatLab/extern/include/mat.h"
-#include "/usr/src/yum-3.2.2/MatLab/extern/include/matrix.h"
 
 #define DEBUG
 
