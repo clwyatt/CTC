@@ -64,7 +64,12 @@ int main(int argc, char ** argv)
       std::cout << ex << std::endl;
       return EXIT_FAILURE;
     }
-  
+
+  ctc::CTCImageType::ConstPointer inputImage = reader->GetOutput(); 
+  ctc::CTCImageType::RegionType region = inputImage->GetLargestPossibleRegion(); 
+  ctc::CTCImageType::IndexType start = region.GetIndex(); 
+  ctc::CTCImageType::SizeType size = region.GetSize(); 
+
   // segment air + constrast
   clog << "Starting Segment";
   ctc::SegmentColonWithContrastFilter::Pointer filter = 
@@ -106,6 +111,8 @@ int main(int argc, char ** argv)
   ctc::CTCImageReader::DictionaryArrayRawPointer dictarray = 
     reader->GetMetaDataDictionaryArray();
 
+  assert(size[2] == dictarray->size());
+
   for(int slice = 0; 
       slice < dictarray->size(); 
       slice++)
@@ -142,14 +149,37 @@ int main(int argc, char ** argv)
 					    SeriesDescriptionValue);
 
       //append after the last . to make unique
-      NewSeriesInstanceUIDValue = SeriesInstanceUIDValue + ".90";
+      // if it has a null at the end, strip it and add it back at the end
+      if( *(SeriesInstanceUIDValue.rbegin()) == 0)
+	{
+	  NewSeriesInstanceUIDValue = SeriesInstanceUIDValue.substr(0, SeriesInstanceUIDValue.size() - 1) + ".1";
+	  NewSeriesInstanceUIDValue.append(1,0);
+	}
+      else
+	{
+	  NewSeriesInstanceUIDValue = SeriesInstanceUIDValue + ".1";
+	}
 
       itk::EncapsulateMetaData<std::string>(*dict, 
  					    SeriesInstanceUIDTag, 
  					    NewSeriesInstanceUIDValue);
 
-      //append to make unique SOPInstanceUID 
-      NewSOPInstanceUIDValue = SOPInstanceUIDValue + ".1";
+      //append to make unique SOPInstanceUID, must be of even length padded by null
+      // if it has a null at the end, strip it and add it back at the end
+      if( *(SOPInstanceUIDValue.rbegin()) == 0)
+	{
+	  NewSOPInstanceUIDValue = SOPInstanceUIDValue.substr(0, SOPInstanceUIDValue.size() - 1) + ".1";
+	  NewSOPInstanceUIDValue.append(1,0);
+	}
+      else
+	{
+	  NewSOPInstanceUIDValue = SOPInstanceUIDValue + ".1";
+	}
+
+
+      // clog <<  SOPInstanceUIDValue << "(" << SOPInstanceUIDValue.size() << ")" << endl;
+      // clog <<  NewSOPInstanceUIDValue << endl;
+
 
       itk::EncapsulateMetaData<std::string>(*dict, 
  					    SOPInstanceUIDTag, 
@@ -176,10 +206,6 @@ int main(int argc, char ** argv)
   format += "/%03d.dcm"; 
   nameGenerator->SetSeriesFormat( format.c_str() );
 
-  ctc::CTCImageType::ConstPointer inputImage = reader->GetOutput(); 
-  ctc::CTCImageType::RegionType region = inputImage->GetLargestPossibleRegion(); 
-  ctc::CTCImageType::IndexType start = region.GetIndex(); 
-  ctc::CTCImageType::SizeType size = region.GetSize(); 
 
   const unsigned int firstSlice = start[2]; 
   const unsigned int lastSlice = start[2] + size[2] - 1; 
