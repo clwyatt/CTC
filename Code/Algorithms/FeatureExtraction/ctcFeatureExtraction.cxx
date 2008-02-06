@@ -532,15 +532,10 @@ namespace ctc
        // Subpart 2 --- Fuzzy C-Means clustering 
        float J1 = 0;
        float J2 = 0; 
-       float objectivefunctionthreshold = 100;
        int loopnum = 0; 
 
        while ( 1 )
        {
-            if(loopnum > 10)
-                break;
-            else
-               loopnum++;
             J1 = J2;
 
                  //(1) Update centroids
@@ -635,7 +630,7 @@ namespace ctc
                  }
             }
 
-            if( abs(J2 - J1) < 9 )
+            if( abs(J2 - J1) < 100 )
                  break;   
            
             //(3) Update memberfunction for each voxel
@@ -682,8 +677,21 @@ namespace ctc
             } 
         } 
 
+       float memberthreshold = 0.02;
+       m = 0;
+       for(i = 0; i < num_regions; i++)
+       {
+             iter = growableregion_vector[i].begin();
+             for (; iter != growableregion_vector[i].end();)
+             {
+                   if(membershipmatrix[m*num_regions+i] < memberthreshold)
+                        growableregion_vector[i].erase(iter++);
+                   else
+                     ++iter;
 
-
+                   m++;                   
+             }
+       } 
 
 
        /* Step 4: Remove the cluster with volume less than 30mm^3 */
@@ -711,16 +719,16 @@ namespace ctc
              {
                    counter++;
              }
-             //if (counter < num_voxels)
-             if (counter < 10)
+             if (counter < num_voxels)
              {
                   growableregion_vector.erase(growableregion_vector.begin()+i); 
                   i--;
                   num_regions--;
              }
        } 
+     
+       /* Step 5: Directional Concentration */
 
-      
        dcmCoordinate center_polyp;
        dcmCoordinate iter_point;
 
