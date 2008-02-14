@@ -1,0 +1,67 @@
+<project name="ctcc" default="compile" basedir=".">
+
+    <description>
+        CTC Classification build file.
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="src" location="src"/>
+    <property name="classes" location="classes"/>
+    <property name="lib" location="lib"/>
+    <property name="dist"  location="dist"/>
+
+    <path id="classpath">
+        <pathelement location="${classes}" />
+        <fileset dir="${lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <target name="compile" depends="init" >
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${classes}" debug="on"> 
+            <classpath refid="classpath"/>
+            <compilerarg value="-Xlint"/>
+        </javac>
+    </target>
+
+    <target name="dist" depends="compile" >
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist}"/>
+
+        <!-- Put everything in ${bin} into the a jar file -->
+        <jar jarfile="${dist}/${ant.project.name}-${DSTAMP}.jar" basedir="${classes}"/>
+    </target>
+
+    <target name="junit" depends="compile">
+        <junit printsummary="yes">
+            <classpath refid="classpath"/>
+            <batchtest fork="yes" haltonfailure="yes">
+                <fileset dir="${src}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="clean" >
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${classes}"/>
+        <delete dir="${dist}"/>
+    </target>
+
+    <target name="run" depends="compile">
+        <java classname="ctc.classification.Main" classpath="">
+            <classpath refid="classpath"/>
+        </java>
+    </target>
+
+</project>
+
