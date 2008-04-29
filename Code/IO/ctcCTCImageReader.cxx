@@ -42,7 +42,7 @@ namespace ctc
     delete m_DictArray;
   }
   
-  void CTCImageReader::GenerateData()
+  void CTCImageReader::GenerateData() throw(itk::ExceptionObject)
   {
 
     assert(!m_Directory.empty());
@@ -77,7 +77,14 @@ namespace ctc
     reader->SetImageIO( dicomIO );
     reader->ReleaseDataFlagOn();
 
-    reader->Update();
+    try
+      {
+	reader->Update();
+      }
+    catch(itk::ExceptionObject & ex)
+      {
+	throw ex;
+      }
 
     // Deep copy the MetaDataDictionary into the array
     for(int slice = 0; 

@@ -45,7 +45,7 @@ namespace ctc
 
     CTCImageReader();
     ~CTCImageReader();
-    void GenerateData();
+    void GenerateData() throw(itk::ExceptionObject);
     void GenerateOutputInformation();
 
     typedef itk::ImageSeriesReader< CTCImageType >     ReaderType;
