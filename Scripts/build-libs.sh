@@ -127,9 +127,9 @@ cd BSL-Kit;
 ##########################
 # Write ENV setup scripts
 ##########################
-echo "export VTK_DIR=" $VTK_DIR >> bsl-kit-setup.sh
-echo "export ITK_DIR=" $ITK_DIR >> bsl-kit-setup.sh
-echo "export FLTK_DIR=" $FLTK_DIR >> bsl-kit-setup.sh
+echo "export VTK_DIR="$VTK_DIR >> bsl-kit-setup.sh
+echo "export ITK_DIR="$ITK_DIR >> bsl-kit-setup.sh
+echo "export FLTK_DIR="$FLTK_DIR >> bsl-kit-setup.sh
 
 echo "setenv VTK_DIR " $VTK_DIR >> bsl-kit-setup.csh
 echo "setenv ITK_DIR " $ITK_DIR >> bsl-kit-setup.csh
