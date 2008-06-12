@@ -28,7 +28,7 @@ namespace ctc
     typedef itk::Point<double,3> PointdcmCoordinate;
     typedef BinaryImageType::IndexType PointIndex;
    
-    AssociatedFeatureList() { SI = 0; CV = 0; Gmag = 0; nSI = 0; nCV = 0; nGmag = 0; u = 0; groupid = 0; tag = 0; }
+    AssociatedFeatureList() { SI = 0; CV = 0; Gmag = 0; nSI = 0; nCV = 0; nGmag = 0; u = 0; groupid = 0; tag = 0; DGC = 0; }
   
     /* Copy Constructor */
     AssociatedFeatureList(const AssociatedFeatureList & another)
@@ -37,6 +37,7 @@ namespace ctc
                voxel_index = another.GetVoxelIndex();
                SI = another.GetSI();
                CV = another.GetCV();
+               DGC = another.GetDGC();
                Gmag = another.GetGmag();
                nSI = another.GetnSI();
                nCV = another.GetnCV();
@@ -57,6 +58,7 @@ namespace ctc
                voxel_index = copyer.GetVoxelIndex();
                SI = copyer.GetSI();
                CV = copyer.GetCV();
+               DGC = copyer.GetDGC();
                Gmag = copyer.GetGmag();
                nSI = copyer.GetnSI();
                nCV = copyer.GetnCV();
@@ -86,6 +88,9 @@ namespace ctc
     float GetGmag() const
           { return Gmag; }
 
+    float GetDGC() const
+          { return DGC; }
+
     float GetnSI() const
           { return nSI; }
 
@@ -113,9 +118,12 @@ namespace ctc
     void SetGmag( float CalculatedGmag )
           { Gmag = CalculatedGmag; }
 
+    void SetDGC( float CalculatedDGC )
+          { DGC = CalculatedDGC; }
+
     void SetnSI( float CalculatednSI )
           { nSI = CalculatednSI; }
-
+    
     void SetnCV( float CalculatednCV )
           { nCV = CalculatednCV; }
 
@@ -148,6 +156,7 @@ namespace ctc
     float SI;
     float CV;
     float Gmag;
+    float DGC;
     float nSI;    // Normalized value
     float nCV;
     float nGmag;
@@ -184,32 +193,14 @@ namespace ctc
     itkNewMacro(Self);
     itkTypeMacro(FeatureExtraction, itk::Object);
 
-    void SetInitialFeatureVector( const FeaturePointer FeatureVector )
-                          { m_FeatureVector = FeatureVector; }
-
     void SetSegmentedImageInput( BinaryImageType *image )
                           { m_ColonImage = image; }
 
     void SetRawImageInput( CTCImageType *image )
                           { m_Image = image; } 
 
-    GrowableRegionType GetSeedRegion() const
-                          { return Seed_Region; }
-
-    GrowableRegionType GetGrowableReg() const
-                          { return Growable_Region; }
-
-    RegionCollectorType GetRegionCollector() const
-                          { return RegionCollector; }
-
     VolumeSizeType GetVolumeSize() 
                           { return m_Image->GetLargestPossibleRegion().GetSize(); }
-
-    dcmVectorType GetPolyCenterCollector() const
-                          { return PolypCenterCollector; } 
-
-    void SetPolyCenterCollector( dcmVectorType collector )
-                          { PolypCenterCollector = collector; }
 
     void Analyze( void );
 
@@ -219,12 +210,22 @@ namespace ctc
 
     void MergeRegions( RegionCollectorType &growableregion_vector, list<int> merge_list, int merger ); 
 
-    void SetOutputVTK( string name )
-                          { UserNamedOutput = name; }
+    void CTC_Image_104_TransformIndexToPhysicalPoint(BinaryImageType::IndexType idx, dcmCoordinate &dcm );
 
-    void SetSeedRegion( GrowableRegionType InputSeedRegion )
-                          { Seed_Region = InputSeedRegion; }
- 
+    void CalculateDGC( RegionCollectorType &growableregion_vector );
+
+    void SetOutputVTK( string name )
+          { UserNamedOutput = name; }
+
+    void SetVolumeID( int id )
+          { vid = id; }
+
+    void SetSeries( int newseries )
+          { series = newseries; }
+  
+    int GetSeries() const
+          { return series; }
+        
   protected:
 
     FeatureExtraction();
@@ -232,17 +233,13 @@ namespace ctc
 
   private:
 
-    CTCImageType *  m_Image;
-    BinaryImageType *     m_ColonImage;
-
-    FeaturePointer       m_FeatureVector;
-    GrowableRegionType   Raw_Region;
-    GrowableRegionType   Seed_Region;
-    GrowableRegionType   Growable_Region;
-    RegionCollectorType  RegionCollector;
+    CTCImageType *       m_Image;
+    BinaryImageType *    m_ColonImage;
     dcmVectorType        PolypCenterCollector;
     string               UserNamedOutput;
-    
+    int                  vid;
+    int                  series;
+
   };
  
 }

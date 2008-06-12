@@ -32,8 +32,7 @@ void MAT4FeatureVector(RegionCollectorType input, char* filename)
          std::cerr << "couldn't open file" << "\n;";
          exit(0);
     }
-   
-    cout << "1" << endl; 
+    
     int num_points = 0;
     int i = 0;
     int num_regions = input.size();
@@ -48,11 +47,8 @@ void MAT4FeatureVector(RegionCollectorType input, char* filename)
                 num_points++;       
           }
     }
-    cout << "2" << endl; 
-
-    double FeatureVectorArray[9*num_points];
-
-    cout << "3" << endl; 
+ 
+    double FeatureVectorArray[10*num_points];
     int m = 0;
 
     /* Push each feature vector value to an array 
@@ -91,32 +87,29 @@ void MAT4FeatureVector(RegionCollectorType input, char* filename)
                FeatureVectorArray[m + num_points*6] = pindex[2];
                FeatureVectorArray[m + num_points*7] = iter->GetSI();
                FeatureVectorArray[m + num_points*8] = iter->GetCV(); 
+               FeatureVectorArray[m + num_points*9] = iter->GetDGC();                
                m++;     
           }
     }
-    cout << "4" << endl; 
 
     /* Define header parameters */
     matFileHeader.type = 0000;
     matFileHeader.rows = num_points;
-    matFileHeader.cols = 9;
+    matFileHeader.cols = 10;
     matFileHeader.imag = 0;
     matFileHeader.namelen = 20;
     
     fwrite( &matFileHeader, sizeof(MAT4HEADER), 1, matFile ); // write the header
-    cout << "5" << endl; 
     fwrite( pname, sizeof(char), matFileHeader.namelen, matFile ); // write out name of variable
-    cout << "6" << endl; 
     fwrite( FeatureVectorArray, sizeof(double), matFileHeader.rows*matFileHeader.cols, matFile );
-    cout << "7" << endl;        
-
+       
     fclose(matFile);
     printf("MAT4 File for extracted voxels is generated!\n"); 
 
 }
 
 
-void MAT4FeatureVectorPolyps(float input[][18], int num_regions, char* filename)
+void MAT4FeatureVectorPolyps(float input[][26], int num_regions, char* filename)
 {
  
     MAT4HEADER matFileHeader;
@@ -134,7 +127,7 @@ void MAT4FeatureVectorPolyps(float input[][18], int num_regions, char* filename)
     int i = 0;
 
  
-    double FeatureVectorArray[18*num_regions];
+    double FeatureVectorArray[26*num_regions];
 
     /* Push each feature vector value to an array 
      *
@@ -156,7 +149,7 @@ void MAT4FeatureVectorPolyps(float input[][18], int num_regions, char* filename)
 
      for (int m = 0; m < num_regions; m++)
      {
-          for (int j = 0; j < 18; j++)
+          for (int j = 0; j < 26; j++)
           {
                 FeatureVectorArray[m+num_regions*j] = input[m][j];
           }
@@ -166,7 +159,7 @@ void MAT4FeatureVectorPolyps(float input[][18], int num_regions, char* filename)
     /* Define header parameters */
     matFileHeader.type = 0000;
     matFileHeader.rows = num_regions;
-    matFileHeader.cols = 18;
+    matFileHeader.cols = 26;
     matFileHeader.imag = 0;
     matFileHeader.namelen = 20;
     

@@ -16,6 +16,6 @@ typedef std::vector<GrowableRegionType>            RegionCollectorType;
 typedef itk::Point<double,3> dcmCoordinate;
 
 void MAT4FeatureVector(RegionCollectorType a, char* filename);
-void MAT4FeatureVectorPolyps(float a[][18], int num_regions, char* filename);
+void MAT4FeatureVectorPolyps(float a[][26], int num_regions, char* filename);
 
 #endif
