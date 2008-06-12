@@ -83,13 +83,13 @@ int main( int argc, char* argv[] )
     std::ofstream out(outfilename());
       
     FeatureExtractionFilterType::Pointer FEfilter = FeatureExtractionFilterType::New();
-    FEfilter->SetInitialFeatureVector(filter->GetOutput());
+    //FEfilter->SetInitialFeatureVector(filter->GetOutput());
 
     /* Core of feature extraction */
     FEfilter->Analyze();
 
     /* Retrieve the feature vectors for those polyp candidates */
-    FeatureExtractionFilterType::RegionCollectorType PolypRegionCollector = FEfilter->GetRegionCollector();
+    //FeatureExtractionFilterType::RegionCollectorType PolypRegionCollector = FEfilter->GetRegionCollector();
 
     /* Generate a MAT4 file according to feature vectors */
   //  MAT4FeatureVector(PolypRegionCollector);    
