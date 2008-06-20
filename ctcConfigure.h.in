@@ -10,4 +10,14 @@
 
 #define CTC_REVISION_STRING "@CTC_REVISION_STRING@"
 
-#define CTC_BIG_ENDIAN @CTC_BIG_ENDIAN@
+// OS X endianness changes based on platform (PPC vs INTEL)
+#if !defined(__APPLE__)
+  #define CTC_BIG_ENDIAN @CTC_BIG_ENDIAN@
+#else 
+  #if defined(__BIG_ENDIAN__)
+    #define CTC_BIG_ENDIAN true
+  #else
+    #define CTC_BIG_ENDIAN false
+  #endif
+#endif
+

@@ -1,5 +1,8 @@
 # This is the root CTC CMakeLists file.
-CMAKE_MINIMUM_REQUIRED(VERSION 1.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 OLD)
+endif(COMMAND cmake_policy)
 
 PROJECT(CTC)
 
@@ -60,8 +63,13 @@ ${CTC_SOURCE_DIR}/Code/Filters
 )
 
 # include extra checks
-INCLUDE(TestBigEndian)
-TEST_BIG_ENDIAN(CTC_BIG_ENDIAN)
+IF(APPLE)
+	MESSAGE(STATUS "Apple system: using compiler ENDIAN defines.")
+ELSE(APPLE)
+       INCLUDE(${CMAKE_ROOT}/Modules/TestBigEndian.cmake)
+       TEST_BIG_ENDIAN(CTC_BIG_ENDIAN)
+ENDIF(APPLE)
+
 INCLUDE(${CTC_SOURCE_DIR}/CMake/GetSubversionRevision.cmake)
 
 # Configure files with settings for use by the build.
