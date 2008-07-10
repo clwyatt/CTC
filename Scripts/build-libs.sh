@@ -11,10 +11,9 @@ fi
 
 if [ $# -eq 0 ]
 then
-  echo "Usage: `basename $0` options (init, rebuild, update)"
+  echo "Usage: `basename $0` options (init, rebuild)"
   echo "       init initial build, checking out source from version control"
   echo "       rebuild rebuild, no version control access (for tweaking parameters)"
-  echo "       update update existing source from version control (afterwards issue `basename $0` rebuild to rebuild updated source)"
   exit          
 fi  
 
@@ -24,7 +23,7 @@ TOPDIR=$PWD
 if [ $1 == "init" ]
 then
 
-mkdir BSL-Kit; cd BSL-Kit;
+mkdir CTC-Dependencies; cd CTC-Dependencies;
 
 
 ##########################
@@ -45,7 +44,7 @@ expect $TMPFILE
 
 echo "Password OK"
 
-cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK checkout VTK >> cvs.log 2>&1
+cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK checkout -r release-4-4-2 VTK >> cvs.log 2>&1
 cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK logout
 
 echo "Building VisualizationToolkit"
@@ -60,10 +59,10 @@ cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF -D BUILD_SHARED_LIBS=ON -D VTK_
 
 make >> make.log 2>&1
 
-export VTK_DIR=${TOPDIR}/BSL-Kit/$VTKBUILDDIR
+export VTK_DIR=${TOPDIR}/CTC-Dependencies/$VTKBUILDDIR
 
 cd $TOPDIR
-cd BSL-Kit;
+cd CTC-Dependencies;
 
 
 ##########################
@@ -84,7 +83,7 @@ expect $TMPFILE
 
 echo "Password OK"
 
-cvs -d :pserver:anoncvs@www.itk.org:/cvsroot/Insight co Insight >> cvs.log 2>&1
+cvs -d :pserver:anoncvs@www.itk.org:/cvsroot/Insight co -r ITK-3-4 Insight >> cvs.log 2>&1
 #cvs -d :pserver:anoncvs@www.itk.org:/cvsroot/Insight co Insight Applications
 cvs -d :pserver:anoncvs@www.itk.org:/cvsroot/Insight logout
 
@@ -95,10 +94,10 @@ cd $ITKBUILDDIR
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../Insight/ >> make.log 2>&1
 make >> make.log 2>&1
 
-export ITK_DIR=${TOPDIR}/BSL-Kit/$ITKBUILDDIR
+export ITK_DIR=${TOPDIR}/CTC-Dependencies/$ITKBUILDDIR
 
 cd $TOPDIR
-cd BSL-Kit;
+cd CTC-Dependencies;
 
 
 
@@ -116,10 +115,10 @@ export CXXFLAGS=-fpermissive
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../fltk-1.1/ >> make.log 2>&1
 make >> make.log 2>&1
 
-export FLTK_DIR=${TOPDIR}/BSL-Kit/$FLTKBUILDDIR
+export FLTK_DIR=${TOPDIR}/CTC-Dependencies/$FLTKBUILDDIR
 
 cd $TOPDIR
-cd BSL-Kit;
+cd CTC-Dependencies;
 
 
 
@@ -143,7 +142,7 @@ fi
 if [ $1 == "rebuild" ]
 then
 
-cd BSL-Kit;
+cd CTC-Dependencies;
 
 
 
@@ -164,10 +163,10 @@ cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF -D BUILD_SHARED_LIBS=ON -D VTK_
 
 make >> make.log 2>&1
 
-export VTK_DIR=${TOPDIR}/BSL-Kit/$VTKBUILDDIR
+export VTK_DIR=${TOPDIR}/CTC-Dependencies/$VTKBUILDDIR
 
 cd $TOPDIR
-cd BSL-Kit;
+cd CTC-Dependencies;
 
 
 ##########################
@@ -181,10 +180,10 @@ cd $ITKBUILDDIR
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../Insight/ >> make.log 2>&1
 make >> make.log 2>&1
 
-export ITK_DIR=${TOPDIR}/BSL-Kit/$ITKBUILDDIR
+export ITK_DIR=${TOPDIR}/CTC-Dependencies/$ITKBUILDDIR
 
 cd $TOPDIR
-cd BSL-Kit;
+cd CTC-Dependencies;
 
 ##########################
 # FLTK Library
@@ -199,39 +198,12 @@ export CXXFLAGS=-fpermissive
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../fltk-1.1/ >> make.log 2>&1
 make >> make.log 2>&1
 
-export FLTK_DIR=${TOPDIR}/BSL-Kit/$FLTKBUILDDIR
+export FLTK_DIR=${TOPDIR}/CTC-Dependencies/$FLTKBUILDDIR
 
 cd $TOPDIR
-cd BSL-Kit;
+cd CTC-Dependencies;
 
 fi
 
 
 
-##############################################################################
-if [ $1 == "update" ]
-then
-
-cd BSL-Kit;
-
-
-##########################
-# VTK Library
-##########################
-echo "Updating VTK from CVS"
-cd VTK
-cvs up
-cd $TOPDIR
-cd BSL-Kit;
-
-##########################
-# Insight Library
-##########################
-echo "Updating Insight from CVS"
-cd Insight
-cvs up
-cd $TOPDIR
-cd BSL-Kit;
-
-
-fi
