@@ -9,10 +9,10 @@ This software is licensed under the BSD license. See Copyright.txt
 for the full license.
 
 Required Libraries:
-- Insight Segmentation and Registration Toolkit Version 2.4 or greater
+- Insight Segmentation and Registration Toolkit Version 3.4 or greater
 
 Directory Descriptions:
-- Documentation contains the Doxygen docs and misc notes
+- Documentation contains the Doxygen docs, the Developer's Guide, and misc notes
 - Code contains the core CTC functionality
 - Testing contains the unit tests for the core
 - Applications contains utilities and processing programs built from CTC core
@@ -20,6 +20,7 @@ Directory Descriptions:
 Contributors:
 - Chris Wyatt, clwyatt@vt.edu
 - Jung Wook Suh, jwsuh@vt.edu
+- Yuan Shen, sheny@vt.edu
 
 Acknowledgements:
 - SliceBySliceFilter is a slightly modified version of that by Gaetan Lehmann 
