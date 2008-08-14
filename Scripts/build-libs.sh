@@ -44,7 +44,7 @@ expect $TMPFILE
 
 echo "Password OK"
 
-cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK checkout -r release-4-4-2 VTK >> cvs.log 2>&1
+cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK checkout -r VTK-5-2 VTK >> cvs.log 2>&1
 cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK logout
 
 echo "Building VisualizationToolkit"
@@ -57,7 +57,7 @@ export CXXFLAGS=-DUSE_NON_CONST
 # -lrt ?
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF -D BUILD_SHARED_LIBS=ON -D VTK_WRAP_TCL=ON -D VTK_USE_TK=ON ../VTK/ >> make.log 2>&1
 
-make >> make.log 2>&1
+make -j 5 >> make.log 2>&1
 
 export VTK_DIR=${TOPDIR}/CTC-Dependencies/$VTKBUILDDIR
 
@@ -92,7 +92,7 @@ ITKBUILDDIR=ITK-`uname -s`-`uname -m`-$CXX
 mkdir $ITKBUILDDIR
 cd $ITKBUILDDIR
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../Insight/ >> make.log 2>&1
-make >> make.log 2>&1
+make -j5 >> make.log 2>&1
 
 export ITK_DIR=${TOPDIR}/CTC-Dependencies/$ITKBUILDDIR
 
@@ -113,7 +113,7 @@ mkdir $FLTKBUILDDIR
 cd $FLTKBUILDDIR
 export CXXFLAGS=-fpermissive
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../fltk-1.1/ >> make.log 2>&1
-make >> make.log 2>&1
+make -j5 >> make.log 2>&1
 
 export FLTK_DIR=${TOPDIR}/CTC-Dependencies/$FLTKBUILDDIR
 
@@ -126,13 +126,13 @@ cd CTC-Dependencies;
 ##########################
 # Write ENV setup scripts
 ##########################
-echo "export VTK_DIR="$VTK_DIR >> bsl-kit-setup.sh
-echo "export ITK_DIR="$ITK_DIR >> bsl-kit-setup.sh
-echo "export FLTK_DIR="$FLTK_DIR >> bsl-kit-setup.sh
+echo "export VTK_DIR="$VTK_DIR >> ctc-dep-setup.sh
+echo "export ITK_DIR="$ITK_DIR >> ctc-dep-setup.sh
+echo "export FLTK_DIR="$FLTK_DIR >> ctc-dep-setup.sh
 
-echo "setenv VTK_DIR " $VTK_DIR >> bsl-kit-setup.csh
-echo "setenv ITK_DIR " $ITK_DIR >> bsl-kit-setup.csh
-echo "setenv FLTK_DIR " $FLTK_DIR >> bsl-kit-setup.csh
+echo "setenv VTK_DIR " $VTK_DIR >> ctc-dep-setup.csh
+echo "setenv ITK_DIR " $ITK_DIR >> ctc-dep-setup.csh
+echo "setenv FLTK_DIR " $FLTK_DIR >> ctc-dep-setup.csh
 
 fi
 
@@ -161,7 +161,7 @@ export CXXFLAGS=-DUSE_NON_CONST
 # -lrt ?
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF -D BUILD_SHARED_LIBS=ON -D VTK_WRAP_TCL=ON -D VTK_USE_TK=ON ../VTK/ >> make.log 2>&1
 
-make >> make.log 2>&1
+make -j5 >> make.log 2>&1
 
 export VTK_DIR=${TOPDIR}/CTC-Dependencies/$VTKBUILDDIR
 
@@ -178,7 +178,7 @@ rm -rf  $ITKBUILDDIR
 mkdir $ITKBUILDDIR
 cd $ITKBUILDDIR
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../Insight/ >> make.log 2>&1
-make >> make.log 2>&1
+make -j5 >> make.log 2>&1
 
 export ITK_DIR=${TOPDIR}/CTC-Dependencies/$ITKBUILDDIR
 
@@ -196,7 +196,7 @@ mkdir $FLTKBUILDDIR
 cd $FLTKBUILDDIR
 export CXXFLAGS=-fpermissive
 cmake -D BUILD_EXAMPLES=OFF -D BUILD_TESTING=OFF ../fltk-1.1/ >> make.log 2>&1
-make >> make.log 2>&1
+make -j5 >> make.log 2>&1
 
 export FLTK_DIR=${TOPDIR}/CTC-Dependencies/$FLTKBUILDDIR
 
