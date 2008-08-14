@@ -98,7 +98,6 @@ int main(int argc, char ** argv)
       // compute and write projection image
       ctc::SegmentProjectionFilter::Pointer pfilter = ctc::SegmentProjectionFilter::New();
       pfilter->SetInput( filter->GetOutput() );
-      pfilter->Update();
 
       ProjectionWriterType::Pointer pwriter = ProjectionWriterType::New();
       string outfilename2 = string(outfilebase()) + "_projection.png";
@@ -195,7 +194,6 @@ int main(int argc, char ** argv)
       // compute and write projection image
       ctc::SegmentProjectionFilter::Pointer pfilter = ctc::SegmentProjectionFilter::New();
       pfilter->SetInput( filter->GetOutput() );
-      pfilter->Update();
       
       ProjectionWriterType::Pointer pwriter = ProjectionWriterType::New();
       string outfilename2 = string(outfilebase()) + "_projection.png";
