@@ -107,7 +107,7 @@ int main(int argc, char ** argv)
   
   // create mesh spatial object
   MeshSourceType::Pointer meshSource = MeshSourceType::New();
-  const ctc::BinaryPixelType objectValue = 255;
+  const ctc::BinaryPixelType objectValue = 1;
   meshSource->SetObjectValue( objectValue );
   
   meshSource->SetInput( filter->GetOutput() );
