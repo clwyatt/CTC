@@ -50,7 +50,7 @@ int main(int argc, char ** argv)
 
   // read in the DICOM series
   ReaderType::Pointer reader = ReaderType::New();
-  reader->SetFileName(infile());
+  reader->SetFileName(infilename);
 
   try
     {
