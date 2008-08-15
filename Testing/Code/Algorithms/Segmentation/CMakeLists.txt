@@ -34,7 +34,7 @@ ${EXECUTABLE_OUTPUT_PATH}/test_ctcSegmentColonWithContrastFilter
 DICOM_short_supine 
 output_ctcSegmentColonWithContrast)
 
-set_tests_properties (test_ctcSegmentColonWithContrastFilter PROPERTIES TIMEOUT 3600)
+set_tests_properties (test_ctcSegmentColonWithContrastFilter PROPERTIES TIMEOUT 5400)
 
 ##########################################################################
 ADD_EXECUTABLE(test_ctcSegmentProjectionFilter test_ctcSegmentProjectionFilter.cxx ) 
