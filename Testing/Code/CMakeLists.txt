@@ -1,2 +1,2 @@
-SUBDIRS(IO Algorithms Filters)
+SUBDIRS(IO Common Algorithms Filters)
 
