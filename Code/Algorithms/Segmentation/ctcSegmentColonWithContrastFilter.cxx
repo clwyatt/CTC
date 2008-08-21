@@ -148,19 +148,20 @@ namespace ctc
       }
     temp->ReleaseData();
 
-    // if number of slices is odd, then last slice was not classified.
+    // if number of (# slices mod 4) > 0, then last slices were not classified.
     // Force the classification to be 2 (skin/fat) to prevent leakage
     // of BG into lung
-    if( size[2] % 2 )
+    if( size[2] % 4 )
       {
 	// FIXME should use slice iterator here  
     	for(int i = 0; i < size[0]; i++)
     	  for(int j = 0; j < size[1]; j++)
+	    for(int k = 4*newsize[2]; k < size[2]; k++)
 	    {
     		BinaryImageType::IndexType index1;
     		index1[0] = i;
     		index1[1] = j;
-    		index1[2] = size[2]-1;
+    		index1[2] = k;
 
     		full->SetPixel(index1, 2);	    
     	      }
