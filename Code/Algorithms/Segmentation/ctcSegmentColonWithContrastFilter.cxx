@@ -19,6 +19,7 @@ Language:  C++
 #include "itkBinaryBallStructuringElement.h"
 
 #include "itkImageFileWriter.h"
+#include "itkImageFileReader.h"
 
 namespace ctc
 {
@@ -32,6 +33,7 @@ namespace ctc
     // set default parameters
     m_DownsampleFactor = 2;
     m_Threshold = -800;
+    m_MaxSegments = 1;
 
   }
   
@@ -72,86 +74,113 @@ namespace ctc
     for(int sliceinc = 0; sliceinc < 4; sliceinc++)
       {
 
-	// iterate through pulling slice pixels
-	std::clog << "Resampling " << sliceinc << " ... ";
-	CTCImageType::ConstPointer input = this->GetInput();
-	for(int i = 0; i < newsize[0]; i++)
-	  for(int j = 0; j < newsize[1]; j++)
-	    for(int k = 0; k < newsize[2]; k++)
-	      {
-		CTCImageType::IndexType index0;
-		index0[0] = i;
-		index0[1] = j;
-		index0[2] = k;
+    	// iterate through pulling slice pixels
+    	std::clog << "Resampling " << sliceinc << " ... ";
+    	CTCImageType::ConstPointer input = this->GetInput();
+    	for(int i = 0; i < newsize[0]; i++)
+    	  for(int j = 0; j < newsize[1]; j++)
+    	    for(int k = 0; k < newsize[2]; k++)
+    	      {
+    		CTCImageType::IndexType index0;
+    		index0[0] = i;
+    		index0[1] = j;
+    		index0[2] = k;
 
-		CTCImageType::IndexType index1;
-		index1[0] = i;
-		index1[1] = j;
-		index1[2] = 4*k + sliceinc;
+    		CTCImageType::IndexType index1;
+    		index1[0] = i;
+    		index1[1] = j;
+    		index1[2] = 4*k + sliceinc;
 
-		temp->SetPixel(index0, input->GetPixel(index1));	    
-	      }
-	std::clog << "Done." << std::endl; 
+    		temp->SetPixel(index0, input->GetPixel(index1));	    
+    	      }
+    	std::clog << "Done." << std::endl; 
 
-	std::clog << "Filtering " << sliceinc << " ... ";
-	typedef itk::CastImageFilter< CTCImageType, itk::Image<double,3> >
-	  ToDoubleType;
-	ToDoubleType::Pointer tod = ToDoubleType::New();
-	tod->SetInput(temp);
-	SmootherType::Pointer smooth = SmootherType::New();
-	smooth->SetInput(tod->GetOutput());
-	smooth->SetTimeStep(0.0625);
-	smooth->SetNumberOfIterations(10);
-	smooth->SetStencilRadius(1);
-	smooth->Update();
-	std::clog << "Done." << std::endl;
+    	std::clog << "Filtering " << sliceinc << " ... ";
+    	typedef itk::CastImageFilter< CTCImageType, itk::Image<double,3> >
+    	  ToDoubleType;
+    	ToDoubleType::Pointer tod = ToDoubleType::New();
+    	tod->SetInput(temp);
+    	SmootherType::Pointer smooth = SmootherType::New();
+    	smooth->SetInput(tod->GetOutput());
+    	smooth->SetTimeStep(0.0625);
+    	smooth->SetNumberOfIterations(10);
+    	smooth->SetStencilRadius(1);
+    	smooth->Update();
+    	std::clog << "Done." << std::endl;
 
-	// segment the image using k-means
-	std::clog << "Clustering " << sliceinc << " ... ";
-	KMeansFilterType::Pointer kmeans = KMeansFilterType::New();
-	kmeans->SetInput(smooth->GetOutput());
-	kmeans->AddClassWithInitialMean(-3000);
-	kmeans->AddClassWithInitialMean(-1000);
-	kmeans->AddClassWithInitialMean(-100);
-	kmeans->AddClassWithInitialMean(30);
-	kmeans->AddClassWithInitialMean(400);
-	kmeans->AddClassWithInitialMean(600);
-	kmeans->Update(); 
-	std::clog << "Done." << std::endl;
+    	// segment the image using k-means
+    	std::clog << "Clustering " << sliceinc << " ... ";
+    	KMeansFilterType::Pointer kmeans = KMeansFilterType::New();
+    	kmeans->SetInput(smooth->GetOutput());
+    	kmeans->AddClassWithInitialMean(-3000);
+    	kmeans->AddClassWithInitialMean(-1000);
+    	kmeans->AddClassWithInitialMean(-100);
+    	kmeans->AddClassWithInitialMean(30);
+    	kmeans->AddClassWithInitialMean(400);
+    	kmeans->AddClassWithInitialMean(600);
+    	kmeans->Update(); 
+    	std::clog << "Done." << std::endl;
 
-	smooth->GetOutput()->ReleaseData();
+    	smooth->GetOutput()->ReleaseData();
 
-	//reassemble image
-	std::clog << "Reassembling " << sliceinc << " ... ";
-	for(int i = 0; i < newsize[0]; i++)
-	  for(int j = 0; j < newsize[1]; j++)
-	    for(int k = 0; k < newsize[2]; k++)
-	      {
-		BinaryImageType::IndexType index0;
-		index0[0] = i;
-		index0[1] = j;
-		index0[2] = k;
+    	//reassemble image
+    	std::clog << "Reassembling " << sliceinc << " ... ";
+    	for(int i = 0; i < newsize[0]; i++)
+    	  for(int j = 0; j < newsize[1]; j++)
+    	    for(int k = 0; k < newsize[2]; k++)
+    	      {
+    		BinaryImageType::IndexType index0;
+    		index0[0] = i;
+    		index0[1] = j;
+    		index0[2] = k;
 
-		BinaryImageType::IndexType index1;
-		index1[0] = i;
-		index1[1] = j;
-		index1[2] = 4*k + sliceinc;
+    		BinaryImageType::IndexType index1;
+    		index1[0] = i;
+    		index1[1] = j;
+    		index1[2] = 4*k + sliceinc;
 
-		full->SetPixel(index1, kmeans->GetOutput()->GetPixel(index0));	    
-	      }
+    		full->SetPixel(index1, kmeans->GetOutput()->GetPixel(index0));	    
+    	      }
 
-	kmeans->GetOutput()->ReleaseData();
+    	kmeans->GetOutput()->ReleaseData();
 
-	std::clog << "Done." << std::endl;
+    	std::clog << "Done." << std::endl;
       }
     temp->ReleaseData();
 
+    // if number of slices is odd, then last slice was not classified.
+    // Force the classification to be 2 (skin/fat) to prevent leakage
+    // of BG into lung
+    if( size[2] % 2 )
+      {
+	// FIXME should use slice iterator here  
+    	for(int i = 0; i < size[0]; i++)
+    	  for(int j = 0; j < size[1]; j++)
+	    {
+    		BinaryImageType::IndexType index1;
+    		index1[0] = i;
+    		index1[1] = j;
+    		index1[2] = size[2]-1;
+
+    		full->SetPixel(index1, 2);	    
+    	      }
+      } 
+
+
     // write out binary image
-    typedef itk::ImageFileWriter<BinaryImageType> WriterType;
-    WriterType::Pointer writer = WriterType::New();
-    writer->SetFileName("full.vtk"); 
-    writer->SetInput( full );
-    writer->Update(); 
+    // typedef itk::ImageFileWriter<BinaryImageType> WriterType;
+    // WriterType::Pointer writer = WriterType::New();
+    // writer->SetFileName("full.vtk"); 
+    // writer->SetInput( full );
+    // writer->Update(); 
+
+
+    // typedef itk::ImageFileReader<BinaryImageType> ReaderType;
+    // ReaderType::Pointer reader = ReaderType::New();
+    // reader->SetFileName("full.vtk"); 
+    // reader->Update(); 
+    // full = reader->GetOutput();
+
 
     // grow background region starting in the 8 corners
     std::clog << "Masking BG ... ";
@@ -203,6 +232,7 @@ namespace ctc
 	  full, 
 	  fullregion);
      BGIteratorType 
+
       it2(m_BGRegionGrowFilter->GetOutput(), 
 	  m_BGRegionGrowFilter->GetOutput()->GetRequestedRegion());
      InputIteratorType 
@@ -241,6 +271,11 @@ namespace ctc
       }
     std::clog << " Done." << std::endl;
 
+    // typedef itk::ImageFileWriter<BinaryImageType> WriterType;
+    // WriterType::Pointer writer = WriterType::New();
+    // writer->SetFileName("mask.vtk"); 
+    // writer->SetInput( m_BGRegionGrowFilter->GetOutput() );
+    // writer->Update(); 
 
 //     std::clog << "---- full -----" << std::endl << std::endl;
 //     std::clog << full << std::endl << std::endl;
@@ -308,6 +343,7 @@ namespace ctc
 
 
     // extract connected largest region, should be the colon
+    unsigned int numPasses = 0;
     bool lumenComplete = false;
     while( !lumenComplete )
       {
@@ -357,16 +393,34 @@ namespace ctc
 	seed[2] = 2*maxi[2];
 
 	std::clog << "Growing at seed " << seed << " value = " 
-		  << static_cast<float>(m_BGRegionGrowFilter->GetOutput()->GetPixel(seed));
+		  << static_cast<float>(m_BGRegionGrowFilter->GetOutput()->GetPixel(seed))
+		  << std::endl;
 
 	BinaryFloodIteratorType bfit(m_BGRegionGrowFilter->GetOutput(),
 				     bfunction,
 				     seed);
+
+	// check that at least some air voxels are present
+	// if so, reset label to colon segment, else just
+	// flood fill the distance map
+	unsigned int numAirVoxels = 0;
+	CTCImageType::ConstPointer input = this->GetInput();
 	bfit.GoToBegin();
 	while(!bfit.IsAtEnd())
 	  {
-	    bfit.Set(128);
+	    if( input->GetPixel( bfit.GetIndex() ) < m_Threshold )
+	      numAirVoxels += 1;
 	    ++bfit;
+	  }
+	std::clog << numAirVoxels << " in segment." << std::endl;
+	if(numAirVoxels > 100) //FIXME to const or parameter!
+	  {
+	    bfit.GoToBegin();
+	    while(!bfit.IsAtEnd())
+	      {
+		bfit.Set(128);
+		++bfit;
+	      }
 	  }
 
 	DistanceFloodIteratorType dfit(m_DistanceFilter->GetOutput(),
@@ -379,11 +433,14 @@ namespace ctc
 	    ++dfit;
 	  }
 
+	numPasses += 1;
 	std::clog << " Done." << std::endl;
     
 	// method to determine if the lumen segmentation is complete
 	// this is simplest possible
-	lumenComplete = static_cast<bool>(maxd < 5); 
+	lumenComplete = 
+	  static_cast<bool>(maxd < 5) || 
+	  static_cast<bool>(numPasses >= m_MaxSegments); 
 
 
       } // lumen complete

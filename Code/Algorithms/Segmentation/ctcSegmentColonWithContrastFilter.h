@@ -49,6 +49,10 @@ class ITK_EXPORT SegmentColonWithContrastFilter :
   itkGetMacro(Threshold, CTCPixelType);
   itkSetMacro(Threshold, CTCPixelType);
 
+  // ITK shortcuts to get/set m_MaxSegments
+  itkGetMacro(MaxSegments, unsigned int);
+  itkSetMacro(MaxSegments, unsigned int);
+
 protected:
 
   SegmentColonWithContrastFilter();
@@ -84,7 +88,7 @@ private:
 
   long int          m_DownsampleFactor;
   CTCPixelType      m_Threshold;
-
+  unsigned int      m_MaxSegments;
 };
 
 } // end namespace ctc

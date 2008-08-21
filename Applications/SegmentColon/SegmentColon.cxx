@@ -41,7 +41,7 @@ int main(int argc, char ** argv)
   vul_arg<char const*> infile(0, "Dicom directory");
   vul_arg<char const*> outfilebase(0, "Output base for filenames (no extension)");
   vul_arg<bool> segcontrast("-s", "Segment Contrast", false);
-  vul_arg<int> maxiter("-i", "Maximum number of iterations (ignored if -s)", 5);
+  vul_arg<int> maxiter("-i", "Maximum number of iterations (segments)", 1);
   vul_arg<int> mindist("-d", "Minimum distance considered (ignored if -s)", 10);
   vul_arg<int> thresh("-t", "Air/Tissue threshold (ignored if -s)", -800);
   vul_arg<bool> analyze("-a", "Write binary output as analyze 7.5 rather than vtk (the default)", false);
@@ -164,7 +164,10 @@ int main(int argc, char ** argv)
   else
     {
       // segment air + constrast
-      ctc::SegmentColonWithContrastFilter::Pointer filter = ctc::SegmentColonWithContrastFilter::New();
+      ctc::SegmentColonWithContrastFilter::Pointer filter = 
+	ctc::SegmentColonWithContrastFilter::New();
+
+      filter->SetMaxSegments(maxiter());
       filter->SetInput( reader->GetOutput() );
   
       // write out binary image
