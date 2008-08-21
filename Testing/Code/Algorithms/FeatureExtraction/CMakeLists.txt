@@ -30,9 +30,9 @@ ITKIO)
 ADD_TEST(test_ctcPrincipleCurvatureExtraction 
          ${EXECUTABLE_OUTPUT_PATH}/test_ctcPrincipleCurvatureExtraction
          DICOM_short_supine 
-         output_ctcPrincipleCurvatureExtraction.vtk)
-
-
+         supine.vtk
+         output_ctcPrincipleCurvatureExtraction.txt)
+set_tests_properties(test_ctcPrincipleCurvatureExtraction PROPERTIES TIMEOUT 3600)
 
 ADD_EXECUTABLE(test_ctcMAT4Converter test_ctcMAT4Converter.cxx)             
 

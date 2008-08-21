@@ -22,6 +22,7 @@ using std::string;
 #include "ctcConfigure.h"
 #include "vul_arg.h"
 #include "ctcCTCImage.h"
+#include "ctcCTCImageReader.h"
 #include "itkImageFileReader.h"
 #include "ctcSegmentColonFilter.h"
 #include "ctcPrincipleCurvatureExtraction.h"
@@ -54,11 +55,9 @@ int main( int argc, char* argv[] )
   seginfilename.append("/");
   seginfilename.append(seginfile());
 
-
-  // read data
-  typedef itk::ImageFileReader< ctc::CTCImageType > RawDataReaderType;
-  RawDataReaderType::Pointer rawreader = RawDataReaderType::New();
-  rawreader->SetFileName(rawinfilename);
+  // read CT data
+  ctc::CTCImageReader::Pointer rawreader = ctc::CTCImageReader::New();  
+  rawreader->SetDirectory(rawinfilename);
 
   // read segmented data
   typedef itk::ImageFileReader< ctc::BinaryImageType > SegDataReaderType;
