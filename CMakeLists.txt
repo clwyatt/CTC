@@ -1,9 +1,5 @@
 # This is the root CTC CMakeLists file.
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 OLD)
-endif(COMMAND cmake_policy)
-
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(CTC)
 
 # VTITK version number
