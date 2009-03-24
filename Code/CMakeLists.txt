@@ -1,2 +1,2 @@
-SUBDIRS(Common IO Algorithms)
+SUBDIRS(Common IO Algorithms SlicerModules)
 

@@ -30,6 +30,14 @@ IF(FLTK_FOUND)
    INCLUDE_DIRECTORIES(${FLTK_INCLUDE_DIR})
 ENDIF(FLTK_FOUND)
 
+# Slicer3, optional, if found modules will be built
+FIND_PACKAGE(Slicer3 QUIET)
+IF(Slicer3_FOUND)
+   MESSAGE(STATUS "Slicer3 found. Modules enabled.")
+   INCLUDE(${Slicer3_USE_FILE})
+   slicer3_set_default_install_prefix_for_external_projects()
+ENDIF(Slicer3_FOUND)
+
 # Output directories.
 SET (LIBRARY_OUTPUT_PATH ${CTC_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${CTC_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all executables.")

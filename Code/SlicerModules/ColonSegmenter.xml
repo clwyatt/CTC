@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>
+    CTC</category>
+  <title>
+    Colon Segmenter</title>
+  <description>
+    Segment colon from CTC images.
+  </description>
+  <version>
+    1.0
+  </version>
+  <documentation-url>www.openctc.org</documentation-url>
+  <license>BSD</license>
+  <contributor>
+    Chris Wyatt
+  </contributor>
+  <acknowledgements>
+    This work funded in part by NIH/NCI grant number 1R01CA114492-01A2.
+  </acknowledgements>
+ <parameters>
+    <label>Input/Output</label>
+    <description>Input/output parameters</description>
+    <image>
+      <name>inputVolume</name>
+      <label>Input Volume</label>
+      <channel>input</channel>
+      <index>0</index>
+      <default>None</default>
+      <description>Image Volume to Segment</description>
+    </image>
+    <image>
+      <name>outputVolume</name>
+      <label>Output Volume</label>
+      <channel>output</channel>
+      <index>1</index>
+      <default>None</default>
+      <description>Segmentation Output</description>
+    </image>
+ </parameters>
+ <parameters>
+   <label>Segmentation Parameters</label>
+   <description>Parameters of the Segmentation Algorithm </description>
+   <boolean>
+     <name>segmentContrast</name>
+     <longflag>--contrast</longflag>
+     <description>Segment Contrast Enhanced Material.</description>
+     <label>Segment Contrast</label>
+   </boolean>
+   <integer>
+     <name>maxIterations</name>
+     <longflag>--maxiter</longflag>
+     <description>Maximum number of iterations (segments).</description>
+     <label>Maximum Segments</label>
+     <default>1</default>
+   </integer>
+   <float>
+     <name>threshold</name>
+     <longflag>--thresh</longflag>
+     <description>"Air/Tissue threshold.</description>
+     <label>Air Threshold</label>
+     <default>-800</default>
+   </float>
+   <integer>
+     <name>minDistance</name>
+     <longflag>--mindist</longflag>
+     <description>Minimum distance considered</description>
+     <label>Minimum Seed Radius</label>
+     <default>10</default>
+   </integer>
+ </parameters>
+</executable>
